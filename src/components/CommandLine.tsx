@@ -37,26 +37,31 @@ export default function CommandLine() {
     }
   };
 
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault(); // Prevent default form submission
+    console.log(`Input via form submit: ${input}`);
+    handleCommand(input);
+    setInput("");
+  };
+
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     console.log(`Key pressed: ${e.key}`);
-    if (e.key === "Enter") {
-      console.log(`Input: ${input}`);
-      handleCommand(input);
-      setInput("");
-    }
+    // Removed Enter key specific logic as it's handled by form onSubmit
   };
 
   return (
-    <div className="command-line">
-      <span className="command-prompt">CMD&gt;</span>
-      <input
-        type="text"
-        className="command-input"
-        placeholder="ENTER COMMAND"
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-        onKeyDown={handleKeyDown}
-      />
-    </div>
+    <form onSubmit={handleSubmit} className="command-line-form">
+      <div className="command-line">
+        <span className="command-prompt">CMD&gt;</span>
+        <input
+          type="text"
+          className="command-input"
+          placeholder="ENTER COMMAND"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={handleKeyDown}
+        />
+      </div>
+    </form>
   );
 }

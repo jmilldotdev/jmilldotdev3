@@ -44,8 +44,12 @@ export default function Header() {
           <div className="logo">JMILL</div>
         </Link>
       </div>
-      <div className="status">SYSTEM STATUS: NORMAL</div>
-      <div className="time">T-MINUS {time}</div>
+      <div className="flex-1 flex justify-center">
+        <div className="status">SYSTEM STATUS: NORMAL</div>
+      </div>
+      <div className="hidden lg:block">
+        <div className="time">T-MINUS {time}</div>
+      </div>
     </header>
   );
 }
