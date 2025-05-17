@@ -55,8 +55,19 @@ function copyPublishedFiles(dir: string, baseDir: string) {
           ""
         );
 
-        // Use only the destination directory and file name for the destination path
-        const destPath = path.join(destDir, destFileName);
+        // Remove the .md extension before slugifying
+        const baseFileName = path.basename(destFileName, ".md");
+
+        // Slugify the base file name
+        const slugifiedFileName = baseFileName
+          .toLowerCase()
+          .replace(/\s+/g, "-") // Replace spaces with hyphens
+          .replace(/[^a-z0-9-]/g, ""); // Remove non-alphanumeric characters except hyphens
+
+        // Append the .md extension back to the slugified file name
+        const finalFileName = `${slugifiedFileName}.mdx`;
+
+        const destPath = path.join(destDir, finalFileName);
 
         // Remove H1 level headings (lines starting with a single #)
         let modifiedContent = content

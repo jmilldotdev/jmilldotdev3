@@ -153,6 +153,16 @@ main {
   width: 100%;
   height: 100%;
   position: relative;
+  z-index: 1;
+}
+
+#sphere-container canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100% !important;
+  height: 100% !important;
+  z-index: 2;
 }
 
 /* Target cross overlay */
@@ -359,5 +369,117 @@ footer {
   .animate-scroll {
     animation: scroll 20s linear infinite;
   }
+}
+
+/* Blog post styles */
+.post-content {
+  color: #eef2ff;
+  background-color: rgba(10, 10, 20, 0.8);
+  border: 1px solid #333;
+  border-left: 3px solid var(--color-primary);
+  font-family: 'Courier New', monospace;
+  line-height: 1.6;
+  letter-spacing: 0.3px;
+  box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+  overflow-y: auto;
+}
+
+.post-content h1, 
+.post-content h2, 
+.post-content h3, 
+.post-content h4 {
+  color: var(--color-primary);
+  margin-top: 1.5em;
+  margin-bottom: 0.75em;
+  font-weight: bold;
+  position: relative;
+}
+
+.post-content h1 {
+  font-size: 1.8rem;
+  border-bottom: 1px solid rgba(255, 72, 0, 0.3);
+  padding-bottom: 0.3em;
+}
+
+.post-content h2 {
+  font-size: 1.5rem;
+}
+
+.post-content h3 {
+  font-size: 1.2rem;
+}
+
+.post-content p {
+  margin-bottom: 1.2em;
+}
+
+.post-content a {
+  color: var(--color-secondary);
+  text-decoration: none;
+  border-bottom: 1px dotted var(--color-secondary);
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.post-content a:hover {
+  color: #fff;
+  border-color: #fff;
+}
+
+.post-content ul, 
+.post-content ol {
+  margin-left: 1.5em;
+  margin-bottom: 1.2em;
+}
+
+.post-content li {
+  margin-bottom: 0.5em;
+}
+
+.post-content code {
+  background-color: rgba(0, 0, 0, 0.3);
+  padding: 0.2em 0.4em;
+  border-radius: 3px;
+  font-size: 0.9em;
+}
+
+.post-content pre {
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 1em;
+  border-radius: 5px;
+  overflow-x: auto;
+  margin-bottom: 1.2em;
+  border-left: 2px solid var(--color-secondary);
+}
+
+.post-content blockquote {
+  border-left: 3px solid var(--color-secondary);
+  padding-left: 1em;
+  margin-left: 0;
+  font-style: italic;
+  color: #ccc;
+}
+
+.post-content img {
+  max-width: 100%;
+  border: 1px solid #333;
+  margin: 1em 0;
+}
+
+.post-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1.2em;
+}
+
+.post-content th,
+.post-content td {
+  border: 1px solid #333;
+  padding: 0.5em;
+  text-align: left;
+}
+
+.post-content th {
+  background-color: rgba(0, 0, 0, 0.5);
+  color: var(--color-primary);
 }
 

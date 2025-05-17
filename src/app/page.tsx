@@ -11,7 +11,13 @@ export default function Home() {
   const sphereGroupRef = useRef<THREE.Group | null>(null);
 
   useEffect(() => {
-    if (!containerRef.current) return;
+    // Check if container exists
+    if (!containerRef.current) {
+      console.error("Container ref is null");
+      return;
+    }
+
+    console.log("Initializing THREE.js scene");
 
     // Initialize 3D scene
     const scene = new THREE.Scene();
@@ -26,12 +32,24 @@ export default function Home() {
     camera.position.z = 5;
     cameraRef.current = camera;
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setSize(
-      containerRef.current.clientWidth,
-      containerRef.current.clientHeight
-    );
+    // Create renderer with explicit size
+    const width = containerRef.current.clientWidth || window.innerWidth;
+    const height = containerRef.current.clientHeight || window.innerHeight;
+    console.log("Container dimensions:", width, height);
+
+    const renderer = new THREE.WebGLRenderer({
+      antialias: true,
+      alpha: true,
+      canvas: document.createElement("canvas"),
+    });
+    renderer.setSize(width, height);
     renderer.setClearColor(0x000000, 0);
+
+    // Ensure any existing canvas is removed first
+    while (containerRef.current.firstChild) {
+      containerRef.current.removeChild(containerRef.current.firstChild);
+    }
+
     containerRef.current.appendChild(renderer.domElement);
     rendererRef.current = renderer;
 
@@ -106,8 +124,8 @@ export default function Home() {
       if (!containerRef.current || !cameraRef.current || !rendererRef.current)
         return;
 
-      const newWidth = containerRef.current.clientWidth;
-      const newHeight = containerRef.current.clientHeight;
+      const newWidth = containerRef.current.clientWidth || window.innerWidth;
+      const newHeight = containerRef.current.clientHeight || window.innerHeight;
 
       cameraRef.current.aspect = newWidth / newHeight;
       cameraRef.current.updateProjectionMatrix();
@@ -117,10 +135,12 @@ export default function Home() {
     window.addEventListener("resize", handleResize);
 
     // Start animation
+    console.log("Starting animation");
     animate();
 
     // Cleanup
     return () => {
+      console.log("Cleaning up THREE.js scene");
       window.removeEventListener("resize", handleResize);
       if (containerRef.current && rendererRef.current) {
         containerRef.current.removeChild(rendererRef.current.domElement);
@@ -130,36 +150,26 @@ export default function Home() {
   }, []);
 
   return (
-    <div id="app">
-      <header className="overflow-hidden whitespace-nowrap overflow-ellipsis">
-        <div className="logo">JMILL</div>
-        <div className="status">SYSTEM STATUS: NORMAL</div>
-        <div className="time">T-MINUS 24:15:37</div>
-      </header>
-
-      <main>
-        <div id="sphere-container" ref={containerRef}>
-          <div className="target-overlay">
-            <div className="target-circle">
-              <div className="target-ring"></div>
-              <div className="target-ring"></div>
-              <div className="target-ring"></div>
-            </div>
+    <main>
+      <div
+        id="sphere-container"
+        ref={containerRef}
+        style={{
+          position: "relative",
+          width: "100%",
+          height: "80vh",
+          zIndex: 1,
+        }}
+        className="flex items-center justify-center"
+      >
+        <div className="target-overlay">
+          <div className="target-circle">
+            <div className="target-ring"></div>
+            <div className="target-ring"></div>
+            <div className="target-ring"></div>
           </div>
         </div>
-      </main>
-
-      <footer>
-        <div className="command-line">
-          <span className="command-prompt">CMD&gt;</span>
-          <input
-            type="text"
-            className="command-input"
-            placeholder="ENTER COMMAND"
-            defaultValue="ANALYZE SPHERE COMPOSITION"
-          />
-        </div>
-      </footer>
-    </div>
+      </div>
+    </main>
   );
 }
