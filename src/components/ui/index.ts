@@ -6,4 +6,3 @@ export { default as HexagonGrid } from "./HexagonGrid";
 export { default as DataGrid } from "./DataGrid";
 export { default as DataSection } from "./DataSection";
 export { default as Terminal } from "./Terminal";
-export { default as CommandLine } from "./CommandLine";
