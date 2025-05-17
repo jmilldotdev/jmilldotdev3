@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { serialize } from "next-mdx-remote/serialize";
+import matter from "gray-matter";
 import PostClient from "@/components/PostClient";
 
 interface PostProps {
@@ -10,9 +11,11 @@ interface PostProps {
 export default async function Post({ params }: PostProps) {
   const filePath = path.join(process.cwd(), "content", `${params.slug}.mdx`);
   const source = fs.readFileSync(filePath, "utf8");
-  const mdxSource = await serialize(source);
 
-  return <PostClient source={mdxSource} />;
+  const { content, data } = matter(source);
+  const mdxSource = await serialize(content);
+
+  return <PostClient source={mdxSource} frontmatter={data} />;
 }
 
 export async function generateStaticParams() {

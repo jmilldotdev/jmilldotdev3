@@ -373,13 +373,10 @@ footer {
 /* Blog post styles */
 .post-content {
   color: #eef2ff;
-  background-color: rgba(10, 10, 20, 0.8);
-  border: 1px solid #333;
-  border-left: 3px solid var(--color-primary);
-  font-family: 'Courier New', monospace;
-  line-height: 1.6;
+  background-color: transparent;
+  line-height: 1.8;
   letter-spacing: 0.3px;
-  box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+  font-family: 'Courier New', monospace;
   overflow-y: auto;
 }
 
@@ -395,21 +392,22 @@ footer {
 }
 
 .post-content h1 {
-  font-size: 1.8rem;
+  font-size: 2.2rem;
   border-bottom: 1px solid rgba(255, 72, 0, 0.3);
   padding-bottom: 0.3em;
 }
 
 .post-content h2 {
-  font-size: 1.5rem;
+  font-size: 1.8rem;
 }
 
 .post-content h3 {
-  font-size: 1.2rem;
+  font-size: 1.4rem;
 }
 
 .post-content p {
-  margin-bottom: 1.2em;
+  margin-bottom: 1.5em;
+  font-size: 1.1rem;
 }
 
 .post-content a {
@@ -427,11 +425,12 @@ footer {
 .post-content ul, 
 .post-content ol {
   margin-left: 1.5em;
-  margin-bottom: 1.2em;
+  margin-bottom: 1.5em;
+  font-size: 1.1rem;
 }
 
 .post-content li {
-  margin-bottom: 0.5em;
+  margin-bottom: 0.75em;
 }
 
 .post-content code {
@@ -443,37 +442,38 @@ footer {
 
 .post-content pre {
   background-color: rgba(0, 0, 0, 0.5);
-  padding: 1em;
+  padding: 1.5em;
   border-radius: 5px;
   overflow-x: auto;
-  margin-bottom: 1.2em;
+  margin-bottom: 1.5em;
   border-left: 2px solid var(--color-secondary);
 }
 
 .post-content blockquote {
   border-left: 3px solid var(--color-secondary);
-  padding-left: 1em;
-  margin-left: 0;
+  padding: 0.5em 0 0.5em 1.5em;
+  margin: 1.5em 0;
   font-style: italic;
   color: #ccc;
+  background-color: rgba(0, 0, 0, 0.2);
 }
 
 .post-content img {
   max-width: 100%;
   border: 1px solid #333;
-  margin: 1em 0;
+  margin: 1.5em 0;
 }
 
 .post-content table {
   width: 100%;
   border-collapse: collapse;
-  margin-bottom: 1.2em;
+  margin-bottom: 1.5em;
 }
 
 .post-content th,
 .post-content td {
   border: 1px solid #333;
-  padding: 0.5em;
+  padding: 0.75em;
   text-align: left;
 }
 

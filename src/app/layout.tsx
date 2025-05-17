@@ -24,8 +24,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             <div className="status">SYSTEM STATUS: NORMAL</div>
             <div className="time">T-MINUS 24:15:37</div>
           </header>
-          <main className="flex-grow relative border border-gray-700 bg-opacity-70 bg-gray-900">
-            {children}
+          <main className="flex-grow relative border border-gray-700 bg-opacity-70 bg-gray-900 overflow-y-auto">
+            <div className="w-full h-full">{children}</div>
           </main>
           <footer className="bg-gray-800 text-white p-4 border border-gray-700">
             <div className="command-line">
