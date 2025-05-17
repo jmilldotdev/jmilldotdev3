@@ -6,7 +6,12 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "generate:index": "tsx ./src/scripts/generate-index",
+    "generate:og": "tsx ./src/scripts/generate-opengraph-images",
+    "generate:content": "tsx ./src/scripts/generate-content",
+    "generate:rss": "tsx ./src/scripts/generate-rss",
+    "generate:sitemap": "tsx ./src/scripts/generate-sitemap"
   },
   "dependencies": {
     "next": "15.3.2",
@@ -22,9 +27,12 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/three": "^0.176.0",
+    "chalk": "^5.4.1",
+    "dotenv": "^16.5.0",
     "eslint": "^9",
     "eslint-config-next": "15.3.2",
     "tailwindcss": "^4",
+    "tsx": "^4.19.4",
     "typescript": "^5"
   }
 }

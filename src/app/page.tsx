@@ -151,7 +151,7 @@ export default function Home() {
 
       <footer>
         <div className="command-line">
-          <span className="command-prompt">JMILL&gt;</span>
+          <span className="command-prompt">CMD&gt;</span>
           <input
             type="text"
             className="command-input"
