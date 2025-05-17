@@ -48,19 +48,15 @@ function copyPublishedFiles(dir: string, baseDir: string) {
         content.includes("publish: true")
       ) {
         // Calculate the relative path from the base directory
-        const relativePath = path.relative(baseDir, fullPath);
+        // const relativePath = path.relative(baseDir, fullPath);
         // Remove emoji and space from the start of the filename
         const destFileName = file.replace(
           /^(\p{Emoji_Presentation}|\p{Emoji}\uFE0F|\s)+/gu,
           ""
         );
 
-        // Use the relative path for the destination path
-        const destPath = path.join(
-          destDir,
-          path.dirname(relativePath),
-          destFileName
-        );
+        // Use only the destination directory and file name for the destination path
+        const destPath = path.join(destDir, destFileName);
 
         // Remove H1 level headings (lines starting with a single #)
         let modifiedContent = content
