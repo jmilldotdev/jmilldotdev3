@@ -11,6 +11,7 @@ export const SphereAnimation: React.FC<SphereAnimationProps> = ({
   className = "",
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
+  const canvasContainerRef = useRef<HTMLDivElement>(null);
   const sceneRef = useRef<THREE.Scene | null>(null);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
@@ -18,8 +19,8 @@ export const SphereAnimation: React.FC<SphereAnimationProps> = ({
 
   useEffect(() => {
     // Check if container exists
-    if (!containerRef.current) {
-      console.error("Container ref is null");
+    if (!canvasContainerRef.current) {
+      console.error("Canvas container ref is null");
       return;
     }
 
@@ -31,7 +32,8 @@ export const SphereAnimation: React.FC<SphereAnimationProps> = ({
 
     const camera = new THREE.PerspectiveCamera(
       75,
-      containerRef.current.clientWidth / containerRef.current.clientHeight,
+      (containerRef.current?.clientWidth || window.innerWidth) /
+        (containerRef.current?.clientHeight || window.innerHeight),
       0.1,
       1000
     );
@@ -39,32 +41,41 @@ export const SphereAnimation: React.FC<SphereAnimationProps> = ({
     cameraRef.current = camera;
 
     // Create renderer with explicit size
-    const width = containerRef.current.clientWidth || window.innerWidth;
-    const height = containerRef.current.clientHeight || window.innerHeight;
+    const width = containerRef.current?.clientWidth || window.innerWidth;
+    const height = containerRef.current?.clientHeight || window.innerHeight;
     console.log("Container dimensions:", width, height);
 
     const renderer = new THREE.WebGLRenderer({
       antialias: true,
       alpha: true,
-      canvas: document.createElement("canvas"),
     });
     renderer.setSize(width, height);
     renderer.setClearColor(0x000000, 0);
 
+    // Set explicit styles to ensure correct rendering
+    renderer.domElement.style.position = "absolute";
+    renderer.domElement.style.top = "0";
+    renderer.domElement.style.left = "0";
+    renderer.domElement.style.width = "100%";
+    renderer.domElement.style.height = "100%";
+    renderer.domElement.style.zIndex = "1";
+
     // Ensure any existing canvas is removed first
-    while (containerRef.current.firstChild) {
-      containerRef.current.removeChild(containerRef.current.firstChild);
+    while (canvasContainerRef.current.firstChild) {
+      canvasContainerRef.current.removeChild(
+        canvasContainerRef.current.firstChild
+      );
     }
 
-    containerRef.current.appendChild(renderer.domElement);
+    canvasContainerRef.current.appendChild(renderer.domElement);
     rendererRef.current = renderer;
 
     // Add ambient light
-    const ambientLight = new THREE.AmbientLight(0x222222);
+    const ambientLight = new THREE.AmbientLight(0x333333);
     scene.add(ambientLight);
 
     // Add directional light
-    const directionalLight = new THREE.DirectionalLight(0xff4800, 0.8);
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
     directionalLight.position.set(1, 1, 1);
     scene.add(directionalLight);
 
@@ -125,6 +136,10 @@ export const SphereAnimation: React.FC<SphereAnimationProps> = ({
       renderer.render(scene, camera);
     }
 
+    // Initial render to make sure something shows up
+    console.log("Initial render");
+    renderer.render(scene, camera);
+
     // Handle window resize
     const handleResize = () => {
       if (!containerRef.current || !cameraRef.current || !rendererRef.current)
@@ -148,8 +163,8 @@ export const SphereAnimation: React.FC<SphereAnimationProps> = ({
     return () => {
       console.log("Cleaning up THREE.js scene");
       window.removeEventListener("resize", handleResize);
-      if (containerRef.current && rendererRef.current) {
-        containerRef.current.removeChild(rendererRef.current.domElement);
+      if (canvasContainerRef.current && rendererRef.current) {
+        canvasContainerRef.current.removeChild(rendererRef.current.domElement);
       }
       scene.clear();
     };
@@ -159,9 +174,13 @@ export const SphereAnimation: React.FC<SphereAnimationProps> = ({
     <div
       id="sphere-container"
       ref={containerRef}
-      className={`relative w-full h-full z-10 flex items-center justify-center ${className}`}
+      className={`relative w-full h-full flex items-center justify-center ${className}`}
     >
-      <div className="target-overlay">
+      {/* Canvas container with lower z-index */}
+      <div ref={canvasContainerRef} className="absolute inset-0 z-[1]" />
+
+      {/* Target overlay with higher z-index */}
+      <div className="absolute inset-0 z-[50] pointer-events-none flex items-center justify-center">
         <div className="target-circle">
           <div className="target-ring"></div>
           <div className="target-ring"></div>
