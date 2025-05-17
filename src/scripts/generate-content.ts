@@ -32,7 +32,11 @@ function copyAttachment(
   return modifiedContent;
 }
 
-function copyPublishedFiles(dir: string, baseDir: string) {
+function copyPublishedFiles(
+  dir: string,
+  baseDir: string,
+  generatedPages: string[] = []
+) {
   const files = fs.readdirSync(dir);
 
   for (const file of files) {
@@ -40,7 +44,7 @@ function copyPublishedFiles(dir: string, baseDir: string) {
     const stat = fs.statSync(fullPath);
 
     if (stat.isDirectory()) {
-      copyPublishedFiles(fullPath, baseDir);
+      copyPublishedFiles(fullPath, baseDir, generatedPages);
     } else if (path.extname(file) === ".md") {
       const content = fs.readFileSync(fullPath, "utf8");
       if (
@@ -81,15 +85,32 @@ function copyPublishedFiles(dir: string, baseDir: string) {
         fs.mkdirSync(path.dirname(destPath), { recursive: true });
         fs.writeFileSync(destPath, modifiedContent);
         console.log(`Copied and modified: ${fullPath} to ${destPath}`);
+
+        // Add the page to our list
+        generatedPages.push(`/brain/${slugifiedFileName}`);
       }
     }
   }
+
+  return generatedPages;
 }
 
 // Ensure the destination directory exists
 fs.mkdirSync(destDir, { recursive: true });
 
 // Start the recursive search and copy process
-copyPublishedFiles(sourceDir, sourceDir);
+const generatedPages = copyPublishedFiles(sourceDir, sourceDir);
+
+// Add the home page
+generatedPages.push("/");
+
+// Ensure config directory exists
+const configDir = path.join(process.cwd(), "src", "config");
+fs.mkdirSync(configDir, { recursive: true });
+
+// Write the pages list to a JSON file
+const pagesPath = path.join(configDir, "pages.json");
+fs.writeFileSync(pagesPath, JSON.stringify(generatedPages, null, 2));
+console.log(`Generated pages list at: ${pagesPath}`);
 
 console.log("Finished copying and modifying published files.");

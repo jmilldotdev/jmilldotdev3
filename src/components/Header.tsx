@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 export default function Header() {
@@ -37,15 +38,14 @@ export default function Header() {
   }, [time]);
 
   return (
-    <header className="col-span-2 retro-border p-2.5 flex justify-between items-center">
+    <header className="w-full retro-border p-2.5 flex justify-between items-center h-20">
       <div className="flex items-center">
-        <div className="w-0 h-0 border-l-[10px] border-r-[10px] border-b-[20px] border-l-transparent border-r-transparent border-b-primary mr-2.5" />
-        <span className="text-primary font-bold text-2xl">JMILL</span>
+        <Link href="/">
+          <div className="logo">JMILL</div>
+        </Link>
       </div>
-      <div className="text-secondary text-sm animate-blink">
-        SYSTEM STATUS: NORMAL
-      </div>
-      <div className="text-white text-sm">T-MINUS {time}</div>
+      <div className="status">SYSTEM STATUS: NORMAL</div>
+      <div className="time">T-MINUS {time}</div>
     </header>
   );
 }

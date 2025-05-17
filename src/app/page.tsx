@@ -1,13 +1,19 @@
 "use client";
 
 import SphereAnimation from "@/components/SphereAnimation";
+import Button from "@/components/ui/Button";
 
 export default function Home() {
   return (
-    <main className="flex-grow h-full flex flex-col items-center justify-center">
-      <div className="w-full h-full">
-        <SphereAnimation className="h-[80vh]" />
+    <div className="w-full h-full flex flex-col items-center justify-center">
+      <div className="flex-1 w-full">
+        <SphereAnimation className="w-full h-full" />
       </div>
-    </main>
+      <div className="mb-8 mt-4">
+        <Button variant="primary" onClick={() => console.log("Login clicked")}>
+          Enter
+        </Button>
+      </div>
+    </div>
   );
 }
