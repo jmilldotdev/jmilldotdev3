@@ -38,7 +38,7 @@ export default function Header() {
   }, [time]);
 
   return (
-    <header className="w-full retro-border p-2.5 flex justify-between items-center h-20">
+    <header className="w-full p-2.5 flex justify-between items-center h-20 bg-gray-900">
       <div className="flex items-center">
         <Link href="/">
           <div className="logo">JMILL</div>

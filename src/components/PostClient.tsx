@@ -8,6 +8,8 @@ interface PostClientProps {
   frontmatter: {
     title?: string;
     date?: string;
+    created?: string;
+    URL?: string;
     tags?: string[];
     [key: string]: string | string[] | number | boolean | undefined;
   };
@@ -45,6 +47,23 @@ export default function PostClient({ code, frontmatter }: PostClientProps) {
             <time className="text-[var(--color-secondary)]">
               {formatDate(frontmatter.date)}
             </time>
+          )}
+
+          {frontmatter.created && (
+            <time className="text-[var(--color-secondary)]">
+              Created: {formatDate(frontmatter.created)}
+            </time>
+          )}
+
+          {frontmatter.URL && (
+            <a
+              href={frontmatter.URL as string}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[var(--color-secondary)] hover:underline"
+            >
+              Source
+            </a>
           )}
 
           {frontmatter.tags && frontmatter.tags.length > 0 && (

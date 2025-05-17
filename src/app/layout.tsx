@@ -19,7 +19,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       <body className="min-h-screen bg-black">
         <div id="app" className="flex flex-col h-screen p-2 gap-2">
           <Header />
-          <main className="flex-1 relative border border-gray-700 bg-opacity-70 bg-gray-900 overflow-hidden">
+          <main className="flex flex-col justify-start flex-1 relative border border-gray-700 bg-opacity-70 bg-gray-900 overflow-auto">
             {children}
           </main>
           <Footer />

@@ -6,6 +6,7 @@ import pages from "@/config/pages.json";
 
 type Command = {
   name: string;
+  alias?: string[];
   description: string;
   execute: () => void;
 };
@@ -17,6 +18,7 @@ export default function CommandLine() {
   const commands: Command[] = [
     {
       name: "random",
+      alias: ["r"],
       description: "Navigate to a random page",
       execute: () => {
         const randomPage = pages[Math.floor(Math.random() * pages.length)];
@@ -26,7 +28,9 @@ export default function CommandLine() {
   ];
 
   const handleCommand = (command: string) => {
-    const cmd = commands.find((c) => c.name === command.toLowerCase());
+    const cmd = commands.find(
+      (c) => c.name === command.toLowerCase() || c.alias?.includes(command)
+    );
     if (cmd) {
       console.log(`Executing command: ${cmd.name}`);
       cmd.execute();

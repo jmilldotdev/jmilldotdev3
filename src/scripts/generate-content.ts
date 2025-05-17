@@ -62,6 +62,12 @@ function copyPublishedFiles(
         // Remove the .md extension before slugifying
         const baseFileName = path.basename(destFileName, ".md");
 
+        // Extract title from baseFileName (capitalize first letter of each word)
+        const title = baseFileName
+          .split(/[-_]/)
+          .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(" ");
+
         // Slugify the base file name
         const slugifiedFileName = baseFileName
           .toLowerCase()
@@ -78,6 +84,34 @@ function copyPublishedFiles(
           .split("\n")
           .filter((line) => !line.trim().match(/^#\s/))
           .join("\n");
+
+        // Handle frontmatter
+        const hasFrontmatter = modifiedContent.startsWith("---");
+        if (hasFrontmatter) {
+          // Extract existing frontmatter
+          const frontmatterEnd = modifiedContent.indexOf("---", 3);
+          const existingFrontmatter = modifiedContent.slice(
+            0,
+            frontmatterEnd + 3
+          );
+          const contentAfterFrontmatter = modifiedContent.slice(
+            frontmatterEnd + 3
+          );
+
+          // Add/update title in frontmatter
+          const updatedFrontmatter = existingFrontmatter
+            .replace(/title:.*\n/, `title: "${title}"\n`)
+            .replace(/---\n/, `---\ntitle: "${title}"\n`);
+
+          modifiedContent = updatedFrontmatter + contentAfterFrontmatter;
+        } else {
+          // Add new frontmatter if none exists
+          modifiedContent = `---
+title: "${title}"
+---
+
+${modifiedContent}`;
+        }
 
         // Copy attachments and update links
         modifiedContent = copyAttachment(modifiedContent, sourceDir, destDir);
