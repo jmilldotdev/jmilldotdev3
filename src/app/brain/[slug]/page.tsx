@@ -4,12 +4,13 @@ import matter from "gray-matter";
 import { bundleMDX } from "mdx-bundler";
 import PostClient from "@/components/PostClient";
 
-interface PostProps {
-  params: { slug: string };
-}
-
-export default async function Post({ params }: PostProps) {
-  const filePath = path.join(process.cwd(), "content", `${params.slug}.mdx`);
+export default async function Post({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await params;
+  const filePath = path.join(process.cwd(), "content", `${slug}.mdx`);
   const source = fs.readFileSync(filePath, "utf8");
 
   const { content, data } = matter(source);
@@ -36,7 +37,9 @@ export default async function Post({ params }: PostProps) {
 
 export async function generateStaticParams() {
   const files = fs.readdirSync(path.join(process.cwd(), "content"));
-  return files.map((file) => ({
-    slug: file.replace(/\\.mdx?$/, ""),
-  }));
+  return files
+    .filter((file) => file.endsWith(".mdx"))
+    .map((file) => ({
+      slug: file.replace(/\.mdx?$/, ""),
+    }));
 }
