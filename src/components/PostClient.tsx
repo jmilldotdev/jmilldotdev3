@@ -1,10 +1,10 @@
 "use client";
 
-import { MDXRemote } from "next-mdx-remote";
-import { MDXRemoteSerializeResult } from "next-mdx-remote";
+import { useMemo } from "react";
+import { getMDXComponent } from "mdx-bundler/client";
 
 interface PostClientProps {
-  source: MDXRemoteSerializeResult;
+  code: string;
   frontmatter: {
     title?: string;
     date?: string;
@@ -13,7 +13,13 @@ interface PostClientProps {
   };
 }
 
-export default function PostClient({ source, frontmatter }: PostClientProps) {
+export default function PostClient({ code, frontmatter }: PostClientProps) {
+  // Convert the MDX string into a React component
+  const Component = useMemo(() => {
+    if (!code) return null;
+    return getMDXComponent(code);
+  }, [code]);
+
   const formatDate = (dateStr?: string) => {
     if (!dateStr) return "";
     const date = new Date(dateStr);
@@ -57,9 +63,7 @@ export default function PostClient({ source, frontmatter }: PostClientProps) {
       </header>
 
       {/* Content */}
-      <div className="post-content w-full">
-        <MDXRemote {...source} />
-      </div>
+      <div className="post-content w-full">{Component && <Component />}</div>
     </article>
   );
 }

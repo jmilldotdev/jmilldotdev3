@@ -1,6 +1,7 @@
 import React from "react";
 import type { Metadata } from "next";
 import "./globals.css";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Your Name - Personal Website",
@@ -20,7 +21,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           className="grid h-screen grid-rows-[80px_1fr_80px] gap-2 p-2"
         >
           <header className="overflow-hidden whitespace-nowrap overflow-ellipsis bg-gray-800 text-white p-4 flex justify-between items-center border border-gray-700">
-            <div className="logo">JMILL</div>
+            <Link href="/">
+              <div className="logo">JMILL</div>
+            </Link>
             <div className="status">SYSTEM STATUS: NORMAL</div>
             <div className="time">T-MINUS 24:15:37</div>
           </header>
@@ -34,7 +37,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 type="text"
                 className="command-input"
                 placeholder="ENTER COMMAND"
-                defaultValue="ANALYZE SPHERE COMPOSITION"
               />
             </div>
           </footer>

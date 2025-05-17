@@ -40,7 +40,7 @@ export default function Header() {
     <header className="col-span-2 retro-border p-2.5 flex justify-between items-center">
       <div className="flex items-center">
         <div className="w-0 h-0 border-l-[10px] border-r-[10px] border-b-[20px] border-l-transparent border-r-transparent border-b-primary mr-2.5" />
-        <span className="text-primary font-bold text-2xl">NERV</span>
+        <span className="text-primary font-bold text-2xl">JMILL</span>
       </div>
       <div className="text-secondary text-sm animate-blink">
         SYSTEM STATUS: NORMAL
