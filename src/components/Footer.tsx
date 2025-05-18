@@ -13,7 +13,7 @@ export default function Footer() {
       <CommandLine
         onInvalidCommand={() => {
           setIsInvalid(true);
-          setTimeout(() => setIsInvalid(false), 500);
+          setTimeout(() => setIsInvalid(false), 800);
         }}
       />
     </footer>
