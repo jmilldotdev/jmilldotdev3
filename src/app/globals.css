@@ -59,6 +59,17 @@
   100% { background-position: 0 100%; }
 }
 
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+@keyframes flash-red {
+  0%, 100% { border-color: #333; }
+  50% { border-color: #ef4444; }
+}
+
 /* Core CRT effects that are difficult to replicate with Tailwind alone */
 body {
   background-color: #000000;
@@ -252,6 +263,7 @@ footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  transition: border-color 0.2s;
 }
 
 .command-line {
@@ -267,12 +279,13 @@ footer {
 
 .command-input {
   background-color: transparent;
-  border: none;
   color: #00FFFF;
   font-family: 'Courier New', monospace;
   font-size: 1rem;
   width: 100%;
   outline: none;
+  border: 1px solid transparent;
+  transition: border-color 0.2s;
 }
 
 /* Responsive styles */
@@ -369,6 +382,14 @@ footer {
   
   .animate-scroll {
     animation: scroll 20s linear infinite;
+  }
+  
+  .animate-shake {
+    animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+  }
+
+  .animate-flash-red {
+    animation: flash-red 0.8s ease-in-out;
   }
 }
 

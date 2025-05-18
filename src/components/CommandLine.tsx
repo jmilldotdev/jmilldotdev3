@@ -12,7 +12,11 @@ type Command = {
   execute: () => void;
 };
 
-export default function CommandLine() {
+interface CommandLineProps {
+  onInvalidCommand?: () => void;
+}
+
+export default function CommandLine({ onInvalidCommand }: CommandLineProps) {
   const router = useRouter();
   const [input, setInput] = useState("");
   const [showHelp, setShowHelp] = useState(false);
@@ -43,30 +47,43 @@ export default function CommandLine() {
 
   const handleCommand = (command: string) => {
     const cmd = commands.find(
-      (c) => c.name === command.toLowerCase() || c.alias?.includes(command)
+      (c) =>
+        c.name === command.toLowerCase() ||
+        c.alias?.includes(command.toLowerCase())
     );
     if (cmd) {
       console.log(`Executing command: ${cmd.name}`);
       cmd.execute();
+    } else {
+      onInvalidCommand?.();
     }
   };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!input.trim()) return;
+
     console.log(`Input via form submit: ${input}`);
     handleCommand(input);
     setInput("");
   };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-    console.log(`Key pressed: ${e.key}`);
+    if (e.key === "Enter") {
+      e.preventDefault();
+      if (!input.trim()) return;
+
+      console.log(`Input via keydown: ${input}`);
+      handleCommand(input);
+      setInput("");
+    }
   };
 
   return (
     <>
       <form onSubmit={handleSubmit} className="w-full">
         <div
-          className="command-line flex w-full cursor-text"
+          className={`command-line flex w-full cursor-text`}
           onClick={(e) => {
             const target = e.target as HTMLElement;
             if (target.tagName !== "INPUT") {

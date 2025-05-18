@@ -3,6 +3,14 @@
 import { useMemo } from "react";
 import { getMDXComponent } from "mdx-bundler/client";
 
+const shakeAnimation = `
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+`;
+
 interface PostClientProps {
   code: string;
   frontmatter: {
@@ -82,6 +90,7 @@ export default function PostClient({ code, frontmatter }: PostClientProps) {
       </header>
 
       {/* Content */}
+      <style>{shakeAnimation}</style>
       <div className="post-content w-full">{Component && <Component />}</div>
     </article>
   );
