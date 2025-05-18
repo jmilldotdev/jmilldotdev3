@@ -121,7 +121,7 @@ ${modifiedContent}`;
         console.log(`Copied and modified: ${fullPath} to ${destPath}`);
 
         // Add the page to our list
-        generatedPages.push(`/brain/${slugifiedFileName}`);
+        generatedPages.push(`/c/${slugifiedFileName}`);
       }
     }
   }

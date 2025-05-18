@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState, KeyboardEvent } from "react";
 import pages from "@/config/pages.json";
+import { Modal } from "./ui";
 
 type Command = {
   name: string;
@@ -14,8 +15,15 @@ type Command = {
 export default function CommandLine() {
   const router = useRouter();
   const [input, setInput] = useState("");
+  const [showHelp, setShowHelp] = useState(false);
 
   const commands: Command[] = [
+    {
+      name: "home",
+      alias: ["~", "root", "h"],
+      description: "Navigate to the home page",
+      execute: () => router.push("/"),
+    },
     {
       name: "random",
       alias: ["r"],
@@ -24,6 +32,12 @@ export default function CommandLine() {
         const randomPage = pages[Math.floor(Math.random() * pages.length)];
         router.push(randomPage);
       },
+    },
+    {
+      name: "help",
+      alias: ["?"],
+      description: "Show available commands",
+      execute: () => setShowHelp(true),
     },
   ];
 
@@ -38,7 +52,7 @@ export default function CommandLine() {
   };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault(); // Prevent default form submission
+    e.preventDefault();
     console.log(`Input via form submit: ${input}`);
     handleCommand(input);
     setInput("");
@@ -46,22 +60,54 @@ export default function CommandLine() {
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     console.log(`Key pressed: ${e.key}`);
-    // Removed Enter key specific logic as it's handled by form onSubmit
   };
 
   return (
-    <form onSubmit={handleSubmit} className="command-line-form">
-      <div className="command-line">
-        <span className="command-prompt">CMD&gt;</span>
-        <input
-          type="text"
-          className="command-input"
-          placeholder="ENTER COMMAND"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={handleKeyDown}
-        />
-      </div>
-    </form>
+    <>
+      <form onSubmit={handleSubmit} className="w-full">
+        <div
+          className="command-line flex w-full cursor-text"
+          onClick={(e) => {
+            const target = e.target as HTMLElement;
+            if (target.tagName !== "INPUT") {
+              const input = target.querySelector("input");
+              input?.focus();
+            }
+          }}
+        >
+          <span className="command-prompt">CMD&gt;</span>
+          <input
+            type="text"
+            className="command-input flex-1 bg-transparent outline-none"
+            placeholder="ENTER COMMAND"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={handleKeyDown}
+          />
+        </div>
+      </form>
+
+      <Modal
+        isOpen={showHelp}
+        onClose={() => setShowHelp(false)}
+        title="Available Commands"
+      >
+        <div className="space-y-4">
+          {commands.map((cmd) => (
+            <div key={cmd.name} className="flex items-baseline gap-2">
+              <div className="font-mono text-white">
+                {cmd.name}
+                {cmd.alias && (
+                  <span className="ml-2 text-gray-400">
+                    ({cmd.alias.join(", ")})
+                  </span>
+                )}
+              </div>
+              <div className="text-gray-400">— {cmd.description}</div>
+            </div>
+          ))}
+        </div>
+      </Modal>
+    </>
   );
 }
