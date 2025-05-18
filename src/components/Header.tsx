@@ -4,38 +4,22 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 
 export default function Header() {
-  const [time, setTime] = useState("24:15:37");
+  const [time, setTime] = useState("");
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      const [hours, mins, secs] = time.split(":").map(Number);
-      let newSecs = secs - 1;
-      let newMins = mins;
-      let newHours = hours;
+    const updateTime = () => {
+      const now = new Date();
+      const hours = now.getHours().toString().padStart(2, "0");
+      const minutes = now.getMinutes().toString().padStart(2, "0");
+      const seconds = now.getSeconds().toString().padStart(2, "0");
+      setTime(`${hours}:${minutes}:${seconds}`);
+    };
 
-      if (newSecs < 0) {
-        newSecs = 59;
-        newMins -= 1;
-        if (newMins < 0) {
-          newMins = 59;
-          newHours -= 1;
-          if (newHours < 0) {
-            newHours = 0;
-            newMins = 0;
-            newSecs = 0;
-          }
-        }
-      }
-
-      setTime(
-        `${newHours.toString().padStart(2, "0")}:${newMins
-          .toString()
-          .padStart(2, "0")}:${newSecs.toString().padStart(2, "0")}`
-      );
-    }, 1000);
+    updateTime();
+    const timer = setInterval(updateTime, 1000);
 
     return () => clearInterval(timer);
-  }, [time]);
+  }, []);
 
   return (
     <header className="w-full p-2.5 flex justify-between items-center h-20 bg-gray-900">
@@ -48,7 +32,7 @@ export default function Header() {
         <div className="status">SYSTEM STATUS: NORMAL</div>
       </div>
       <div className="hidden lg:block">
-        <div className="time">T-MINUS {time}</div>
+        <div className="time">{time}</div>
       </div>
     </header>
   );

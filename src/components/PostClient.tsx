@@ -42,15 +42,15 @@ export default function PostClient({ code, frontmatter }: PostClientProps) {
           </h1>
         )}
 
-        <div className="flex flex-wrap items-center gap-4 text-sm opacity-80">
+        <div className="flex flex-col md:flex-row flex-wrap items-start md:items-center gap-4 text-sm opacity-80">
           {frontmatter.date && (
-            <time className="text-[var(--color-secondary)]">
+            <time className="text-[var(--color-secondary)] flex items-center">
               {formatDate(frontmatter.date)}
             </time>
           )}
 
           {frontmatter.created && (
-            <time className="text-[var(--color-secondary)]">
+            <time className="text-[var(--color-secondary)] flex items-center">
               Created: {formatDate(frontmatter.created)}
             </time>
           )}
@@ -60,14 +60,14 @@ export default function PostClient({ code, frontmatter }: PostClientProps) {
               href={frontmatter.URL as string}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[var(--color-secondary)] hover:underline"
+              className="text-[var(--color-secondary)] hover:underline break-all flex items-center"
             >
-              Source
+              {frontmatter.URL}
             </a>
           )}
 
           {frontmatter.tags && frontmatter.tags.length > 0 && (
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2 items-center self-center md:self-auto">
               {frontmatter.tags.map((tag: string) => (
                 <span
                   key={tag}
