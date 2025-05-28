@@ -18,7 +18,7 @@ export async function generateMetadata({
     const { data } = matter(source);
 
     return {
-      title: data.title || "jmill",
+      title: `jmill | ${data.title}` || "jmill",
       description:
         data.description ||
         data.excerpt ||
@@ -26,7 +26,7 @@ export async function generateMetadata({
       keywords: data.tags?.join(", ") || data.keywords,
       authors: data.author ? [{ name: data.author }] : [{ name: "jmill" }],
       openGraph: {
-        title: data.title || "jmill",
+        title: `jmill | ${data.title}` || "jmill",
         description:
           data.description ||
           data.excerpt ||
@@ -39,7 +39,7 @@ export async function generateMetadata({
       },
       twitter: {
         card: "summary_large_image",
-        title: data.title || "jmill",
+        title: `jmill | ${data.title}` || "jmill",
         description:
           data.description ||
           data.excerpt ||
