@@ -61,26 +61,6 @@ export default async function TagPage({
     console.error("Error loading tag data:", error);
   }
 
-  const formatDate = (dateStr?: string) => {
-    if (!dateStr) return "";
-    const date = new Date(dateStr);
-    return date.toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
-  };
-
-  const getRootUrl = (url?: string) => {
-    if (!url) return "";
-    try {
-      const urlObj = new URL(url);
-      return urlObj.hostname;
-    } catch {
-      return url;
-    }
-  };
-
   return (
     <div className="w-full px-4 md:px-8 lg:px-16 py-8">
       <header className="mb-10 border-l-4 border-[var(--color-primary)] pl-4 py-2">
