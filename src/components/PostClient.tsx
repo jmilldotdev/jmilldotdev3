@@ -68,12 +68,6 @@ export default function PostClient({ code, frontmatter }: PostClientProps) {
             </div>
           )}
 
-          {frontmatter.created && (
-            <div className="text-[var(--color-secondary)]">
-              Created: {formatDate(frontmatter.created)}
-            </div>
-          )}
-
           {frontmatter.URL && (
             <div>
               <a
