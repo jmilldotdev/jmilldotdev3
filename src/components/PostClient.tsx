@@ -2,6 +2,7 @@
 
 import { useMemo } from "react";
 import { getMDXComponent } from "mdx-bundler/client";
+import Link from "next/link";
 
 const shakeAnimation = `
 @keyframes shake {
@@ -88,14 +89,22 @@ export default function PostClient({ code, frontmatter }: PostClientProps) {
 
           {frontmatter.tags && frontmatter.tags.length > 0 && (
             <div className="flex flex-wrap gap-2">
-              {frontmatter.tags.map((tag: string) => (
-                <span
-                  key={tag}
-                  className="bg-black bg-opacity-30 px-2 py-1 rounded text-xs border border-[var(--color-secondary)] text-[var(--color-secondary)]"
-                >
-                  {tag}
-                </span>
-              ))}
+              {frontmatter.tags.map((tag: string) => {
+                const cleanTag = tag
+                  .replace(/^sources\//, "")
+                  .replace(/^[^\w]*/, "");
+                if (!cleanTag) return null;
+
+                return (
+                  <Link
+                    key={tag}
+                    href={`/t/${encodeURIComponent(cleanTag)}`}
+                    className="bg-black bg-opacity-30 px-2 py-1 rounded text-xs border border-[var(--color-secondary)] text-[var(--color-secondary)] hover:bg-opacity-50 hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] transition-colors"
+                  >
+                    {cleanTag}
+                  </Link>
+                );
+              })}
             </div>
           )}
         </div>
