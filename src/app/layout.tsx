@@ -3,10 +3,11 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
+import Script from "next/script";
 
 export const metadata: Metadata = {
-  title: "Your Name - Personal Website",
-  description: "Personal website with retro CRT aesthetic",
+  title: "jmill",
+  description: "jmill's digital shrine to himself.",
 };
 
 interface LayoutProps {
@@ -16,6 +17,11 @@ interface LayoutProps {
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
     <html lang="en">
+      <Script
+        defer
+        src="https://umami-tawny-theta.vercel.app/script.js"
+        data-website-id="016992b7-62de-4ef5-84aa-b0274ddaabb0"
+      />
       <body className="min-h-screen bg-black">
         <div id="app" className="flex flex-col h-screen p-2 gap-2">
           <Header />
