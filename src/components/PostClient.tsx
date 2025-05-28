@@ -40,42 +40,54 @@ export default function PostClient({ code, frontmatter }: PostClientProps) {
     });
   };
 
+  const getRootUrl = (url?: string) => {
+    if (!url) return "";
+    try {
+      const urlObj = new URL(url);
+      return urlObj.hostname;
+    } catch {
+      return url; // fallback to original if URL parsing fails
+    }
+  };
+
   return (
     <article className="w-full px-4 md:px-8 lg:px-16 py-8">
       {/* Frontmatter Header */}
-      <header className="mb-10 border-l-4 border-[var(--color-primary)] pl-4 py-2">
+      <header className="post-header mb-10 border-l-4 border-[var(--color-primary)] pl-4 py-2">
         {frontmatter.title && (
-          <h1 className="text-3xl md:text-4xl font-bold text-[var(--color-primary)] mb-2">
+          <h1 className="text-3xl md:text-4xl font-bold text-[var(--color-primary)] mb-4">
             {frontmatter.title}
           </h1>
         )}
 
-        <div className="flex flex-col md:flex-row flex-wrap items-start md:items-center gap-4 text-sm opacity-80">
+        <div className="space-y-2 text-sm opacity-80">
           {frontmatter.date && (
-            <time className="text-[var(--color-secondary)] flex items-center">
+            <div className="text-[var(--color-secondary)]">
               {formatDate(frontmatter.date)}
-            </time>
+            </div>
           )}
 
           {frontmatter.created && (
-            <time className="text-[var(--color-secondary)] flex items-center">
+            <div className="text-[var(--color-secondary)]">
               Created: {formatDate(frontmatter.created)}
-            </time>
+            </div>
           )}
 
           {frontmatter.URL && (
-            <a
-              href={frontmatter.URL as string}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-[var(--color-secondary)] hover:underline break-all flex items-center"
-            >
-              {frontmatter.URL}
-            </a>
+            <div>
+              <a
+                href={frontmatter.URL as string}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[var(--color-secondary)] hover:underline"
+              >
+                {getRootUrl(frontmatter.URL as string)}
+              </a>
+            </div>
           )}
 
           {frontmatter.tags && frontmatter.tags.length > 0 && (
-            <div className="flex flex-wrap gap-2 items-center self-center md:self-auto">
+            <div className="flex flex-wrap gap-2">
               {frontmatter.tags.map((tag: string) => (
                 <span
                   key={tag}
