@@ -18,6 +18,22 @@ interface PageMetadata {
   path: string;
 }
 
+// Convert backlink text to slug using same logic as filename processing
+function textToSlug(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/\s+/g, "-") // Replace spaces with hyphens
+    .replace(/[^a-z0-9-]/g, ""); // Remove non-alphanumeric characters except hyphens
+}
+
+// Convert [[backlinks]] to MDX Link components
+function processBacklinks(content: string): string {
+  return content.replace(/\[\[([^\]]+)\]\]/g, (match, linkText) => {
+    const slug = textToSlug(linkText);
+    return `<Link href="/c/${slug}" className="text-[var(--color-primary)] hover:underline hover:text-[var(--color-secondary)] transition-colors font-medium">${linkText}</Link>`;
+  });
+}
+
 function copyAttachment(
   content: string,
   sourceDir: string,
@@ -110,37 +126,39 @@ function copyPublishedFiles(
 
         // Handle frontmatter
         const hasFrontmatter = modifiedContent.startsWith("---");
+        let frontmatterPart = "";
+        let contentPart = "";
+
         if (hasFrontmatter) {
           // Extract existing frontmatter
           const frontmatterEnd = modifiedContent.indexOf("---", 3);
-          const existingFrontmatter = modifiedContent.slice(
-            0,
-            frontmatterEnd + 3
-          );
-          const contentAfterFrontmatter = modifiedContent.slice(
-            frontmatterEnd + 3
-          );
+          frontmatterPart = modifiedContent.slice(0, frontmatterEnd + 3);
+          contentPart = modifiedContent.slice(frontmatterEnd + 3);
 
           // Add/update title in frontmatter
-          const updatedFrontmatter = existingFrontmatter
+          frontmatterPart = frontmatterPart
             .replace(/title:.*\n/, `title: "${title}"\n`)
             .replace(/---\n/, `---\ntitle: "${title}"\n`);
-
-          modifiedContent = updatedFrontmatter + contentAfterFrontmatter;
         } else {
           // Add new frontmatter if none exists
-          modifiedContent = `---
+          frontmatterPart = `---
 title: "${title}"
----
-
-${modifiedContent}`;
+---`;
+          contentPart = modifiedContent;
         }
 
-        // Copy attachments and update links
-        modifiedContent = copyAttachment(modifiedContent, sourceDir, destDir);
+        // Copy attachments and update links (only in content part)
+        contentPart = copyAttachment(contentPart, sourceDir, destDir);
 
-        // Replace c/entity with entity in content
-        modifiedContent = modifiedContent.replace(/c\/entity/g, "entity");
+        // Replace c/entity with entity in content (only in content part)
+        contentPart = contentPart.replace(/c\/entity/g, "entity");
+
+        // Process backlinks (only in content part)
+        contentPart = processBacklinks(contentPart);
+
+        // Reassemble the content
+        modifiedContent =
+          frontmatterPart + '\n\nimport Link from "next/link";\n' + contentPart;
 
         fs.mkdirSync(path.dirname(destPath), { recursive: true });
         fs.writeFileSync(destPath, modifiedContent);

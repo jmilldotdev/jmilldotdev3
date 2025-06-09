@@ -127,7 +127,22 @@ export default function QuickSwitcher({
       perform: () => router.push("/c/projects"),
     };
 
-    return [homeAction, projectsAction, ...contentActions, ...tagActions];
+    const entityAction: Action = {
+      id: "entity",
+      name: "Entity",
+      shortcut: ["e"],
+      keywords: "entity",
+      section: "Navigation",
+      perform: () => router.push("/c/entity"),
+    };
+
+    return [
+      homeAction,
+      projectsAction,
+      entityAction,
+      ...contentActions,
+      ...tagActions,
+    ];
   }, [pageMetadata, tagData, router]);
 
   return (

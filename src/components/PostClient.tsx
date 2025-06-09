@@ -4,6 +4,19 @@ import { useMemo } from "react";
 import { getMDXComponent } from "mdx-bundler/client";
 import Link from "next/link";
 
+// Polyfill for process in browser environment
+if (typeof window !== "undefined") {
+  (
+    globalThis as typeof globalThis & {
+      process?: { env: Record<string, string> };
+    }
+  ).process = (
+    globalThis as typeof globalThis & {
+      process?: { env: Record<string, string> };
+    }
+  ).process || { env: {} };
+}
+
 const shakeAnimation = `
 @keyframes shake {
   0%, 100% { transform: translateX(0); }
