@@ -222,4 +222,10 @@ const tagMapPath = path.join(configDir, "tags.json");
 fs.writeFileSync(tagMapPath, JSON.stringify(tagData, null, 2));
 console.log(`Generated tag mappings at: ${tagMapPath}`);
 
+// Generate entities index (for c/entity tagged content)
+const entityPages = tagMap.get("c/entity") || [];
+const entitiesIndexPath = path.join(configDir, "entities.json");
+fs.writeFileSync(entitiesIndexPath, JSON.stringify(entityPages, null, 2));
+console.log(`Generated entities index at: ${entitiesIndexPath}`);
+
 console.log("Finished copying and modifying published files.");
