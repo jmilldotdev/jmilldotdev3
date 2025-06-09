@@ -139,6 +139,9 @@ ${modifiedContent}`;
         // Copy attachments and update links
         modifiedContent = copyAttachment(modifiedContent, sourceDir, destDir);
 
+        // Replace c/entity with entity in content
+        modifiedContent = modifiedContent.replace(/c\/entity/g, "entity");
+
         fs.mkdirSync(path.dirname(destPath), { recursive: true });
         fs.writeFileSync(destPath, modifiedContent);
         console.log(`Copied and modified: ${fullPath} to ${destPath}`);
@@ -146,13 +149,23 @@ ${modifiedContent}`;
         // Add the page to our list
         generatedPages.push(`/c/${slugifiedFileName}`);
 
+        // Clean tags in the data
+        const cleanedTags = (data.tags || [])
+          .map((tag: string) =>
+            tag
+              .replace(/^sources\//, "")
+              .replace(/^c\/entity$/, "entity")
+              .replace(/^[^\w]*/, "")
+          )
+          .filter((tag: string) => tag);
+
         // Create page metadata
         const pageData: PageMetadata = {
           slug: slugifiedFileName,
           title: data.title || title,
           created: data.created,
           date: data.date,
-          tags: data.tags || [],
+          tags: cleanedTags,
           url: data.URL,
           path: `/c/${slugifiedFileName}`,
         };
@@ -162,15 +175,11 @@ ${modifiedContent}`;
         // Add to tag map
         if (pageData.tags && pageData.tags.length > 0) {
           pageData.tags.forEach((tag: string) => {
-            // Clean up tag format (remove sources/, etc.)
-            const cleanTag = tag
-              .replace(/^sources\//, "")
-              .replace(/^[^\w]*/, "");
-            if (cleanTag) {
-              if (!tagMap.has(cleanTag)) {
-                tagMap.set(cleanTag, []);
+            if (tag) {
+              if (!tagMap.has(tag)) {
+                tagMap.set(tag, []);
               }
-              tagMap.get(cleanTag)!.push(pageData);
+              tagMap.get(tag)!.push(pageData);
             }
           });
         }
@@ -222,8 +231,8 @@ const tagMapPath = path.join(configDir, "tags.json");
 fs.writeFileSync(tagMapPath, JSON.stringify(tagData, null, 2));
 console.log(`Generated tag mappings at: ${tagMapPath}`);
 
-// Generate entities index (for c/entity tagged content)
-const entityPages = tagMap.get("c/entity") || [];
+// Generate entities index (for entity tagged content)
+const entityPages = tagMap.get("entity") || [];
 const entitiesIndexPath = path.join(configDir, "entities.json");
 fs.writeFileSync(entitiesIndexPath, JSON.stringify(entityPages, null, 2));
 console.log(`Generated entities index at: ${entitiesIndexPath}`);
