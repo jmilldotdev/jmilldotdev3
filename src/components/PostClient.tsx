@@ -46,6 +46,12 @@ export default function PostClient({ source, frontmatter }: PostClientProps) {
     Link,
   };
 
+  // Check if there's actual content beyond imports
+  const hasContent =
+    source
+      .replace(/import\s+.*?from\s+["'].*?["'];?\s*/g, "") // Remove import statements
+      .trim().length > 0;
+
   return (
     <article className="w-full px-4 md:px-8 lg:px-16 py-8">
       {/* Frontmatter Header */}
@@ -102,7 +108,13 @@ export default function PostClient({ source, frontmatter }: PostClientProps) {
       {/* Content */}
       <style>{shakeAnimation}</style>
       <div className="post-content w-full">
-        <MDXRemote source={source} components={components} />
+        {hasContent ? (
+          <MDXRemote source={source} components={components} />
+        ) : (
+          <div className="text-[var(--color-secondary)] opacity-60 italic">
+            No content available.
+          </div>
+        )}
       </div>
     </article>
   );
