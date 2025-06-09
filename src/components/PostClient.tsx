@@ -1,21 +1,5 @@
-"use client";
-
-import { useMemo } from "react";
-import { getMDXComponent } from "mdx-bundler/client";
+import { MDXRemote } from "next-mdx-remote/rsc";
 import Link from "next/link";
-
-// Polyfill for process in browser environment
-if (typeof window !== "undefined") {
-  (
-    globalThis as typeof globalThis & {
-      process?: { env: Record<string, string> };
-    }
-  ).process = (
-    globalThis as typeof globalThis & {
-      process?: { env: Record<string, string> };
-    }
-  ).process || { env: {} };
-}
 
 const shakeAnimation = `
 @keyframes shake {
@@ -26,7 +10,7 @@ const shakeAnimation = `
 `;
 
 interface PostClientProps {
-  code: string;
+  source: string;
   frontmatter: {
     title?: string;
     date?: string;
@@ -37,13 +21,7 @@ interface PostClientProps {
   };
 }
 
-export default function PostClient({ code, frontmatter }: PostClientProps) {
-  // Convert the MDX string into a React component
-  const Component = useMemo(() => {
-    if (!code) return null;
-    return getMDXComponent(code);
-  }, [code]);
-
+export default function PostClient({ source, frontmatter }: PostClientProps) {
   const formatDate = (dateStr?: string) => {
     if (!dateStr) return "";
     const date = new Date(dateStr);
@@ -62,6 +40,10 @@ export default function PostClient({ code, frontmatter }: PostClientProps) {
     } catch {
       return url; // fallback to original if URL parsing fails
     }
+  };
+
+  const components = {
+    Link,
   };
 
   return (
@@ -119,7 +101,9 @@ export default function PostClient({ code, frontmatter }: PostClientProps) {
 
       {/* Content */}
       <style>{shakeAnimation}</style>
-      <div className="post-content w-full">{Component && <Component />}</div>
+      <div className="post-content w-full">
+        <MDXRemote source={source} components={components} />
+      </div>
     </article>
   );
 }
