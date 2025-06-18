@@ -101,13 +101,16 @@ export default async function TagPage({
                     {post.tags
                       .filter(
                         (t) =>
-                          t.replace(/^sources\//, "").replace(/^[^\w]*/, "") !==
-                          decodedTag
+                          t
+                            .replace(/^sources\//, "")
+                            .replace(/^c\/entity$/, "entity")
+                            .replace(/^[^\w]*/, "") !== decodedTag
                       )
                       .slice(0, 3)
                       .map((t) => {
                         const cleanTag = t
                           .replace(/^sources\//, "")
+                          .replace(/^c\/entity$/, "entity")
                           .replace(/^[^\w]*/, "");
                         return (
                           <span

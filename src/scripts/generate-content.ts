@@ -139,6 +139,11 @@ function copyPublishedFiles(
           frontmatterPart = frontmatterPart
             .replace(/title:.*\n/, `title: "${title}"\n`)
             .replace(/---\n/, `---\ntitle: "${title}"\n`);
+
+          // Clean up tags in frontmatter
+          frontmatterPart = frontmatterPart
+            .replace(/- c\/entity/g, "- entity")
+            .replace(/- sources\//g, "- ");
         } else {
           // Add new frontmatter if none exists
           frontmatterPart = `---

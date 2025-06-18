@@ -95,7 +95,10 @@ export default function QuickSwitcher({
     }));
 
     const tagActions: Action[] = Object.keys(tagData).map((tag) => {
-      const cleanTag = tag.replace(/^sources\//, "").replace(/^[^\w]*/, "");
+      const cleanTag = tag
+        .replace(/^sources\//, "")
+        .replace(/^c\/entity$/, "entity")
+        .replace(/^[^\w]*/, "");
       const pageCount = tagData[tag].length;
 
       return {

@@ -87,6 +87,7 @@ export default function PostClient({ source, frontmatter }: PostClientProps) {
               {frontmatter.tags.map((tag: string) => {
                 const cleanTag = tag
                   .replace(/^sources\//, "")
+                  .replace(/^c\/entity$/, "entity")
                   .replace(/^[^\w]*/, "");
                 if (!cleanTag) return null;
 
