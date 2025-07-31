@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import QuickSwitcherTrigger from "./QuickSwitcherTrigger";
 
 export default function Header() {
   const [time, setTime] = useState("");
@@ -33,7 +32,6 @@ export default function Header() {
         <div className="text-[#00FFFF] text-sm animate-blink">SYSTEM STATUS: NORMAL</div>
       </div>
       <div className="flex items-center gap-4">
-        <QuickSwitcherTrigger />
         <div className="hidden lg:block">
           <div className="text-white">{time}</div>
         </div>
