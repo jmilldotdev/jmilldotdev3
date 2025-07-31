@@ -45,8 +45,8 @@ export const SphereAnimation = forwardRef<
 
     // Create dramatic pulse/shake effect before shattering
     const startTime = Date.now();
-    const shakeIntensity = 0.01;
-    const pulseIntensity = 0.03;
+    const shakeIntensity = 0.02;
+    const pulseIntensity = 0.01;
     
     const shakeEffect = () => {
       if (!sphereGroupRef.current) return;
@@ -590,8 +590,8 @@ export const SphereAnimation = forwardRef<
       ref={containerRef}
       className={`relative w-full h-full flex items-center justify-center ${className}`}
     >
-      {/* Canvas container with lower z-index */}
-      <div ref={canvasContainerRef} className="absolute inset-0 z-[1]" />
+      {/* Canvas container with higher z-index but no pointer events */}
+      <div ref={canvasContainerRef} className="absolute inset-0 z-[20] pointer-events-none" />
     </div>
   );
 });
