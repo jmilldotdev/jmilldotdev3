@@ -20,7 +20,7 @@ interface BaseWindowProps {
 }
 
 export const BaseWindow: React.FC<BaseWindowProps> = ({
-  id: _id,
+  id,
   title,
   x,
   y,
@@ -33,38 +33,41 @@ export const BaseWindow: React.FC<BaseWindowProps> = ({
   onMouseDown,
   children,
   className = "",
-  titleBarButtons
+  titleBarButtons,
 }) => {
   return (
     <div
       className={`window-container absolute border-2 border-[#00FFFF] bg-black/40 backdrop-blur-sm ${
-        isMaximized ? 'inset-4' : ''
+        isMaximized ? "inset-4" : ""
       } ${className}`}
-      style={isMaximized ? {
-        zIndex: zIndex
-      } : {
-        left: x,
-        top: y,
-        width: width,
-        height: height,
-        zIndex: zIndex
-      }}
+      key={id}
+      style={
+        isMaximized
+          ? {
+              zIndex: zIndex,
+            }
+          : {
+              left: x,
+              top: y,
+              width: width,
+              height: height,
+              zIndex: zIndex,
+            }
+      }
     >
       {/* Title Bar */}
       <div
         className="flex items-center justify-between bg-[#00FFFF] bg-opacity-20 px-3 py-2 cursor-move"
         onMouseDown={!isMaximized ? onMouseDown : undefined}
       >
-        <span className="text-black font-mono text-sm font-bold">
-          {title}
-        </span>
+        <span className="text-black font-mono text-sm font-bold">{title}</span>
         <div className="flex gap-2 items-center">
           {titleBarButtons}
           <button
             onClick={onToggleMaximize}
             className="text-black hover:bg-black hover:text-[#00FFFF] w-6 h-6 border border-black text-xs font-mono transition-colors"
           >
-            {isMaximized ? '□' : '■'}
+            {isMaximized ? "□" : "■"}
           </button>
           <button
             onClick={onClose}
@@ -76,7 +79,10 @@ export const BaseWindow: React.FC<BaseWindowProps> = ({
       </div>
 
       {/* Content */}
-      <div className="h-full overflow-hidden" style={{ height: 'calc(100% - 40px)' }}>
+      <div
+        className="h-full overflow-hidden"
+        style={{ height: "calc(100% - 40px)" }}
+      >
         {children}
       </div>
     </div>
