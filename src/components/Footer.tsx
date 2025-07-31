@@ -8,7 +8,9 @@ export default function Footer() {
 
   return (
     <footer
-      className={`w-full p-2.5 h-20 ${isInvalid ? "animate-flash-red" : ""}`}
+      className={`w-full p-2.5 h-20 border border-gray-700 bg-gray-900/70 flex justify-between items-center transition-colors duration-200 ${
+        isInvalid ? "animate-flash-red" : ""
+      }`}
     >
       <CommandLine
         onInvalidCommand={() => {

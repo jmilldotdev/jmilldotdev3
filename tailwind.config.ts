@@ -11,12 +11,21 @@ const config: Config = {
       colors: {
         primary: "#FF4800",
         secondary: "#00FFFF",
+        background: "#000000",
+        foreground: "#FFFFFF",
+      },
+      fontFamily: {
+        mono: ['Courier New', 'monospace'],
       },
       animation: {
         blink: "blink 2s infinite",
         "warning-blink": "warning-blink 1s infinite",
-        pulse: "pulse 4s infinite",
+        "pulse-bar": "pulse 4s infinite",
         scroll: "scroll 20s linear infinite",
+        scanline: "scanline 10s linear infinite",
+        shake: "shake 0.5s cubic-bezier(.36,.07,.19,.97) both",
+        "flash-red": "flash-red 0.8s ease-in-out",
+        flicker: "flicker 5s infinite",
       },
       keyframes: {
         blink: {
@@ -35,10 +44,37 @@ const config: Config = {
           "0%": { transform: "translateY(0)" },
           "100%": { transform: "translateY(-300px)" },
         },
+        scanline: {
+          "0%": { backgroundPosition: "0 0" },
+          "100%": { backgroundPosition: "0 100%" },
+        },
+        shake: {
+          "0%, 100%": { transform: "translateX(0)" },
+          "25%": { transform: "translateX(-5px)" },
+          "75%": { transform: "translateX(5px)" },
+        },
+        "flash-red": {
+          "0%, 100%": { borderColor: "#333" },
+          "50%": { borderColor: "#ef4444" },
+        },
+        flicker: {
+          "0%": { backgroundColor: "rgba(0,0,0,0)" },
+          "5%": { backgroundColor: "rgba(0,0,0,0.02)" },
+          "10%": { backgroundColor: "rgba(0,0,0,0)" },
+          "15%": { backgroundColor: "rgba(0,0,0,0.04)" },
+          "30%": { backgroundColor: "rgba(0,0,0,0)" },
+          "50%": { backgroundColor: "rgba(0,0,0,0.03)" },
+          "80%": { backgroundColor: "rgba(0,0,0,0)" },
+          "95%": { backgroundColor: "rgba(0,0,0,0.05)" },
+          "100%": { backgroundColor: "rgba(0,0,0,0)" },
+        },
       },
     },
   },
-  plugins: [require("tailwind-scrollbar")({ nocompatible: true })],
+  plugins: [
+    require("@tailwindcss/typography"),
+    require("tailwind-scrollbar")({ nocompatible: true }),
+  ],
 };
 
 export default config;

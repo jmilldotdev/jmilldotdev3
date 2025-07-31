@@ -83,7 +83,7 @@ export default function CommandLine({ onInvalidCommand }: CommandLineProps) {
     <>
       <form onSubmit={handleSubmit} className="w-full">
         <div
-          className={`command-line flex w-full cursor-text`}
+          className={`flex items-center w-full cursor-text`}
           onClick={(e) => {
             const target = e.target as HTMLElement;
             if (target.tagName !== "INPUT") {
@@ -92,10 +92,10 @@ export default function CommandLine({ onInvalidCommand }: CommandLineProps) {
             }
           }}
         >
-          <span className="command-prompt">CMD&gt;</span>
+          <span className="text-[#FF4800] mr-2.5">CMD&gt;</span>
           <input
             type="text"
-            className="command-input flex-1 bg-transparent outline-none"
+            className="flex-1 bg-transparent text-[#00FFFF] font-mono text-base outline-none border border-transparent transition-colors duration-200"
             placeholder="ENTER COMMAND"
             value={input}
             onChange={(e) => setInput(e.target.value)}

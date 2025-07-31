@@ -181,10 +181,10 @@ export const SphereAnimation: React.FC<SphereAnimationProps> = ({
 
       {/* Target overlay with higher z-index */}
       <div className="absolute inset-0 z-[50] pointer-events-none flex items-center justify-center">
-        <div className="target-circle">
-          <div className="target-ring"></div>
-          <div className="target-ring"></div>
-          <div className="target-ring"></div>
+        <div className="relative w-[150px] h-[150px] sm:w-[200px] sm:h-[200px] md:w-[300px] md:h-[300px] before:content-[''] before:absolute before:bg-[#FF4800]/70 before:top-1/2 before:left-0 before:w-full before:h-[2px] before:-translate-y-1/2 after:content-[''] after:absolute after:bg-[#FF4800]/70 after:top-0 after:left-1/2 after:w-[2px] after:h-full after:-translate-x-1/2">
+          <div className="absolute top-0 left-0 w-full h-full border-2 border-[#FF4800]/40 rounded-full"></div>
+          <div className="absolute top-[10%] left-[10%] w-[80%] h-[80%] border-2 border-[#FF4800]/30 rounded-full"></div>
+          <div className="absolute top-[20%] left-[20%] w-[60%] h-[60%] border-2 border-[#FF4800]/20 rounded-full"></div>
         </div>
       </div>
     </div>

@@ -28,9 +28,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       />
       <body className="min-h-screen bg-black">
         <QuickSwitcher pageMetadata={pageMetadata} tagData={tagData}>
-          <div id="app" className="flex flex-col h-screen p-2 gap-2">
+          <div id="app" className="grid grid-rows-[80px_1fr_80px] h-screen p-2.5 gap-2.5">
             <Header />
-            <main className="flex flex-col justify-start flex-1 relative border border-gray-700 bg-opacity-70 bg-gray-900 overflow-auto">
+            <main className="relative border border-gray-700 bg-gray-900/70 flex flex-col justify-start overflow-auto">
               {children}
             </main>
             <Footer />
