@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import * as THREE from "three";
 
 interface Window {
   id: string;
@@ -27,6 +28,15 @@ interface VectorDesktopProps {
   isVisible: boolean;
 }
 
+interface WindowShatterEffect {
+  id: string;
+  scene: THREE.Scene;
+  renderer: THREE.WebGLRenderer;
+  camera: THREE.PerspectiveCamera;
+  fragments: THREE.LineSegments[];
+  container: HTMLDivElement;
+}
+
 export const VectorDesktop: React.FC<VectorDesktopProps> = ({ isVisible }) => {
   const [windows, setWindows] = useState<Window[]>([]);
   const [nextZIndex, setNextZIndex] = useState(10);
@@ -35,6 +45,7 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({ isVisible }) => {
     offsetX: number;
     offsetY: number;
   }>({ windowId: null, offsetX: 0, offsetY: 0 });
+  const [windowShatterEffects, setWindowShatterEffects] = useState<WindowShatterEffect[]>([]);
 
   const desktopIcons: DesktopIcon[] = [
     {
@@ -105,7 +116,161 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({ isVisible }) => {
     setNextZIndex(prev => prev + 1);
   };
 
+  const createWindowShatterEffect = (window: Window) => {
+    // Create container for the 3D effect
+    const container = document.createElement('div');
+    container.style.position = 'absolute';
+    container.style.left = `${window.x}px`;
+    container.style.top = `${window.y}px`;
+    container.style.width = `${window.width}px`;
+    container.style.height = `${window.height}px`;
+    container.style.zIndex = '30';
+    container.style.pointerEvents = 'none';
+    document.body.appendChild(container);
+
+    // Create 3D scene
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.width / window.height, 0.1, 1000);
+    camera.position.z = 3;
+
+    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+    renderer.setSize(window.width, window.height);
+    renderer.setClearColor(0x000000, 0);
+    container.appendChild(renderer.domElement);
+
+    // Create wireframe rectangle geometry for the window
+    const rectangleGeometry = new THREE.PlaneGeometry(2, 1.5, 12, 8);
+    const wireframe = new THREE.WireframeGeometry(rectangleGeometry);
+    
+    // Break into fragments similar to sphere
+    const fragments: THREE.LineSegments[] = [];
+    const positions = wireframe.attributes.position.array;
+    const fragmentCount = Math.floor(positions.length / 6);
+    const totalFragments = 10;
+    const usedIndices = new Set<number>();
+
+    for (let fragIndex = 0; fragIndex < totalFragments; fragIndex++) {
+      const fragmentGeometry = new THREE.BufferGeometry();
+      const fragmentPositions = [];
+
+      // Create varied fragment sizes
+      const fragmentType = Math.floor(Math.random() * 4);
+      let fragmentSize;
+
+      switch (fragmentType) {
+        case 0: fragmentSize = Math.floor(Math.random() * 8) + 3; break;
+        case 1: fragmentSize = Math.floor(Math.random() * 15) + 8; break;
+        case 2: fragmentSize = Math.floor(Math.random() * 25) + 15; break;
+        case 3: fragmentSize = Math.floor(Math.random() * 12) + 5; break;
+        default: fragmentSize = Math.floor(Math.random() * 10) + 5;
+      }
+
+      for (let segCount = 0; segCount < fragmentSize && usedIndices.size < fragmentCount; segCount++) {
+        let randomIndex;
+        let attempts = 0;
+        do {
+          randomIndex = Math.floor(Math.random() * fragmentCount);
+          attempts++;
+        } while (usedIndices.has(randomIndex) && attempts < 50);
+
+        if (!usedIndices.has(randomIndex)) {
+          usedIndices.add(randomIndex);
+          const startIdx = randomIndex * 6;
+          if (startIdx + 5 < positions.length) {
+            fragmentPositions.push(
+              positions[startIdx], positions[startIdx + 1], positions[startIdx + 2],
+              positions[startIdx + 3], positions[startIdx + 4], positions[startIdx + 5]
+            );
+          }
+        }
+      }
+
+      if (fragmentPositions.length > 0) {
+        fragmentGeometry.setAttribute('position', new THREE.Float32BufferAttribute(fragmentPositions, 3));
+        
+        const material = new THREE.LineBasicMaterial({
+          color: 0x00ffff,
+          transparent: true,
+          opacity: 0.8,
+        });
+
+        const fragment = new THREE.LineSegments(fragmentGeometry, material);
+        
+        // Position fragments in a larger emission area
+        fragment.position.x = (Math.random() - 0.5) * 1.5; // Larger spread
+        fragment.position.y = (Math.random() - 0.5) * 1.2; // Larger spread
+        fragment.position.z = (Math.random() - 0.5) * 0.2;
+
+        // Store velocities
+        (fragment as any).velocity = new THREE.Vector3(
+          (Math.random() - 0.5) * 0.02,
+          (Math.random() - 0.5) * 0.02,
+          (Math.random() - 0.5) * 0.02
+        );
+        
+        (fragment as any).rotationVelocity = new THREE.Vector3(
+          (Math.random() - 0.5) * 0.03,
+          (Math.random() - 0.5) * 0.03,
+          (Math.random() - 0.5) * 0.03
+        );
+
+        scene.add(fragment);
+        fragments.push(fragment);
+      }
+    }
+
+    const shatterEffect: WindowShatterEffect = {
+      id: window.id,
+      scene,
+      renderer,
+      camera,
+      fragments,
+      container
+    };
+
+    setWindowShatterEffects(prev => [...prev, shatterEffect]);
+
+    // Animation and cleanup
+    let startTime = Date.now();
+    const animate = () => {
+      const elapsed = Date.now() - startTime;
+      
+      fragments.forEach(fragment => {
+        const velocity = (fragment as any).velocity;
+        const rotationVelocity = (fragment as any).rotationVelocity;
+        
+        fragment.position.x += velocity.x;
+        fragment.position.y += velocity.y;
+        fragment.position.z += velocity.z;
+        
+        fragment.rotation.x += rotationVelocity.x;
+        fragment.rotation.y += rotationVelocity.y;
+        fragment.rotation.z += rotationVelocity.z;
+        
+        // Fade out
+        const material = fragment.material as THREE.LineBasicMaterial;
+        material.opacity *= 0.995;
+      });
+
+      renderer.render(scene, camera);
+
+      if (elapsed < 4000) {
+        requestAnimationFrame(animate);
+      } else {
+        // Cleanup
+        container.remove();
+        setWindowShatterEffects(prev => prev.filter(effect => effect.id !== window.id));
+      }
+    };
+
+    animate();
+  };
+
   const closeWindow = (windowId: string) => {
+    const windowToClose = windows.find(w => w.id === windowId);
+    if (windowToClose) {
+      createWindowShatterEffect(windowToClose);
+    }
     setWindows(prev => prev.filter(w => w.id !== windowId));
   };
 
@@ -167,6 +332,7 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({ isVisible }) => {
       };
     }
   }, [dragState]);
+
 
   if (!isVisible) return null;
 
@@ -237,6 +403,7 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({ isVisible }) => {
           </div>
         </div>
       ))}
+
 
     </div>
   );
