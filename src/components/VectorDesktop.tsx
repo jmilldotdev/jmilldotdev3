@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
-import * as THREE from "three";
+import { useState, useEffect, useCallback } from "react";
 import WikiWindow from "./WikiWindow";
+import { BaseWindow } from "./BaseWindow";
 
 interface Window {
   id: string;
@@ -30,24 +30,15 @@ interface VectorDesktopProps {
   isVisible: boolean;
 }
 
-interface WindowShatterEffect {
-  id: string;
-  scene: THREE.Scene;
-  renderer: THREE.WebGLRenderer;
-  camera: THREE.PerspectiveCamera;
-  fragments: THREE.LineSegments[];
-  container: HTMLDivElement;
-}
 
 export const VectorDesktop: React.FC<VectorDesktopProps> = ({ isVisible }) => {
   const [windows, setWindows] = useState<Window[]>([]);
-  const [nextZIndex, setNextZIndex] = useState(10);
+  const [nextZIndex, setNextZIndex] = useState(20);
   const [dragState, setDragState] = useState<{
     windowId: string | null;
     offsetX: number;
     offsetY: number;
   }>({ windowId: null, offsetX: 0, offsetY: 0 });
-  const [windowShatterEffects, setWindowShatterEffects] = useState<WindowShatterEffect[]>([]);
 
   const desktopIcons: DesktopIcon[] = [
     {
@@ -112,14 +103,49 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({ isVisible }) => {
   ];
 
   const createWindow = (icon: DesktopIcon) => {
+    // Get the actual container dimensions instead of window dimensions
+    const container = document.querySelector('main');
+    const viewportWidth = container ? container.clientWidth : window.innerWidth;
+    const viewportHeight = container ? container.clientHeight : window.innerHeight;
+    
+    // Action bar height (approximate)
+    const actionBarHeight = 60;
+    const margin = 10;
+    
+    // Calculate responsive dimensions
+    let windowWidth: number;
+    let windowHeight: number;
+    let windowX: number;
+    let windowY: number;
+    
+    if (viewportWidth <= 768) {
+      // Mobile: use reasonable proportions, not full screen
+      windowWidth = Math.max(300, Math.min(viewportWidth - (2 * margin), icon.id === 'wiki' ? 600 : 480));
+      windowHeight = Math.max(250, Math.min(viewportHeight - actionBarHeight - (2 * margin), icon.id === 'wiki' ? 600 : 400));
+      windowX = margin;
+      windowY = margin;
+    } else if (viewportWidth <= 1024) {
+      // Tablet landscape: reasonable proportions
+      windowWidth = Math.max(400, Math.min(viewportWidth - (2 * margin), icon.id === 'wiki' ? 680 : 480));
+      windowHeight = Math.max(300, Math.min(viewportHeight - actionBarHeight - (2 * margin), icon.id === 'wiki' ? 620 : 400));
+      windowX = margin + Math.random() * Math.max(0, viewportWidth - windowWidth - (2 * margin));
+      windowY = margin + Math.random() * Math.max(0, viewportHeight - windowHeight - actionBarHeight - (2 * margin));
+    } else {
+      // Desktop: ensure windows fit within bounds
+      windowWidth = Math.min(viewportWidth - (2 * margin), icon.id === 'wiki' ? 700 : 500);
+      windowHeight = Math.min(viewportHeight - actionBarHeight - (2 * margin), icon.id === 'wiki' ? 550 : 350);
+      windowX = margin + Math.random() * Math.max(0, viewportWidth - windowWidth - (2 * margin));
+      windowY = margin + Math.random() * Math.max(0, viewportHeight - windowHeight - actionBarHeight - (2 * margin));
+    }
+
     const newWindow: Window = {
       id: `window-${Date.now()}`,
       title: icon.name,
       content: icon.content,
-      x: Math.random() * 200 + 100,
-      y: Math.random() * 100 + 100,
-      width: icon.id === 'wiki' ? 900 : 600,
-      height: icon.id === 'wiki' ? 650 : 400,
+      x: windowX,
+      y: windowY,
+      width: windowWidth,
+      height: windowHeight,
       isMaximized: false,
       zIndex: nextZIndex,
       type: icon.id === 'wiki' ? 'wiki' : 'default'
@@ -138,165 +164,6 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({ isVisible }) => {
     } else if (icon.id === 'terminal') {
       (document.getElementById('terminal-cursor-terminal') as unknown as SVGAnimateElement)?.beginElement();
     }
-  };
-
-  const createWindowShatterEffect = (window: Window) => {
-    // Create container for the 3D effect
-    const container = document.createElement('div');
-    container.style.position = 'absolute';
-    container.style.left = `${window.x}px`;
-    container.style.top = `${window.y}px`;
-    container.style.width = `${window.width}px`;
-    container.style.height = `${window.height}px`;
-    container.style.zIndex = '30';
-    container.style.pointerEvents = 'none';
-    document.body.appendChild(container);
-
-    // Create 3D scene
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, window.width / window.height, 0.1, 1000);
-    camera.position.z = 3;
-
-    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-    renderer.setSize(window.width, window.height);
-    renderer.setClearColor(0x000000, 0);
-    container.appendChild(renderer.domElement);
-
-    // Create wireframe rectangle geometry for the window
-    const rectangleGeometry = new THREE.PlaneGeometry(2, 1.5, 12, 8);
-    const wireframe = new THREE.WireframeGeometry(rectangleGeometry);
-    
-    // Break into fragments similar to sphere
-    const fragments: THREE.LineSegments[] = [];
-    const positions = wireframe.attributes.position.array;
-    const fragmentCount = Math.floor(positions.length / 6);
-    const totalFragments = 10;
-    const usedIndices = new Set<number>();
-
-    for (let fragIndex = 0; fragIndex < totalFragments; fragIndex++) {
-      const fragmentGeometry = new THREE.BufferGeometry();
-      const fragmentPositions = [];
-
-      // Create varied fragment sizes
-      const fragmentType = Math.floor(Math.random() * 4);
-      let fragmentSize;
-
-      switch (fragmentType) {
-        case 0: fragmentSize = Math.floor(Math.random() * 8) + 3; break;
-        case 1: fragmentSize = Math.floor(Math.random() * 15) + 8; break;
-        case 2: fragmentSize = Math.floor(Math.random() * 25) + 15; break;
-        case 3: fragmentSize = Math.floor(Math.random() * 12) + 5; break;
-        default: fragmentSize = Math.floor(Math.random() * 10) + 5;
-      }
-
-      for (let segCount = 0; segCount < fragmentSize && usedIndices.size < fragmentCount; segCount++) {
-        let randomIndex;
-        let attempts = 0;
-        do {
-          randomIndex = Math.floor(Math.random() * fragmentCount);
-          attempts++;
-        } while (usedIndices.has(randomIndex) && attempts < 50);
-
-        if (!usedIndices.has(randomIndex)) {
-          usedIndices.add(randomIndex);
-          const startIdx = randomIndex * 6;
-          if (startIdx + 5 < positions.length) {
-            fragmentPositions.push(
-              positions[startIdx], positions[startIdx + 1], positions[startIdx + 2],
-              positions[startIdx + 3], positions[startIdx + 4], positions[startIdx + 5]
-            );
-          }
-        }
-      }
-
-      if (fragmentPositions.length > 0) {
-        fragmentGeometry.setAttribute('position', new THREE.Float32BufferAttribute(fragmentPositions, 3));
-        
-        const material = new THREE.LineBasicMaterial({
-          color: 0x00ffff,
-          transparent: true,
-          opacity: 0.8,
-        });
-
-        const fragment = new THREE.LineSegments(fragmentGeometry, material);
-        
-        // Distribute fragments across the entire window rectangle area
-        // Scale based on window aspect ratio to match window shape
-        const windowAspect = window.width / window.height;
-        const baseWidth = 2.0;
-        const baseHeight = 1.5;
-        
-        // Adjust dimensions to match window proportions
-        const emissionWidth = baseWidth * Math.min(windowAspect, 2); // Cap at reasonable size
-        const emissionHeight = baseHeight * Math.min(1/windowAspect, 2);
-        
-        fragment.position.x = (Math.random() - 0.5) * emissionWidth;
-        fragment.position.y = (Math.random() - 0.5) * emissionHeight;
-        fragment.position.z = (Math.random() - 0.5) * 0.1;
-
-        // Use same gentle velocity system as sphere
-        (fragment as any).velocity = new THREE.Vector3(
-          (Math.random() - 0.5) * 0.008,
-          (Math.random() - 0.5) * 0.008,
-          (Math.random() - 0.5) * 0.008
-        );
-        
-        (fragment as any).rotationVelocity = new THREE.Vector3(
-          (Math.random() - 0.5) * 0.03,
-          (Math.random() - 0.5) * 0.03,
-          (Math.random() - 0.5) * 0.03
-        );
-
-        scene.add(fragment);
-        fragments.push(fragment);
-      }
-    }
-
-    const shatterEffect: WindowShatterEffect = {
-      id: window.id,
-      scene,
-      renderer,
-      camera,
-      fragments,
-      container
-    };
-
-    setWindowShatterEffects(prev => [...prev, shatterEffect]);
-
-    // Animation and cleanup
-    let startTime = Date.now();
-    const animate = () => {
-      const elapsed = Date.now() - startTime;
-      
-      fragments.forEach(fragment => {
-        const velocity = (fragment as any).velocity;
-        const rotationVelocity = (fragment as any).rotationVelocity;
-        
-        fragment.position.x += velocity.x;
-        fragment.position.y += velocity.y;
-        fragment.position.z += velocity.z;
-        
-        fragment.rotation.x += rotationVelocity.x;
-        fragment.rotation.y += rotationVelocity.y;
-        fragment.rotation.z += rotationVelocity.z;
-        
-        // Fade out slowly like sphere fragments
-        const material = fragment.material as THREE.LineBasicMaterial;
-        material.opacity *= 0.998;
-      });
-
-      renderer.render(scene, camera);
-
-      if (elapsed < 4000) {
-        requestAnimationFrame(animate);
-      } else {
-        // Cleanup
-        container.remove();
-        setWindowShatterEffects(prev => prev.filter(effect => effect.id !== window.id));
-      }
-    };
-
-    animate();
   };
 
   const closeWindow = (windowId: string) => {
@@ -344,29 +211,46 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({ isVisible }) => {
   const handleMouseDown = (e: React.MouseEvent, windowId: string) => {
     e.preventDefault();
     const window = windows.find(w => w.id === windowId);
+    const container = document.querySelector('main');
+    const containerRect = container?.getBoundingClientRect();
+    
     if (window) {
+      // Adjust mouse coordinates relative to container
+      const adjustedX = containerRect ? e.clientX - containerRect.left : e.clientX;
+      const adjustedY = containerRect ? e.clientY - containerRect.top : e.clientY;
+      
       setDragState({
         windowId,
-        offsetX: e.clientX - window.x,
-        offsetY: e.clientY - window.y
+        offsetX: adjustedX - window.x,
+        offsetY: adjustedY - window.y
       });
     }
     bringToFront(windowId);
   };
 
-  const handleMouseMove = (e: MouseEvent) => {
+  const handleMouseMove = useCallback((e: MouseEvent) => {
     if (dragState.windowId) {
+      const margin = 10;
+      const container = document.querySelector('main');
+      const containerWidth = container ? container.clientWidth : window.innerWidth;
+      const containerHeight = container ? container.clientHeight : window.innerHeight;
+      const containerRect = container?.getBoundingClientRect();
+      
+      // Adjust mouse coordinates relative to container
+      const adjustedX = containerRect ? e.clientX - containerRect.left : e.clientX;
+      const adjustedY = containerRect ? e.clientY - containerRect.top : e.clientY;
+      
       setWindows(prev => prev.map(w => 
         w.id === dragState.windowId
           ? {
               ...w,
-              x: Math.max(0, Math.min(window.innerWidth - w.width, e.clientX - dragState.offsetX)),
-              y: Math.max(0, Math.min(window.innerHeight - w.height, e.clientY - dragState.offsetY))
+              x: Math.max(margin, Math.min(containerWidth - w.width - margin, adjustedX - dragState.offsetX)),
+              y: Math.max(margin, Math.min(containerHeight - w.height - margin, adjustedY - dragState.offsetY))
             }
           : w
       ));
     }
-  };
+  }, [dragState.windowId, dragState.offsetX, dragState.offsetY]);
 
   const handleMouseUp = () => {
     setDragState({ windowId: null, offsetX: 0, offsetY: 0 });
@@ -381,7 +265,7 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({ isVisible }) => {
         document.removeEventListener('mouseup', handleMouseUp);
       };
     }
-  }, [dragState]);
+  }, [dragState, handleMouseMove]);
 
 
   if (!isVisible) return null;
@@ -456,48 +340,26 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({ isVisible }) => {
             onMouseDown={(e) => handleMouseDown(e, window.id)}
           />
         ) : (
-          <div
+          <BaseWindow
             key={window.id}
-            className={`window-container absolute border-2 border-[#00FFFF] bg-black ${
-              window.isMaximized ? 'inset-4' : ''
-            }`}
-            style={window.isMaximized ? {} : {
-              left: window.x,
-              top: window.y,
-              width: window.width,
-              height: window.height,
-              zIndex: window.zIndex
-            }}
+            id={window.id}
+            title={window.title}
+            x={window.x}
+            y={window.y}
+            width={window.width}
+            height={window.height}
+            isMaximized={window.isMaximized}
+            zIndex={window.zIndex}
+            onClose={() => closeWindow(window.id)}
+            onToggleMaximize={() => toggleMaximize(window.id)}
+            onMouseDown={(e) => handleMouseDown(e, window.id)}
           >
-            {/* Title Bar */}
-            <div
-              className="flex items-center justify-between bg-[#00FFFF] bg-opacity-20 px-3 py-2 cursor-move"
-              onMouseDown={(e) => !window.isMaximized && handleMouseDown(e, window.id)}
-            >
-              <span className="text-black font-mono text-sm font-bold">{window.title}</span>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => toggleMaximize(window.id)}
-                  className="text-black hover:bg-black hover:text-[#00FFFF] w-6 h-6 border border-black text-xs font-mono transition-colors"
-                >
-                  {window.isMaximized ? '□' : '■'}
-                </button>
-                <button
-                  onClick={() => closeWindow(window.id)}
-                  className="text-black hover:bg-black hover:text-[#00FFFF] w-6 h-6 border border-black text-xs font-mono transition-colors"
-                >
-                  ×
-                </button>
-              </div>
-            </div>
-
-            {/* Content */}
-            <div className="p-4 overflow-auto" style={{ height: 'calc(100% - 40px)' }}>
+            <div className="p-4 overflow-auto h-full">
               <pre className="text-[#00FFFF] font-mono text-sm whitespace-pre-wrap leading-relaxed">
                 {window.content}
               </pre>
             </div>
-          </div>
+          </BaseWindow>
         )
       ))}
 

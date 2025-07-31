@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { MDXRemote } from "next-mdx-remote";
 import Link from "next/link";
+import { BaseWindow } from "./BaseWindow";
 
 // Error Boundary Component
 class ErrorBoundary extends React.Component<
@@ -219,67 +220,84 @@ export default function WikiWindow({
       }
     }
     
-    // For external links or non-wiki internal links, use regular Link
+    // Check if it's an external link (starts with http)
+    if (href && (href.startsWith('http://') || href.startsWith('https://'))) {
+      return (
+        <a 
+          href={href} 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className={className || "text-[#FF4800] no-underline border-b border-solid border-[#FF4800] hover:text-[#FF6600] hover:border-[#FF6600] inline-flex items-center gap-1"}
+          {...props}
+        >
+          {children}
+          <span className="text-xs opacity-60">↗</span>
+        </a>
+      );
+    }
+    
+    // For other internal links, use regular Link
     return <Link href={href || '#'} className={className} {...props}>{children}</Link>;
   };
 
   const components = {
     Link: WikiLink,
-    // Make standard Link available too
-    a: WikiLink,
+    // Handle regular anchor tags with proper styling
+    a: ({ href, children, className, ...props }: { href?: string; children: React.ReactNode; className?: string; [key: string]: unknown }) => {
+      // Check if it's an external link (starts with http)
+      if (href && (href.startsWith('http://') || href.startsWith('https://'))) {
+        return (
+          <a 
+            href={href} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className={className || "text-[#FF4800] no-underline border-b border-solid border-[#FF4800] hover:text-[#FF6600] hover:border-[#FF6600] inline-flex items-center gap-1"}
+            {...props}
+          >
+            {children}
+            <span className="text-xs opacity-60">↗</span>
+          </a>
+        );
+      }
+      
+      // For internal links, use wiki styling
+      return (
+        <a 
+          href={href || '#'} 
+          className={className || "text-[#00FFFF] no-underline border-b border-dotted border-[#00FFFF] hover:text-white hover:border-white"} 
+          {...props}
+        >
+          {children}
+        </a>
+      );
+    },
   };
 
   return (
-    <div
-      className={`window-container absolute border-2 border-[#00FFFF] bg-black ${
-        isMaximized ? 'inset-4' : ''
-      }`}
-      style={isMaximized ? {} : {
-        left: x,
-        top: y,
-        width: width,
-        height: height,
-        zIndex: zIndex
-      }}
+    <BaseWindow
+      id="wiki-window"
+      title={`WIKI.MD${currentFile ? ` - ${currentFile.toUpperCase()}` : ''}`}
+      x={x}
+      y={y}
+      width={width}
+      height={height}
+      isMaximized={isMaximized}
+      zIndex={zIndex}
+      onClose={onClose}
+      onToggleMaximize={onToggleMaximize}
+      onMouseDown={onMouseDown}
+      titleBarButtons={
+        <button
+          onClick={loadRandomPage}
+          className="text-black hover:bg-black hover:text-[#00FFFF] px-2 py-1 border border-black text-xs font-mono transition-colors"
+          disabled={isLoading}
+        >
+          {isLoading ? "..." : "RND"}
+        </button>
+      }
     >
-      {/* Title Bar */}
-      <div
-        className="flex items-center justify-between bg-[#00FFFF] bg-opacity-20 px-3 py-2 cursor-move"
-        onMouseDown={!isMaximized ? onMouseDown : undefined}
-      >
-        <span className="text-black font-mono text-sm font-bold">
-          WIKI.MD {currentFile && `- ${currentFile.toUpperCase()}`}
-        </span>
-        <div className="flex gap-2">
-          <button
-            onClick={loadRandomPage}
-            className="text-black hover:bg-black hover:text-[#00FFFF] px-2 py-1 border border-black text-xs font-mono transition-colors"
-            disabled={isLoading}
-          >
-            {isLoading ? "..." : "RND"}
-          </button>
-          <button
-            onClick={onToggleMaximize}
-            className="text-black hover:bg-black hover:text-[#00FFFF] w-6 h-6 border border-black text-xs font-mono transition-colors"
-          >
-            {isMaximized ? '□' : '■'}
-          </button>
-          <button
-            onClick={onClose}
-            className="text-black hover:bg-black hover:text-[#00FFFF] w-6 h-6 border border-black text-xs font-mono transition-colors"
-          >
-            ×
-          </button>
-        </div>
-      </div>
-
-      {/* Content */}
-      <div className="p-4 overflow-auto" style={{ height: 'calc(100% - 40px)' }}>
-        {isLoading ? (
-          <div className="text-[#00FFFF] font-mono text-sm animate-pulse">
-            Loading wiki content...
-          </div>
-        ) : currentContent ? (
+      <div className="p-4 overflow-auto h-full">
+        {currentContent ? (
           <article className="w-full">
             {/* Frontmatter Header */}
             {currentContent.frontmatter.title && (
@@ -341,7 +359,7 @@ export default function WikiWindow({
               {currentContent.source ? (
                 <ErrorBoundary>
                   <MDXRemote 
-                    {...(currentContent.source as any)} 
+                    {...(currentContent.source as Record<string, unknown>)} 
                     components={components} 
                   />
                 </ErrorBoundary>
@@ -351,7 +369,7 @@ export default function WikiWindow({
                     <div>
                       <div className="mb-2">❌ {String(currentContent.frontmatter.error)}</div>
                       <div className="text-xs opacity-40">
-                        Try clicking the "RND" button to load a different page.
+                        Try clicking the &quot;RND&quot; button to load a different page.
                       </div>
                     </div>
                   ) : (
@@ -367,6 +385,6 @@ export default function WikiWindow({
           </div>
         )}
       </div>
-    </div>
+    </BaseWindow>
   );
 }

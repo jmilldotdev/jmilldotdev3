@@ -31,28 +31,30 @@ function processBacklinks(content: string, validSlugs: Set<string>): string {
   return content.replace(/\[\[([^\]]+)\]\]/g, (match, linkText) => {
     // Check if this is an image reference
     if (linkText.match(/\.(png|jpg|jpeg|gif|webp)$/i)) {
-      const imagePath = `/content/Images/${linkText}`;
+      const imagePath = `/images/${linkText}`;
       return `<img src="${imagePath}" alt="${linkText}" className="max-w-full h-auto border border-gray-700 my-3 rounded" />`;
     }
-    
+
     // Handle pipe syntax [[link|display text]]
     let actualLinkText = linkText;
     let displayText = linkText;
-    if (linkText.includes('|')) {
-      const parts = linkText.split('|');
+    if (linkText.includes("|")) {
+      const parts = linkText.split("|");
       actualLinkText = parts[0].trim();
       displayText = parts[1].trim();
     }
-    
+
     // Convert to slug and check if it's valid
     const slug = textToSlug(actualLinkText);
-    
+
     // If the slug is valid, create a link; otherwise, return plain text
     if (validSlugs.has(slug)) {
       return `<Link href="/c/${slug}" className="text-[var(--color-primary)] hover:underline hover:text-[var(--color-secondary)] transition-colors font-medium">${displayText}</Link>`;
     } else {
       // Return as plain text for invalid links
-      console.log(`Warning: Invalid link removed: [[${linkText}]] -> slug: ${slug}`);
+      console.log(
+        `Warning: Invalid link removed: [[${linkText}]] -> slug: ${slug}`
+      );
       return displayText;
     }
   });
@@ -66,16 +68,29 @@ function copyAttachment(
   const regex = /!\[\[(.*?)\]\]/g;
   let match;
   const modifiedContent = content;
+  const publicImagesDir = path.join(process.cwd(), "public", "images");
 
   while ((match = regex.exec(content)) !== null) {
     const fileName = match[1];
     const sourcePath = path.join(attachmentsDir, fileName);
-    const destPath = path.join(destDir, "Images", fileName);
+    // Copy to both content/Images and public/images for web serving
+    const contentDestPath = path.join(destDir, "Images", fileName);
+    const publicDestPath = path.join(publicImagesDir, fileName);
 
     if (fs.existsSync(sourcePath)) {
-      fs.mkdirSync(path.dirname(destPath), { recursive: true });
-      fs.copyFileSync(sourcePath, destPath);
-      console.log(`Copied attachment: ${sourcePath} to ${destPath}`);
+      // Copy to content directory
+      fs.mkdirSync(path.dirname(contentDestPath), { recursive: true });
+      fs.copyFileSync(sourcePath, contentDestPath);
+      console.log(
+        `Copied attachment to content: ${sourcePath} to ${contentDestPath}`
+      );
+
+      // Copy to public directory for web serving
+      fs.mkdirSync(path.dirname(publicDestPath), { recursive: true });
+      fs.copyFileSync(sourcePath, publicDestPath);
+      console.log(
+        `Copied attachment to public: ${sourcePath} to ${publicDestPath}`
+      );
     } else {
       console.warn(`Attachment not found: ${sourcePath}`);
     }
@@ -170,30 +185,39 @@ function copyPublishedFiles(
           frontmatterPart = frontmatterPart
             .replace(/- c\/entity/g, "- entity")
             .replace(/- sources\//g, "- ");
-            
+
           // Clean up related field by removing invalid link references
-          frontmatterPart = frontmatterPart.replace(/related:\s*\n([\s\S]*?)(?=\n\w+:|$)/g, (match, relatedContent) => {
-            if (!relatedContent) return match;
-            
-            const lines = relatedContent.split('\n');
-            const validLines = lines.filter(line => {
-              // Remove lines that contain [[...]] references that don't correspond to valid pages
-              const linkMatch = line.match(/\[\[([^\]]+)\]\]/);
-              if (linkMatch) {
-                const linkText = linkMatch[1];
-                const actualLinkText = linkText.includes('|') ? linkText.split('|')[0].trim() : linkText;
-                const slug = textToSlug(actualLinkText);
-                const isValid = validSlugs.has(slug);
-                if (!isValid) {
-                  console.log(`Warning: Removed invalid related link: ${linkText}`);
-                  return false;
+          frontmatterPart = frontmatterPart.replace(
+            /related:\s*\n([\s\S]*?)(?=\n\w+:|$)/g,
+            (match, relatedContent) => {
+              if (!relatedContent) return match;
+
+              const lines = relatedContent.split("\n");
+              const validLines = lines.filter((line: string) => {
+                // Remove lines that contain [[...]] references that don't correspond to valid pages
+                const linkMatch = line.match(/\[\[([^\]]+)\]\]/);
+                if (linkMatch) {
+                  const linkText = linkMatch[1];
+                  const actualLinkText = linkText.includes("|")
+                    ? linkText.split("|")[0].trim()
+                    : linkText;
+                  const slug = textToSlug(actualLinkText);
+                  const isValid = validSlugs.has(slug);
+                  if (!isValid) {
+                    console.log(
+                      `Warning: Removed invalid related link: ${linkText}`
+                    );
+                    return false;
+                  }
                 }
-              }
-              return true;
-            });
-            
-            return validLines.length > 1 ? `related:\n${validLines.join('\n')}` : '';
-          });
+                return true;
+              });
+
+              return validLines.length > 1
+                ? `related:\n${validLines.join("\n")}`
+                : "";
+            }
+          );
         } else {
           // Add new frontmatter if none exists
           frontmatterPart = `---
@@ -209,13 +233,16 @@ title: "${title}"
         contentPart = contentPart.replace(/c\/entity/g, "entity");
 
         // Process image references first (![[ ]] syntax)
-        contentPart = contentPart.replace(/!\[\[([^\]]+)\]\]/g, (match, linkText) => {
-          if (linkText.match(/\.(png|jpg|jpeg|gif|webp)$/i)) {
-            const imagePath = `/content/Images/${linkText}`;
-            return `<img src="${imagePath}" alt="${linkText}" className="max-w-full h-auto border border-gray-700 my-3 rounded" />`;
+        contentPart = contentPart.replace(
+          /!\[\[([^\]]+)\]\]/g,
+          (match, linkText) => {
+            if (linkText.match(/\.(png|jpg|jpeg|gif|webp)$/i)) {
+              const imagePath = `/images/${linkText}`;
+              return `<img src="${imagePath}" alt="${linkText}" className="max-w-full h-auto border border-gray-700 my-3 rounded" />`;
+            }
+            return match; // Return unchanged if not an image
           }
-          return match; // Return unchanged if not an image
-        });
+        );
 
         // Process backlinks (only in content part)
         contentPart = processBacklinks(contentPart, validSlugs);
@@ -288,13 +315,19 @@ function collectValidSlugs(dir: string) {
   for (const file of files) {
     const fullPath = path.join(dir, file);
     const stat = fs.statSync(fullPath);
-    
+
     if (stat.isDirectory()) {
       collectValidSlugs(fullPath);
     } else if (path.extname(file) === ".md") {
       const content = fs.readFileSync(fullPath, "utf8");
-      if (content.includes('publish: "true"') || content.includes("publish: true")) {
-        const destFileName = file.replace(/^(\p{Emoji_Presentation}|\p{Emoji}\uFE0F|\s)+/gu, "");
+      if (
+        content.includes('publish: "true"') ||
+        content.includes("publish: true")
+      ) {
+        const destFileName = file.replace(
+          /^(\p{Emoji_Presentation}|\p{Emoji}\uFE0F|\s)+/gu,
+          ""
+        );
         const baseFileName = path.basename(destFileName, ".md");
         const slugifiedFileName = baseFileName
           .toLowerCase()
@@ -309,7 +342,14 @@ function collectValidSlugs(dir: string) {
 collectValidSlugs(sourceDir);
 
 // Second pass: process files with valid slug validation
-const result = copyPublishedFiles(sourceDir, sourceDir, [], [], new Map(), validSlugs);
+const result = copyPublishedFiles(
+  sourceDir,
+  sourceDir,
+  [],
+  [],
+  new Map(),
+  validSlugs
+);
 const { generatedPages, pageMetadata, tagMap } = result;
 
 // Add the home page
@@ -351,5 +391,33 @@ const entityPages = tagMap.get("entity") || [];
 const entitiesIndexPath = path.join(configDir, "entities.json");
 fs.writeFileSync(entitiesIndexPath, JSON.stringify(entityPages, null, 2));
 console.log(`Generated entities index at: ${entitiesIndexPath}`);
+
+// Copy all existing images from content/Images to public/images for web serving
+const contentImagesDir = path.join(destDir, "Images");
+const publicImagesDir = path.join(process.cwd(), "public", "images");
+
+if (fs.existsSync(contentImagesDir)) {
+  // Ensure public images directory exists
+  fs.mkdirSync(publicImagesDir, { recursive: true });
+
+  // Copy all image files
+  const imageFiles = fs.readdirSync(contentImagesDir);
+  imageFiles.forEach((fileName) => {
+    const sourcePath = path.join(contentImagesDir, fileName);
+    const destPath = path.join(publicImagesDir, fileName);
+
+    // Only copy if it's a file (not a directory)
+    if (fs.statSync(sourcePath).isFile()) {
+      fs.copyFileSync(sourcePath, destPath);
+      console.log(`Copied image for web serving: ${fileName}`);
+    }
+  });
+
+  console.log(
+    `Copied ${imageFiles.length} images to public directory for web serving`
+  );
+} else {
+  console.log("No content/Images directory found");
+}
 
 console.log("Finished copying and modifying published files.");

@@ -245,11 +245,11 @@ export const SphereAnimation = forwardRef<
             (Math.random() - 0.5) * 0.01,
             (Math.random() - 0.5) * 0.01
           );
-          (fragment as any).velocity = velocity;
+          (fragment as unknown as THREE.LineSegments & { velocity: THREE.Vector3 }).velocity = velocity;
 
           // Store rotation velocity - inherit the sphere's rotation momentum plus some variation
           const baseRotationSpeed = { x: 0.002, y: 0.004, z: 0 };
-          (fragment as any).rotationVelocity = new THREE.Vector3(
+          (fragment as unknown as THREE.LineSegments & { rotationVelocity: THREE.Vector3 }).rotationVelocity = new THREE.Vector3(
             baseRotationSpeed.x + (Math.random() - 0.5) * 0.002,
             baseRotationSpeed.y + (Math.random() - 0.5) * 0.002,
             baseRotationSpeed.z + (Math.random() - 0.5) * 0.003
@@ -353,11 +353,11 @@ export const SphereAnimation = forwardRef<
             (Math.random() - 0.5) * 0.008,
             (Math.random() - 0.5) * 0.008
           );
-          (fragment as any).velocity = velocity;
+          (fragment as unknown as THREE.LineSegments & { velocity: THREE.Vector3 }).velocity = velocity;
 
           // Store rotation velocity
           const baseRotationSpeed = { x: 0.003, y: 0.001, z: 0.002 }; // Red sphere speeds
-          (fragment as any).rotationVelocity = new THREE.Vector3(
+          (fragment as unknown as THREE.LineSegments & { rotationVelocity: THREE.Vector3 }).rotationVelocity = new THREE.Vector3(
             baseRotationSpeed.x + (Math.random() - 0.5) * 0.002,
             baseRotationSpeed.y + (Math.random() - 0.5) * 0.002,
             baseRotationSpeed.z + (Math.random() - 0.5) * 0.002
@@ -373,8 +373,9 @@ export const SphereAnimation = forwardRef<
   };
 
   useEffect(() => {
-    // Check if container exists
-    if (!canvasContainerRef.current) {
+    // Check if container exists and store ref
+    const canvasContainer = canvasContainerRef.current;
+    if (!canvasContainer) {
       console.error("Canvas container ref is null");
       return;
     }
@@ -416,13 +417,13 @@ export const SphereAnimation = forwardRef<
     renderer.domElement.style.zIndex = "1";
 
     // Ensure any existing canvas is removed first
-    while (canvasContainerRef.current.firstChild) {
-      canvasContainerRef.current.removeChild(
-        canvasContainerRef.current.firstChild
+    while (canvasContainer.firstChild) {
+      canvasContainer.removeChild(
+        canvasContainer.firstChild
       );
     }
 
-    canvasContainerRef.current.appendChild(renderer.domElement);
+    canvasContainer.appendChild(renderer.domElement);
     rendererRef.current = renderer;
 
     // Add ambient light
@@ -527,8 +528,8 @@ export const SphereAnimation = forwardRef<
       // Animate red fragments slowly
       if (isShatteredRef.current && redFragmentsRef.current.length > 0) {
         redFragmentsRef.current.forEach((fragment) => {
-          const velocity = (fragment as any).velocity;
-          const rotationVelocity = (fragment as any).rotationVelocity;
+          const velocity = (fragment as unknown as THREE.LineSegments & { velocity: THREE.Vector3 }).velocity;
+          const rotationVelocity = (fragment as unknown as THREE.LineSegments & { rotationVelocity: THREE.Vector3 }).rotationVelocity;
 
           // Update position slowly
           fragment.position.x += velocity.x;
@@ -576,8 +577,8 @@ export const SphereAnimation = forwardRef<
     return () => {
       console.log("Cleaning up THREE.js scene");
       window.removeEventListener("resize", handleResize);
-      if (canvasContainerRef.current && rendererRef.current) {
-        canvasContainerRef.current.removeChild(rendererRef.current.domElement);
+      if (canvasContainer && rendererRef.current) {
+        canvasContainer.removeChild(rendererRef.current.domElement);
       }
       scene.clear();
     };
@@ -592,7 +593,7 @@ export const SphereAnimation = forwardRef<
       {/* Canvas container with higher z-index but no pointer events */}
       <div
         ref={canvasContainerRef}
-        className="absolute inset-0 z-[20] pointer-events-none"
+        className="absolute inset-0 z-[18] pointer-events-none"
       />
     </div>
   );
