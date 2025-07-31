@@ -252,9 +252,12 @@ title: "${title}"
           .replace(/allowfullscreen/g, "allowFullScreen")
           .replace(/frameborder=/g, "frameBorder=");
 
+        // Check if we need the Link import - only add if there are valid Link components
+        const hasLinks = contentPart.includes('<Link href="/c/');
+        const importStatement = hasLinks ? '\n\nimport Link from "next/link";\n' : '\n\n';
+
         // Reassemble the content
-        modifiedContent =
-          frontmatterPart + '\n\nimport Link from "next/link";\n' + contentPart;
+        modifiedContent = frontmatterPart + importStatement + contentPart;
 
         fs.mkdirSync(path.dirname(destPath), { recursive: true });
         fs.writeFileSync(destPath, modifiedContent);

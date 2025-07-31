@@ -194,6 +194,7 @@ export default function WikiWindow({
         ];
         await loadSpecificPage("index");
       }
+      setIsLoading(false);
     };
     initializeWiki();
   }, []);

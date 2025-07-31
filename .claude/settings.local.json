@@ -6,7 +6,8 @@
       "Bash(pnpm tsc:*)",
       "Bash(pnpm add:*)",
       "mcp__ide__getDiagnostics",
-      "Bash(mkdir:*)"
+      "Bash(mkdir:*)",
+      "Bash(find:*)"
     ],
     "deny": []
   }
