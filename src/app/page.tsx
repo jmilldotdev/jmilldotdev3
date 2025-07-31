@@ -30,11 +30,13 @@ export default function Home() {
       </div>
 
       <div className="h-12 flex items-center justify-center">
-        {!buttonClicked && (
-          <Button variant="primary" onClick={handleEnterClick}>
-            Enter
-          </Button>
-        )}
+        <Button 
+          variant="primary" 
+          onClick={handleEnterClick}
+          className={`transition-opacity duration-1000 ${buttonClicked ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
+        >
+          Enter
+        </Button>
       </div>
     </div>
   );
