@@ -56,7 +56,9 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({ isVisible }) => {
       content: "JMILL OPERATING SYSTEM v2.1\n\nCopyright (c) 2024 JMILL Industries\nAll rights reserved.\n\nSYSTEM SPECIFICATIONS:\n- Neural Processing Unit: Active\n- Memory Core: 64GB Quantum RAM\n- Storage: 2TB Holographic Drive\n- Network: Quantum Entanglement Enabled\n\nSTATUS: OPERATIONAL",
       icon: (
         <svg viewBox="0 0 24 24" className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth="1">
-          <circle cx="12" cy="12" r="10"/>
+          <circle cx="12" cy="12" r="10">
+            <animate attributeName="stroke-dasharray" values="0 63;63 0" dur="2s" begin="indefinite" repeatCount="indefinite" id="about-circle-about"/>
+          </circle>
           <path d="M9,9h6v6H9z"/>
           <path d="M12,6v3"/>
           <path d="M12,15v3"/>
@@ -75,9 +77,15 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({ isVisible }) => {
         <svg viewBox="0 0 24 24" className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth="1">
           <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2Z"/>
           <path d="M14,2V8H20"/>
-          <path d="M16,13H8"/>
-          <path d="M16,17H8"/>
-          <path d="M10,9H8"/>
+          <path d="M16,13H8" strokeDasharray="8 0">
+            <animate attributeName="stroke-dasharray" values="8 0;0 8;8 0" dur="1.5s" begin="indefinite" repeatCount="indefinite" id="files-line1-files"/>
+          </path>
+          <path d="M16,17H8" strokeDasharray="8 0">
+            <animate attributeName="stroke-dasharray" values="8 0;0 8;8 0" dur="1.5s" begin="indefinite" repeatCount="indefinite" id="files-line2-files"/>
+          </path>
+          <path d="M10,9H8" strokeDasharray="2 0">
+            <animate attributeName="stroke-dasharray" values="2 0;0 2;2 0" dur="1.5s" begin="indefinite" repeatCount="indefinite" id="files-line3-files"/>
+          </path>
         </svg>
       )
     },
@@ -93,7 +101,9 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({ isVisible }) => {
           <path d="M8,21H16"/>
           <path d="M12,17V21"/>
           <path d="M6,7L10,10L6,13"/>
-          <path d="M13,13H17"/>
+          <path d="M13,13H17">
+            <animate attributeName="opacity" values="1;0;1" dur="1s" repeatCount="indefinite" begin="indefinite" id="terminal-cursor-terminal"/>
+          </path>
         </svg>
       )
     }
@@ -114,6 +124,17 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({ isVisible }) => {
 
     setWindows(prev => [...prev, newWindow]);
     setNextZIndex(prev => prev + 1);
+
+    // Start animation for the corresponding icon
+    if (icon.id === 'about') {
+      document.getElementById('about-circle-about')?.beginElement();
+    } else if (icon.id === 'files') {
+      setTimeout(() => document.getElementById('files-line3-files')?.beginElement(), 0);
+      setTimeout(() => document.getElementById('files-line1-files')?.beginElement(), 500);
+      setTimeout(() => document.getElementById('files-line2-files')?.beginElement(), 1000);
+    } else if (icon.id === 'terminal') {
+      document.getElementById('terminal-cursor-terminal')?.beginElement();
+    }
   };
 
   const createWindowShatterEffect = (window: Window) => {
@@ -196,16 +217,25 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({ isVisible }) => {
 
         const fragment = new THREE.LineSegments(fragmentGeometry, material);
         
-        // Position fragments in a larger emission area
-        fragment.position.x = (Math.random() - 0.5) * 1.5; // Larger spread
-        fragment.position.y = (Math.random() - 0.5) * 1.2; // Larger spread
-        fragment.position.z = (Math.random() - 0.5) * 0.2;
+        // Distribute fragments across the entire window rectangle area
+        // Scale based on window aspect ratio to match window shape
+        const windowAspect = window.width / window.height;
+        const baseWidth = 2.0;
+        const baseHeight = 1.5;
+        
+        // Adjust dimensions to match window proportions
+        const emissionWidth = baseWidth * Math.min(windowAspect, 2); // Cap at reasonable size
+        const emissionHeight = baseHeight * Math.min(1/windowAspect, 2);
+        
+        fragment.position.x = (Math.random() - 0.5) * emissionWidth;
+        fragment.position.y = (Math.random() - 0.5) * emissionHeight;
+        fragment.position.z = (Math.random() - 0.5) * 0.1;
 
-        // Store velocities
+        // Use same gentle velocity system as sphere
         (fragment as any).velocity = new THREE.Vector3(
-          (Math.random() - 0.5) * 0.02,
-          (Math.random() - 0.5) * 0.02,
-          (Math.random() - 0.5) * 0.02
+          (Math.random() - 0.5) * 0.008,
+          (Math.random() - 0.5) * 0.008,
+          (Math.random() - 0.5) * 0.008
         );
         
         (fragment as any).rotationVelocity = new THREE.Vector3(
@@ -247,9 +277,9 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({ isVisible }) => {
         fragment.rotation.y += rotationVelocity.y;
         fragment.rotation.z += rotationVelocity.z;
         
-        // Fade out
+        // Fade out slowly like sphere fragments
         const material = fragment.material as THREE.LineBasicMaterial;
-        material.opacity *= 0.995;
+        material.opacity *= 0.998;
       });
 
       renderer.render(scene, camera);
@@ -268,10 +298,27 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({ isVisible }) => {
 
   const closeWindow = (windowId: string) => {
     const windowToClose = windows.find(w => w.id === windowId);
-    if (windowToClose) {
-      createWindowShatterEffect(windowToClose);
-    }
     setWindows(prev => prev.filter(w => w.id !== windowId));
+    
+    // Stop animation for the corresponding icon if no more windows of this type are open
+    if (windowToClose) {
+      const remainingWindowsOfSameType = windows.filter(w => w.id !== windowId && w.title === windowToClose.title);
+      if (remainingWindowsOfSameType.length === 0) {
+        // Find the icon by matching window title to icon name
+        const correspondingIcon = desktopIcons.find(icon => icon.name === windowToClose.title);
+        if (correspondingIcon) {
+          if (correspondingIcon.id === 'about') {
+            document.getElementById('about-circle-about')?.endElement();
+          } else if (correspondingIcon.id === 'files') {
+            document.getElementById('files-line1-files')?.endElement();
+            document.getElementById('files-line2-files')?.endElement();
+            document.getElementById('files-line3-files')?.endElement();
+          } else if (correspondingIcon.id === 'terminal') {
+            document.getElementById('terminal-cursor-terminal')?.endElement();
+          }
+        }
+      }
+    }
   };
 
   const toggleMaximize = (windowId: string) => {
@@ -310,8 +357,8 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({ isVisible }) => {
         w.id === dragState.windowId
           ? {
               ...w,
-              x: e.clientX - dragState.offsetX,
-              y: e.clientY - dragState.offsetY
+              x: Math.max(0, Math.min(window.innerWidth - w.width, e.clientX - dragState.offsetX)),
+              y: Math.max(0, Math.min(window.innerHeight - w.height, e.clientY - dragState.offsetY))
             }
           : w
       ));
@@ -350,8 +397,41 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({ isVisible }) => {
           className="absolute flex flex-col items-center cursor-pointer group z-20"
           style={{ left: icon.x, top: icon.y }}
           onDoubleClick={() => createWindow(icon)}
+          onMouseEnter={() => {
+            const isWindowOpen = windows.some(w => w.title === icon.name);
+            if (!isWindowOpen) {
+              if (icon.id === 'about') {
+                document.getElementById('about-circle-about')?.beginElement();
+              } else if (icon.id === 'files') {
+                // Trigger file content lines in sequence
+                setTimeout(() => document.getElementById('files-line3-files')?.beginElement(), 0);
+                setTimeout(() => document.getElementById('files-line1-files')?.beginElement(), 500);
+                setTimeout(() => document.getElementById('files-line2-files')?.beginElement(), 1000);
+              } else if (icon.id === 'terminal') {
+                document.getElementById('terminal-cursor-terminal')?.beginElement();
+              }
+            }
+          }}
+          onMouseLeave={() => {
+            const isWindowOpen = windows.some(w => w.title === icon.name);
+            if (!isWindowOpen) {
+              if (icon.id === 'about') {
+                document.getElementById('about-circle-about')?.endElement();
+              } else if (icon.id === 'files') {
+                document.getElementById('files-line1-files')?.endElement();
+                document.getElementById('files-line2-files')?.endElement();
+                document.getElementById('files-line3-files')?.endElement();
+              } else if (icon.id === 'terminal') {
+                document.getElementById('terminal-cursor-terminal')?.endElement();
+              }
+            }
+          }}
         >
-          <div className="text-[#00FFFF] p-2 border border-[#00FFFF] border-opacity-50 group-hover:border-opacity-100 group-hover:bg-[#00FFFF] group-hover:bg-opacity-10 transition-all">
+          <div className={`text-[#00FFFF] p-2 border border-[#00FFFF] transition-all ${
+            windows.some(w => w.title === icon.name) 
+              ? 'border-opacity-100 shadow-[0_0_10px_#00FFFF]' 
+              : 'border-opacity-50 group-hover:border-opacity-100 group-hover:shadow-[0_0_10px_#00FFFF]'
+          }`}>
             {icon.icon}
           </div>
           <span className="text-[#00FFFF] text-xs mt-1 text-center font-mono">{icon.name}</span>
@@ -362,7 +442,7 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({ isVisible }) => {
       {windows.map(window => (
         <div
           key={window.id}
-          className={`window-container absolute border-2 border-[#00FFFF] bg-black bg-opacity-90 ${
+          className={`window-container absolute border-2 border-[#00FFFF] bg-black ${
             window.isMaximized ? 'inset-4' : ''
           }`}
           style={window.isMaximized ? {} : {
@@ -378,17 +458,17 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({ isVisible }) => {
             className="flex items-center justify-between bg-[#00FFFF] bg-opacity-20 px-3 py-2 cursor-move"
             onMouseDown={(e) => !window.isMaximized && handleMouseDown(e, window.id)}
           >
-            <span className="text-[#00FFFF] font-mono text-sm">{window.title}</span>
+            <span className="text-black font-mono text-sm font-bold">{window.title}</span>
             <div className="flex gap-2">
               <button
                 onClick={() => toggleMaximize(window.id)}
-                className="text-[#FF4800] hover:bg-[#FF4800] hover:text-black w-6 h-6 border border-[#FF4800] text-xs font-mono transition-colors"
+                className="text-black hover:bg-black hover:text-[#00FFFF] w-6 h-6 border border-black text-xs font-mono transition-colors"
               >
                 {window.isMaximized ? '□' : '■'}
               </button>
               <button
                 onClick={() => closeWindow(window.id)}
-                className="text-[#FF4800] hover:bg-[#FF4800] hover:text-black w-6 h-6 border border-[#FF4800] text-xs font-mono transition-colors"
+                className="text-black hover:bg-black hover:text-[#00FFFF] w-6 h-6 border border-black text-xs font-mono transition-colors"
               >
                 ×
               </button>
