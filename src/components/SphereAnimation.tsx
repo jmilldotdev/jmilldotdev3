@@ -242,21 +242,17 @@ export const SphereAnimation = forwardRef<
           (Math.random() - 0.5) * 0.01,
           (Math.random() - 0.5) * 0.01
         );
-        (
-          fragment as THREE.LineSegments & { velocity: THREE.Vector3 }
-        ).velocity = velocity;
+        (fragment as any).velocity = velocity;
 
         // Store rotation velocity - inherit the sphere's rotation momentum plus some variation
         const baseRotationSpeed = { x: 0.002, y: 0.004, z: 0 };
-        (
-          fragment as THREE.LineSegments & { rotationVelocity: THREE.Vector3 }
-        ).rotationVelocity = new THREE.Vector3(
+        (fragment as any).rotationVelocity = new THREE.Vector3(
           baseRotationSpeed.x + (Math.random() - 0.5) * 0.002,
           baseRotationSpeed.y + (Math.random() - 0.5) * 0.002,
           baseRotationSpeed.z + (Math.random() - 0.5) * 0.003
         );
 
-        sceneRef.current.add(fragment);
+        sceneRef.current?.add(fragment);
         fragments.push(fragment);
       }
     }
@@ -364,7 +360,7 @@ export const SphereAnimation = forwardRef<
           baseRotationSpeed.z + (Math.random() - 0.5) * 0.002
         );
 
-        sceneRef.current.add(fragment);
+        sceneRef.current?.add(fragment);
         fragments.push(fragment);
       }
     }

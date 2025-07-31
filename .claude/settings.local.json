@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "Bash(pnpm install:*)",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "Bash(pnpm tsc:*)"
     ],
     "deny": []
   }

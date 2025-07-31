@@ -127,13 +127,13 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({ isVisible }) => {
 
     // Start animation for the corresponding icon
     if (icon.id === 'about') {
-      document.getElementById('about-circle-about')?.beginElement();
+      (document.getElementById('about-circle-about') as unknown as SVGAnimateElement)?.beginElement();
     } else if (icon.id === 'files') {
-      setTimeout(() => document.getElementById('files-line3-files')?.beginElement(), 0);
-      setTimeout(() => document.getElementById('files-line1-files')?.beginElement(), 500);
-      setTimeout(() => document.getElementById('files-line2-files')?.beginElement(), 1000);
+      setTimeout(() => (document.getElementById('files-line3-files') as unknown as SVGAnimateElement)?.beginElement(), 0);
+      setTimeout(() => (document.getElementById('files-line1-files') as unknown as SVGAnimateElement)?.beginElement(), 500);
+      setTimeout(() => (document.getElementById('files-line2-files') as unknown as SVGAnimateElement)?.beginElement(), 1000);
     } else if (icon.id === 'terminal') {
-      document.getElementById('terminal-cursor-terminal')?.beginElement();
+      (document.getElementById('terminal-cursor-terminal') as unknown as SVGAnimateElement)?.beginElement();
     }
   };
 
@@ -308,13 +308,13 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({ isVisible }) => {
         const correspondingIcon = desktopIcons.find(icon => icon.name === windowToClose.title);
         if (correspondingIcon) {
           if (correspondingIcon.id === 'about') {
-            document.getElementById('about-circle-about')?.endElement();
+            (document.getElementById('about-circle-about') as unknown as SVGAnimateElement)?.endElement();
           } else if (correspondingIcon.id === 'files') {
-            document.getElementById('files-line1-files')?.endElement();
-            document.getElementById('files-line2-files')?.endElement();
-            document.getElementById('files-line3-files')?.endElement();
+            (document.getElementById('files-line1-files') as unknown as SVGAnimateElement)?.endElement();
+            (document.getElementById('files-line2-files') as unknown as SVGAnimateElement)?.endElement();
+            (document.getElementById('files-line3-files') as unknown as SVGAnimateElement)?.endElement();
           } else if (correspondingIcon.id === 'terminal') {
-            document.getElementById('terminal-cursor-terminal')?.endElement();
+            (document.getElementById('terminal-cursor-terminal') as unknown as SVGAnimateElement)?.endElement();
           }
         }
       }
@@ -401,14 +401,14 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({ isVisible }) => {
             const isWindowOpen = windows.some(w => w.title === icon.name);
             if (!isWindowOpen) {
               if (icon.id === 'about') {
-                document.getElementById('about-circle-about')?.beginElement();
+                (document.getElementById('about-circle-about') as unknown as SVGAnimateElement)?.beginElement();
               } else if (icon.id === 'files') {
                 // Trigger file content lines in sequence
-                setTimeout(() => document.getElementById('files-line3-files')?.beginElement(), 0);
-                setTimeout(() => document.getElementById('files-line1-files')?.beginElement(), 500);
-                setTimeout(() => document.getElementById('files-line2-files')?.beginElement(), 1000);
+                setTimeout(() => (document.getElementById('files-line3-files') as unknown as SVGAnimateElement)?.beginElement(), 0);
+                setTimeout(() => (document.getElementById('files-line1-files') as unknown as SVGAnimateElement)?.beginElement(), 500);
+                setTimeout(() => (document.getElementById('files-line2-files') as unknown as SVGAnimateElement)?.beginElement(), 1000);
               } else if (icon.id === 'terminal') {
-                document.getElementById('terminal-cursor-terminal')?.beginElement();
+                (document.getElementById('terminal-cursor-terminal') as unknown as SVGAnimateElement)?.beginElement();
               }
             }
           }}
@@ -416,13 +416,13 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({ isVisible }) => {
             const isWindowOpen = windows.some(w => w.title === icon.name);
             if (!isWindowOpen) {
               if (icon.id === 'about') {
-                document.getElementById('about-circle-about')?.endElement();
+                (document.getElementById('about-circle-about') as unknown as SVGAnimateElement)?.endElement();
               } else if (icon.id === 'files') {
-                document.getElementById('files-line1-files')?.endElement();
-                document.getElementById('files-line2-files')?.endElement();
-                document.getElementById('files-line3-files')?.endElement();
+                (document.getElementById('files-line1-files') as unknown as SVGAnimateElement)?.endElement();
+                (document.getElementById('files-line2-files') as unknown as SVGAnimateElement)?.endElement();
+                (document.getElementById('files-line3-files') as unknown as SVGAnimateElement)?.endElement();
               } else if (icon.id === 'terminal') {
-                document.getElementById('terminal-cursor-terminal')?.endElement();
+                (document.getElementById('terminal-cursor-terminal') as unknown as SVGAnimateElement)?.endElement();
               }
             }
           }}
