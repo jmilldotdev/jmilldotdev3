@@ -245,11 +245,19 @@ export const SphereAnimation = forwardRef<
             (Math.random() - 0.5) * 0.01,
             (Math.random() - 0.5) * 0.01
           );
-          (fragment as unknown as THREE.LineSegments & { velocity: THREE.Vector3 }).velocity = velocity;
+          (
+            fragment as unknown as THREE.LineSegments & {
+              velocity: THREE.Vector3;
+            }
+          ).velocity = velocity;
 
           // Store rotation velocity - inherit the sphere's rotation momentum plus some variation
           const baseRotationSpeed = { x: 0.002, y: 0.004, z: 0 };
-          (fragment as unknown as THREE.LineSegments & { rotationVelocity: THREE.Vector3 }).rotationVelocity = new THREE.Vector3(
+          (
+            fragment as unknown as THREE.LineSegments & {
+              rotationVelocity: THREE.Vector3;
+            }
+          ).rotationVelocity = new THREE.Vector3(
             baseRotationSpeed.x + (Math.random() - 0.5) * 0.002,
             baseRotationSpeed.y + (Math.random() - 0.5) * 0.002,
             baseRotationSpeed.z + (Math.random() - 0.5) * 0.003
@@ -324,7 +332,7 @@ export const SphereAnimation = forwardRef<
           );
 
           const material = new THREE.LineBasicMaterial({
-            color: 0xff0000,
+            color: 0xff4800,
             transparent: true,
             opacity: 0.4,
           });
@@ -353,11 +361,19 @@ export const SphereAnimation = forwardRef<
             (Math.random() - 0.5) * 0.008,
             (Math.random() - 0.5) * 0.008
           );
-          (fragment as unknown as THREE.LineSegments & { velocity: THREE.Vector3 }).velocity = velocity;
+          (
+            fragment as unknown as THREE.LineSegments & {
+              velocity: THREE.Vector3;
+            }
+          ).velocity = velocity;
 
           // Store rotation velocity
           const baseRotationSpeed = { x: 0.003, y: 0.001, z: 0.002 }; // Red sphere speeds
-          (fragment as unknown as THREE.LineSegments & { rotationVelocity: THREE.Vector3 }).rotationVelocity = new THREE.Vector3(
+          (
+            fragment as unknown as THREE.LineSegments & {
+              rotationVelocity: THREE.Vector3;
+            }
+          ).rotationVelocity = new THREE.Vector3(
             baseRotationSpeed.x + (Math.random() - 0.5) * 0.002,
             baseRotationSpeed.y + (Math.random() - 0.5) * 0.002,
             baseRotationSpeed.z + (Math.random() - 0.5) * 0.002
@@ -418,9 +434,7 @@ export const SphereAnimation = forwardRef<
 
     // Ensure any existing canvas is removed first
     while (canvasContainer.firstChild) {
-      canvasContainer.removeChild(
-        canvasContainer.firstChild
-      );
+      canvasContainer.removeChild(canvasContainer.firstChild);
     }
 
     canvasContainer.appendChild(renderer.domElement);
@@ -528,8 +542,16 @@ export const SphereAnimation = forwardRef<
       // Animate red fragments slowly
       if (isShatteredRef.current && redFragmentsRef.current.length > 0) {
         redFragmentsRef.current.forEach((fragment) => {
-          const velocity = (fragment as unknown as THREE.LineSegments & { velocity: THREE.Vector3 }).velocity;
-          const rotationVelocity = (fragment as unknown as THREE.LineSegments & { rotationVelocity: THREE.Vector3 }).rotationVelocity;
+          const velocity = (
+            fragment as unknown as THREE.LineSegments & {
+              velocity: THREE.Vector3;
+            }
+          ).velocity;
+          const rotationVelocity = (
+            fragment as unknown as THREE.LineSegments & {
+              rotationVelocity: THREE.Vector3;
+            }
+          ).rotationVelocity;
 
           // Update position slowly
           fragment.position.x += velocity.x;

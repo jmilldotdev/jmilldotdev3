@@ -166,7 +166,7 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({ isVisible }) => {
     }
   };
 
-  const closeWindow = (windowId: string) => {
+  const closeWindow = useCallback((windowId: string) => {
     const windowToClose = windows.find(w => w.id === windowId);
     setWindows(prev => prev.filter(w => w.id !== windowId));
     
@@ -189,7 +189,7 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({ isVisible }) => {
         }
       }
     }
-  };
+  }, [windows, desktopIcons]);
 
   const toggleMaximize = (windowId: string) => {
     setWindows(prev => prev.map(w => 
@@ -267,6 +267,26 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({ isVisible }) => {
     }
   }, [dragState, handleMouseMove]);
 
+  // Handle escape key to close active window
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && windows.length > 0) {
+        // Find the window with the highest z-index (active window)
+        const activeWindow = windows.reduce((prev, current) => 
+          current.zIndex > prev.zIndex ? current : prev
+        );
+        closeWindow(activeWindow.id);
+      }
+    };
+
+    if (isVisible) {
+      document.addEventListener('keydown', handleKeyDown);
+      return () => {
+        document.removeEventListener('keydown', handleKeyDown);
+      };
+    }
+  }, [isVisible, windows, closeWindow]);
+
 
   if (!isVisible) return null;
 
@@ -283,7 +303,7 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({ isVisible }) => {
           key={icon.id}
           className="absolute flex flex-col items-center cursor-pointer group z-20"
           style={{ left: icon.x, top: icon.y }}
-          onDoubleClick={() => createWindow(icon)}
+          onClick={() => createWindow(icon)}
           onMouseEnter={() => {
             const isWindowOpen = windows.some(w => w.title === icon.name);
             if (!isWindowOpen) {
