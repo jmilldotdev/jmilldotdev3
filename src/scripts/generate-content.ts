@@ -26,11 +26,35 @@ function textToSlug(text: string): string {
     .replace(/[^a-z0-9-]/g, ""); // Remove non-alphanumeric characters except hyphens
 }
 
-// Convert [[backlinks]] to MDX Link components
-function processBacklinks(content: string): string {
+// Convert [[backlinks]] to MDX Link components and handle images
+function processBacklinks(content: string, validSlugs: Set<string>): string {
   return content.replace(/\[\[([^\]]+)\]\]/g, (match, linkText) => {
-    const slug = textToSlug(linkText);
-    return `<Link href="/c/${slug}" className="text-[var(--color-primary)] hover:underline hover:text-[var(--color-secondary)] transition-colors font-medium">${linkText}</Link>`;
+    // Check if this is an image reference
+    if (linkText.match(/\.(png|jpg|jpeg|gif|webp)$/i)) {
+      const imagePath = `/content/Images/${linkText}`;
+      return `<img src="${imagePath}" alt="${linkText}" className="max-w-full h-auto border border-gray-700 my-3 rounded" />`;
+    }
+    
+    // Handle pipe syntax [[link|display text]]
+    let actualLinkText = linkText;
+    let displayText = linkText;
+    if (linkText.includes('|')) {
+      const parts = linkText.split('|');
+      actualLinkText = parts[0].trim();
+      displayText = parts[1].trim();
+    }
+    
+    // Convert to slug and check if it's valid
+    const slug = textToSlug(actualLinkText);
+    
+    // If the slug is valid, create a link; otherwise, return plain text
+    if (validSlugs.has(slug)) {
+      return `<Link href="/c/${slug}" className="text-[var(--color-primary)] hover:underline hover:text-[var(--color-secondary)] transition-colors font-medium">${displayText}</Link>`;
+    } else {
+      // Return as plain text for invalid links
+      console.log(`Warning: Invalid link removed: [[${linkText}]] -> slug: ${slug}`);
+      return displayText;
+    }
   });
 }
 
@@ -65,7 +89,8 @@ function copyPublishedFiles(
   baseDir: string,
   generatedPages: string[] = [],
   pageMetadata: PageMetadata[] = [],
-  tagMap: Map<string, PageMetadata[]> = new Map()
+  tagMap: Map<string, PageMetadata[]> = new Map(),
+  validSlugs: Set<string> = new Set()
 ) {
   const files = fs.readdirSync(dir);
 
@@ -79,7 +104,8 @@ function copyPublishedFiles(
         baseDir,
         generatedPages,
         pageMetadata,
-        tagMap
+        tagMap,
+        validSlugs
       );
     } else if (path.extname(file) === ".md") {
       const content = fs.readFileSync(fullPath, "utf8");
@@ -144,6 +170,30 @@ function copyPublishedFiles(
           frontmatterPart = frontmatterPart
             .replace(/- c\/entity/g, "- entity")
             .replace(/- sources\//g, "- ");
+            
+          // Clean up related field by removing invalid link references
+          frontmatterPart = frontmatterPart.replace(/related:\s*\n([\s\S]*?)(?=\n\w+:|$)/g, (match, relatedContent) => {
+            if (!relatedContent) return match;
+            
+            const lines = relatedContent.split('\n');
+            const validLines = lines.filter(line => {
+              // Remove lines that contain [[...]] references that don't correspond to valid pages
+              const linkMatch = line.match(/\[\[([^\]]+)\]\]/);
+              if (linkMatch) {
+                const linkText = linkMatch[1];
+                const actualLinkText = linkText.includes('|') ? linkText.split('|')[0].trim() : linkText;
+                const slug = textToSlug(actualLinkText);
+                const isValid = validSlugs.has(slug);
+                if (!isValid) {
+                  console.log(`Warning: Removed invalid related link: ${linkText}`);
+                  return false;
+                }
+              }
+              return true;
+            });
+            
+            return validLines.length > 1 ? `related:\n${validLines.join('\n')}` : '';
+          });
         } else {
           // Add new frontmatter if none exists
           frontmatterPart = `---
@@ -158,8 +208,22 @@ title: "${title}"
         // Replace c/entity with entity in content (only in content part)
         contentPart = contentPart.replace(/c\/entity/g, "entity");
 
+        // Process image references first (![[ ]] syntax)
+        contentPart = contentPart.replace(/!\[\[([^\]]+)\]\]/g, (match, linkText) => {
+          if (linkText.match(/\.(png|jpg|jpeg|gif|webp)$/i)) {
+            const imagePath = `/content/Images/${linkText}`;
+            return `<img src="${imagePath}" alt="${linkText}" className="max-w-full h-auto border border-gray-700 my-3 rounded" />`;
+          }
+          return match; // Return unchanged if not an image
+        });
+
         // Process backlinks (only in content part)
-        contentPart = processBacklinks(contentPart);
+        contentPart = processBacklinks(contentPart, validSlugs);
+
+        // Fix iframe properties for React compatibility
+        contentPart = contentPart
+          .replace(/allowfullscreen/g, "allowFullScreen")
+          .replace(/frameborder=/g, "frameBorder=");
 
         // Reassemble the content
         modifiedContent =
@@ -216,8 +280,36 @@ title: "${title}"
 // Ensure the destination directory exists
 fs.mkdirSync(destDir, { recursive: true });
 
-// Start the recursive search and copy process
-const result = copyPublishedFiles(sourceDir, sourceDir);
+// First pass: collect all valid slugs
+const validSlugs = new Set<string>();
+
+function collectValidSlugs(dir: string) {
+  const files = fs.readdirSync(dir);
+  for (const file of files) {
+    const fullPath = path.join(dir, file);
+    const stat = fs.statSync(fullPath);
+    
+    if (stat.isDirectory()) {
+      collectValidSlugs(fullPath);
+    } else if (path.extname(file) === ".md") {
+      const content = fs.readFileSync(fullPath, "utf8");
+      if (content.includes('publish: "true"') || content.includes("publish: true")) {
+        const destFileName = file.replace(/^(\p{Emoji_Presentation}|\p{Emoji}\uFE0F|\s)+/gu, "");
+        const baseFileName = path.basename(destFileName, ".md");
+        const slugifiedFileName = baseFileName
+          .toLowerCase()
+          .replace(/\s+/g, "-")
+          .replace(/[^a-z0-9-]/g, "");
+        validSlugs.add(slugifiedFileName);
+      }
+    }
+  }
+}
+
+collectValidSlugs(sourceDir);
+
+// Second pass: process files with valid slug validation
+const result = copyPublishedFiles(sourceDir, sourceDir, [], [], new Map(), validSlugs);
 const { generatedPages, pageMetadata, tagMap } = result;
 
 // Add the home page

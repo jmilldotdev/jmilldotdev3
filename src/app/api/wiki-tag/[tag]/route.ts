@@ -35,8 +35,9 @@ export async function GET(
     const posts = tagData[decodedTag] || [];
     
     // Generate MDX content for the tag page
-    let mdxContent = `# ${decodedTag}\n\n`;
-    mdxContent += `${posts.length} ${posts.length === 1 ? 'post' : 'posts'} tagged with **${decodedTag}**\n\n`;
+    const escapedTag = decodedTag.replace(/[`${}\\]/g, '\\$&');
+    let mdxContent = `# ${escapedTag}\n\n`;
+    mdxContent += `${posts.length} ${posts.length === 1 ? 'post' : 'posts'} tagged with **${escapedTag}**\n\n`;
     
     if (posts.length === 0) {
       mdxContent += 'No posts found for this tag.\n\n';
@@ -44,7 +45,9 @@ export async function GET(
       posts.forEach(post => {
         // Convert /c/ paths to wiki-loadable slugs
         const slug = post.path.replace('/c/', '');
-        mdxContent += `- <Link href="/c/${slug}" className="text-[var(--color-primary)] hover:underline hover:text-[var(--color-secondary)] transition-colors font-medium">${post.title}</Link>\n`;
+        // Escape the title to prevent template literal injection
+        const escapedTitle = post.title.replace(/[`${}\\]/g, '\\$&');
+        mdxContent += `- <Link href="/c/${slug}" className="text-[var(--color-primary)] hover:underline hover:text-[var(--color-secondary)] transition-colors font-medium">${escapedTitle}</Link>\n`;
         
         // Add other tags if they exist
         if (post.tags && post.tags.length > 1) {
@@ -64,7 +67,9 @@ export async function GET(
             );
           
           if (otherTags.length > 0) {
-            mdxContent += `  - *Also tagged:* ${otherTags.join(', ')}\n`;
+            // Escape tag names to prevent template literal injection
+            const escapedTags = otherTags.map(tag => tag.replace(/[`${}\\]/g, '\\$&'));
+            mdxContent += `  - *Also tagged:* ${escapedTags.join(', ')}\n`;
           }
         }
         mdxContent += '\n';

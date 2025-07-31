@@ -1222,6 +1222,186 @@
   ],
   "bookmark": [
     {
+      "slug": "freetierfyi",
+      "title": "Freetier.fyi",
+      "created": "2025-07-17 12:40",
+      "tags": [
+        "bookmark"
+      ],
+      "url": "https://freetier.fyi/",
+      "path": "/c/freetierfyi"
+    },
+    {
+      "slug": "secure-annex",
+      "title": "Secure Annex",
+      "created": "2025-07-17 12:19",
+      "tags": [
+        "bookmark"
+      ],
+      "url": "https://secureannex.com/",
+      "path": "/c/secure-annex"
+    },
+    {
+      "slug": "veney",
+      "title": "Veney",
+      "created": "2025-07-17 12:19",
+      "tags": [
+        "bookmark"
+      ],
+      "url": "https://veney.xyz/",
+      "path": "/c/veney"
+    },
+    {
+      "slug": "orangedao",
+      "title": "OrangeDAO",
+      "created": "2025-07-17 12:18",
+      "tags": [
+        "bookmark"
+      ],
+      "url": "https://www.orangedao.xyz/",
+      "path": "/c/orangedao"
+    },
+    {
+      "slug": "poetry-camera",
+      "title": "Poetry camera",
+      "created": "2025-07-11 07:36",
+      "tags": [
+        "bookmark"
+      ],
+      "url": "https://poetry.camera/",
+      "path": "/c/poetry-camera"
+    },
+    {
+      "slug": "vibetunnel",
+      "title": "Vibetunnel",
+      "created": "2025-07-11 07:36",
+      "tags": [
+        "bookmark"
+      ],
+      "url": "https://vibetunnel.sh/",
+      "path": "/c/vibetunnel"
+    },
+    {
+      "slug": "agent",
+      "title": "Agent",
+      "created": "2025-07-11 07:35",
+      "tags": [
+        "bookmark"
+      ],
+      "url": "https://ampcode.com/AGENT.md",
+      "path": "/c/agent"
+    },
+    {
+      "slug": "ask-a-forecaster",
+      "title": "Ask a Forecaster",
+      "created": "2025-07-11 07:34",
+      "tags": [
+        "bookmark"
+      ],
+      "url": "https://askaforecaster.com/",
+      "path": "/c/ask-a-forecaster"
+    },
+    {
+      "slug": "radiopaper",
+      "title": "Radiopaper",
+      "created": "2025-07-11 07:34",
+      "tags": [
+        "bookmark"
+      ],
+      "url": null,
+      "path": "/c/radiopaper"
+    },
+    {
+      "slug": "q-art-codes",
+      "title": "Q Art Codes",
+      "created": "2025-07-11 07:32",
+      "tags": [
+        "bookmark"
+      ],
+      "url": "https://qart.codes/",
+      "path": "/c/q-art-codes"
+    },
+    {
+      "slug": "blinks-by-move38",
+      "title": "Blinks by Move38",
+      "created": "2025-07-03 08:07",
+      "tags": [
+        "bookmark"
+      ],
+      "url": "https://move38.com/",
+      "path": "/c/blinks-by-move38"
+    },
+    {
+      "slug": "tilt-five",
+      "title": "Tilt Five",
+      "created": "2025-07-03 08:06",
+      "tags": [
+        "bookmark"
+      ],
+      "url": "https://www.tiltfive.com/",
+      "path": "/c/tilt-five"
+    },
+    {
+      "slug": "francisco-san",
+      "title": "Francisco san",
+      "created": "2025-06-27 07:27",
+      "tags": [
+        "bookmark"
+      ],
+      "url": "https://franciscosan.org/",
+      "path": "/c/francisco-san"
+    },
+    {
+      "slug": "haven-studios-generative-escape-rooms",
+      "title": "Haven Studios generative escape rooms",
+      "created": "2025-06-27 07:26",
+      "tags": [
+        "bookmark"
+      ],
+      "url": "https://sonyinteractive.com/en/news/blog/haven-studios-experimenting-with-ml-driven-escape-room-games/",
+      "path": "/c/haven-studios-generative-escape-rooms"
+    },
+    {
+      "slug": "dsheets",
+      "title": "DSheets",
+      "created": "2025-06-27 07:25",
+      "tags": [
+        "bookmark"
+      ],
+      "url": "https://sheets.fileverse.io",
+      "path": "/c/dsheets"
+    },
+    {
+      "slug": "the-candor-corpus",
+      "title": "The CANDOR Corpus",
+      "created": "2025-06-27 07:24",
+      "tags": [
+        "bookmark"
+      ],
+      "url": "https://www.science.org/doi/10.1126/sciadv.adf3197",
+      "path": "/c/the-candor-corpus"
+    },
+    {
+      "slug": "dream-recorder",
+      "title": "Dream Recorder",
+      "created": "2025-06-19 07:44",
+      "tags": [
+        "bookmark"
+      ],
+      "url": "https://dreamrecorder.ai/",
+      "path": "/c/dream-recorder"
+    },
+    {
+      "slug": "grey-hack",
+      "title": "Grey Hack",
+      "created": "2025-06-19 07:43",
+      "tags": [
+        "bookmark"
+      ],
+      "url": "https://store.steampowered.com/app/605230/Grey_Hack/",
+      "path": "/c/grey-hack"
+    },
+    {
       "slug": "browserdating",
       "title": "Browser.dating",
       "created": "2025-06-07 08:34",
@@ -1340,16 +1520,6 @@
       ],
       "url": "https://andonlabs.com/evals/vending-bench",
       "path": "/c/vending-bench"
-    },
-    {
-      "slug": "metagame-festival-1",
-      "title": "Metagame Festival 1",
-      "created": "2025-05-10 11:21",
-      "tags": [
-        "bookmark"
-      ],
-      "url": "https://metagame.games/",
-      "path": "/c/metagame-festival-1"
     },
     {
       "slug": "metagame-festival",

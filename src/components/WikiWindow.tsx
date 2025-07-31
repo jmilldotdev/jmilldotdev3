@@ -4,6 +4,45 @@ import React, { useState, useEffect } from "react";
 import { MDXRemote } from "next-mdx-remote";
 import Link from "next/link";
 
+// Error Boundary Component
+class ErrorBoundary extends React.Component<
+  { children: React.ReactNode },
+  { hasError: boolean; error?: Error }
+> {
+  constructor(props: { children: React.ReactNode }) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    console.error('WikiWindow MDX Error:', error, errorInfo);
+    console.error('Error stack:', error.stack);
+    console.error('Component stack trace:', errorInfo.componentStack);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="text-[#FF4800] bg-black/30 p-4 rounded border border-[#FF4800]/30">
+          <div className="font-bold mb-2">⚠️ Content Error</div>
+          <div className="text-sm opacity-80 mb-2">
+            There was an error rendering this content.
+          </div>
+          <div className="text-xs opacity-60">
+            {this.state.error?.message || 'Unknown error occurred'}
+          </div>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
+
 interface WikiWindowProps {
   onClose: () => void;
   isMaximized: boolean;
@@ -186,6 +225,8 @@ export default function WikiWindow({
 
   const components = {
     Link: WikiLink,
+    // Make standard Link available too
+    a: WikiLink,
   };
 
   return (
@@ -298,10 +339,12 @@ export default function WikiWindow({
             {/* MDX Content */}
             <div className="text-[#eef2ff] leading-relaxed tracking-[0.3px] font-mono prose prose-invert prose-headings:text-[#FF4800] prose-h1:text-2xl prose-h1:border-b prose-h1:border-[#FF4800]/30 prose-h1:pb-1 prose-h1:mt-4 prose-h1:mb-2 prose-h2:text-xl prose-h2:mt-4 prose-h2:mb-2 prose-h3:text-lg prose-h3:mt-4 prose-h3:mb-2 prose-p:text-sm prose-p:mb-3 prose-a:text-[#00FFFF] prose-a:no-underline prose-a:border-b prose-a:border-dotted prose-a:border-[#00FFFF] hover:prose-a:text-white hover:prose-a:border-white prose-ul:ml-4 prose-ul:mb-3 prose-ul:text-sm prose-ol:ml-4 prose-ol:mb-3 prose-ol:text-sm prose-li:mb-1 prose-code:bg-black/30 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:text-sm prose-pre:bg-black/50 prose-pre:p-4 prose-pre:rounded prose-pre:border-l-2 prose-pre:border-[#00FFFF] prose-blockquote:border-l-4 prose-blockquote:border-[#00FFFF] prose-blockquote:pl-4 prose-blockquote:py-1 prose-blockquote:my-3 prose-blockquote:italic prose-blockquote:text-gray-400 prose-blockquote:bg-black/20 prose-img:border prose-img:border-gray-700 prose-img:my-3 prose-table:w-full prose-table:border-collapse prose-table:mb-3 prose-th:border prose-th:border-gray-700 prose-th:p-2 prose-th:text-left prose-th:bg-black/50 prose-th:text-[#FF4800] prose-td:border prose-td:border-gray-700 prose-td:p-2 max-w-none prose-sm">
               {currentContent.source ? (
-                <MDXRemote 
-                  {...(currentContent.source as any)} 
-                  components={components} 
-                />
+                <ErrorBoundary>
+                  <MDXRemote 
+                    {...(currentContent.source as any)} 
+                    components={components} 
+                  />
+                </ErrorBoundary>
               ) : (
                 <div className="text-[#00FFFF] opacity-60 italic text-sm">
                   {currentContent.frontmatter.error ? (
