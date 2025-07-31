@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import * as THREE from "three";
+import WikiWindow from "./WikiWindow";
 
 interface Window {
   id: string;
@@ -13,6 +14,7 @@ interface Window {
   height: number;
   isMaximized: boolean;
   zIndex: number;
+  type?: string;
 }
 
 interface DesktopIcon {
@@ -68,23 +70,23 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({ isVisible }) => {
       )
     },
     {
-      id: "files",
-      name: "FILES.EXE",
+      id: "wiki",
+      name: "WIKI.MD",
       x: 50,
       y: 180,
-      content: "FILE SYSTEM ACCESS\n\n/home/jmill/\n├── projects/\n│   ├── neural_net.py\n│   ├── quantum_sim.cpp\n│   └── ai_research/\n├── documents/\n│   ├── README.md\n│   └── notes.txt\n└── system/\n    ├── kernel.sys\n    └── drivers/\n\nACCESS LEVEL: ADMINISTRATOR\nENCRYPTION: AES-256 QUANTUM",
+      content: "WIKI SYSTEM ACCESS\n\nBrowse random pages from the knowledge base:\n\n• Projects & Creative Works\n• Concepts & Theories\n• Tools & Resources\n• Bookmarks & References\n\nClick 'RND' to load a random page\nContent rendered with MDX\nInteractive links enabled",
       icon: (
         <svg viewBox="0 0 24 24" className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth="1">
           <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2Z"/>
           <path d="M14,2V8H20"/>
           <path d="M16,13H8" strokeDasharray="8 0">
-            <animate attributeName="stroke-dasharray" values="8 0;0 8;8 0" dur="1.5s" begin="indefinite" repeatCount="indefinite" id="files-line1-files"/>
+            <animate attributeName="stroke-dasharray" values="8 0;0 8;8 0" dur="1.5s" begin="indefinite" repeatCount="indefinite" id="wiki-line1-wiki"/>
           </path>
           <path d="M16,17H8" strokeDasharray="8 0">
-            <animate attributeName="stroke-dasharray" values="8 0;0 8;8 0" dur="1.5s" begin="indefinite" repeatCount="indefinite" id="files-line2-files"/>
+            <animate attributeName="stroke-dasharray" values="8 0;0 8;8 0" dur="1.5s" begin="indefinite" repeatCount="indefinite" id="wiki-line2-wiki"/>
           </path>
           <path d="M10,9H8" strokeDasharray="2 0">
-            <animate attributeName="stroke-dasharray" values="2 0;0 2;2 0" dur="1.5s" begin="indefinite" repeatCount="indefinite" id="files-line3-files"/>
+            <animate attributeName="stroke-dasharray" values="2 0;0 2;2 0" dur="1.5s" begin="indefinite" repeatCount="indefinite" id="wiki-line3-wiki"/>
           </path>
         </svg>
       )
@@ -116,10 +118,11 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({ isVisible }) => {
       content: icon.content,
       x: Math.random() * 200 + 100,
       y: Math.random() * 100 + 100,
-      width: 600,
-      height: 400,
+      width: icon.id === 'wiki' ? 900 : 600,
+      height: icon.id === 'wiki' ? 650 : 400,
       isMaximized: false,
-      zIndex: nextZIndex
+      zIndex: nextZIndex,
+      type: icon.id === 'wiki' ? 'wiki' : 'default'
     };
 
     setWindows(prev => [...prev, newWindow]);
@@ -128,10 +131,10 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({ isVisible }) => {
     // Start animation for the corresponding icon
     if (icon.id === 'about') {
       (document.getElementById('about-circle-about') as unknown as SVGAnimateElement)?.beginElement();
-    } else if (icon.id === 'files') {
-      setTimeout(() => (document.getElementById('files-line3-files') as unknown as SVGAnimateElement)?.beginElement(), 0);
-      setTimeout(() => (document.getElementById('files-line1-files') as unknown as SVGAnimateElement)?.beginElement(), 500);
-      setTimeout(() => (document.getElementById('files-line2-files') as unknown as SVGAnimateElement)?.beginElement(), 1000);
+    } else if (icon.id === 'wiki') {
+      setTimeout(() => (document.getElementById('wiki-line3-wiki') as unknown as SVGAnimateElement)?.beginElement(), 0);
+      setTimeout(() => (document.getElementById('wiki-line1-wiki') as unknown as SVGAnimateElement)?.beginElement(), 500);
+      setTimeout(() => (document.getElementById('wiki-line2-wiki') as unknown as SVGAnimateElement)?.beginElement(), 1000);
     } else if (icon.id === 'terminal') {
       (document.getElementById('terminal-cursor-terminal') as unknown as SVGAnimateElement)?.beginElement();
     }
@@ -309,10 +312,10 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({ isVisible }) => {
         if (correspondingIcon) {
           if (correspondingIcon.id === 'about') {
             (document.getElementById('about-circle-about') as unknown as SVGAnimateElement)?.endElement();
-          } else if (correspondingIcon.id === 'files') {
-            (document.getElementById('files-line1-files') as unknown as SVGAnimateElement)?.endElement();
-            (document.getElementById('files-line2-files') as unknown as SVGAnimateElement)?.endElement();
-            (document.getElementById('files-line3-files') as unknown as SVGAnimateElement)?.endElement();
+          } else if (correspondingIcon.id === 'wiki') {
+            (document.getElementById('wiki-line1-wiki') as unknown as SVGAnimateElement)?.endElement();
+            (document.getElementById('wiki-line2-wiki') as unknown as SVGAnimateElement)?.endElement();
+            (document.getElementById('wiki-line3-wiki') as unknown as SVGAnimateElement)?.endElement();
           } else if (correspondingIcon.id === 'terminal') {
             (document.getElementById('terminal-cursor-terminal') as unknown as SVGAnimateElement)?.endElement();
           }
@@ -402,11 +405,10 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({ isVisible }) => {
             if (!isWindowOpen) {
               if (icon.id === 'about') {
                 (document.getElementById('about-circle-about') as unknown as SVGAnimateElement)?.beginElement();
-              } else if (icon.id === 'files') {
-                // Trigger file content lines in sequence
-                setTimeout(() => (document.getElementById('files-line3-files') as unknown as SVGAnimateElement)?.beginElement(), 0);
-                setTimeout(() => (document.getElementById('files-line1-files') as unknown as SVGAnimateElement)?.beginElement(), 500);
-                setTimeout(() => (document.getElementById('files-line2-files') as unknown as SVGAnimateElement)?.beginElement(), 1000);
+              } else if (icon.id === 'wiki') {
+                setTimeout(() => (document.getElementById('wiki-line3-wiki') as unknown as SVGAnimateElement)?.beginElement(), 0);
+                setTimeout(() => (document.getElementById('wiki-line1-wiki') as unknown as SVGAnimateElement)?.beginElement(), 500);
+                setTimeout(() => (document.getElementById('wiki-line2-wiki') as unknown as SVGAnimateElement)?.beginElement(), 1000);
               } else if (icon.id === 'terminal') {
                 (document.getElementById('terminal-cursor-terminal') as unknown as SVGAnimateElement)?.beginElement();
               }
@@ -417,17 +419,17 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({ isVisible }) => {
             if (!isWindowOpen) {
               if (icon.id === 'about') {
                 (document.getElementById('about-circle-about') as unknown as SVGAnimateElement)?.endElement();
-              } else if (icon.id === 'files') {
-                (document.getElementById('files-line1-files') as unknown as SVGAnimateElement)?.endElement();
-                (document.getElementById('files-line2-files') as unknown as SVGAnimateElement)?.endElement();
-                (document.getElementById('files-line3-files') as unknown as SVGAnimateElement)?.endElement();
+              } else if (icon.id === 'wiki') {
+                (document.getElementById('wiki-line1-wiki') as unknown as SVGAnimateElement)?.endElement();
+                (document.getElementById('wiki-line2-wiki') as unknown as SVGAnimateElement)?.endElement();
+                (document.getElementById('wiki-line3-wiki') as unknown as SVGAnimateElement)?.endElement();
               } else if (icon.id === 'terminal') {
                 (document.getElementById('terminal-cursor-terminal') as unknown as SVGAnimateElement)?.endElement();
               }
             }
           }}
         >
-          <div className={`text-[#00FFFF] p-2 border border-[#00FFFF] transition-all ${
+          <div className={`text-[#00FFFF] p-3 border border-[#00FFFF] transition-all flex items-center justify-center w-16 h-16 ${
             windows.some(w => w.title === icon.name) 
               ? 'border-opacity-100 shadow-[0_0_10px_#00FFFF]' 
               : 'border-opacity-50 group-hover:border-opacity-100 group-hover:shadow-[0_0_10px_#00FFFF]'
@@ -440,48 +442,63 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({ isVisible }) => {
 
       {/* Windows */}
       {windows.map(window => (
-        <div
-          key={window.id}
-          className={`window-container absolute border-2 border-[#00FFFF] bg-black ${
-            window.isMaximized ? 'inset-4' : ''
-          }`}
-          style={window.isMaximized ? {} : {
-            left: window.x,
-            top: window.y,
-            width: window.width,
-            height: window.height,
-            zIndex: window.zIndex
-          }}
-        >
-          {/* Title Bar */}
+        window.type === 'wiki' ? (
+          <WikiWindow
+            key={window.id}
+            onClose={() => closeWindow(window.id)}
+            isMaximized={window.isMaximized}
+            onToggleMaximize={() => toggleMaximize(window.id)}
+            x={window.x}
+            y={window.y}
+            width={window.width}
+            height={window.height}
+            zIndex={window.zIndex}
+            onMouseDown={(e) => handleMouseDown(e, window.id)}
+          />
+        ) : (
           <div
-            className="flex items-center justify-between bg-[#00FFFF] bg-opacity-20 px-3 py-2 cursor-move"
-            onMouseDown={(e) => !window.isMaximized && handleMouseDown(e, window.id)}
+            key={window.id}
+            className={`window-container absolute border-2 border-[#00FFFF] bg-black ${
+              window.isMaximized ? 'inset-4' : ''
+            }`}
+            style={window.isMaximized ? {} : {
+              left: window.x,
+              top: window.y,
+              width: window.width,
+              height: window.height,
+              zIndex: window.zIndex
+            }}
           >
-            <span className="text-black font-mono text-sm font-bold">{window.title}</span>
-            <div className="flex gap-2">
-              <button
-                onClick={() => toggleMaximize(window.id)}
-                className="text-black hover:bg-black hover:text-[#00FFFF] w-6 h-6 border border-black text-xs font-mono transition-colors"
-              >
-                {window.isMaximized ? '□' : '■'}
-              </button>
-              <button
-                onClick={() => closeWindow(window.id)}
-                className="text-black hover:bg-black hover:text-[#00FFFF] w-6 h-6 border border-black text-xs font-mono transition-colors"
-              >
-                ×
-              </button>
+            {/* Title Bar */}
+            <div
+              className="flex items-center justify-between bg-[#00FFFF] bg-opacity-20 px-3 py-2 cursor-move"
+              onMouseDown={(e) => !window.isMaximized && handleMouseDown(e, window.id)}
+            >
+              <span className="text-black font-mono text-sm font-bold">{window.title}</span>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => toggleMaximize(window.id)}
+                  className="text-black hover:bg-black hover:text-[#00FFFF] w-6 h-6 border border-black text-xs font-mono transition-colors"
+                >
+                  {window.isMaximized ? '□' : '■'}
+                </button>
+                <button
+                  onClick={() => closeWindow(window.id)}
+                  className="text-black hover:bg-black hover:text-[#00FFFF] w-6 h-6 border border-black text-xs font-mono transition-colors"
+                >
+                  ×
+                </button>
+              </div>
+            </div>
+
+            {/* Content */}
+            <div className="p-4 overflow-auto" style={{ height: 'calc(100% - 40px)' }}>
+              <pre className="text-[#00FFFF] font-mono text-sm whitespace-pre-wrap leading-relaxed">
+                {window.content}
+              </pre>
             </div>
           </div>
-
-          {/* Content */}
-          <div className="p-4 overflow-auto" style={{ height: 'calc(100% - 40px)' }}>
-            <pre className="text-[#00FFFF] font-mono text-sm whitespace-pre-wrap leading-relaxed">
-              {window.content}
-            </pre>
-          </div>
-        </div>
+        )
       ))}
 
 
