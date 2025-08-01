@@ -6,7 +6,6 @@ import SphereAnimation, {
 } from "@/components/SphereAnimation";
 import VectorDesktop from "@/components/VectorDesktop";
 import Button from "@/components/ui/Button";
-import { AchievementPopup } from "@/components/AchievementPopup";
 import { AchievementsManager, type Achievement } from "@/lib/achievements";
 
 export default function Home() {
@@ -14,7 +13,7 @@ export default function Home() {
   const [showDesktop, setShowDesktop] = useState(false);
   const [currentAchievement, setCurrentAchievement] = useState<Achievement | null>(null);
   const sphereRef = useRef<SphereAnimationRef>(null);
-  const achievementsManager = useRef<AchievementsManager>();
+  const achievementsManager = useRef<AchievementsManager | null>(null);
 
   useEffect(() => {
     achievementsManager.current = AchievementsManager.getInstance();
@@ -66,12 +65,13 @@ export default function Home() {
         </Button>
       </div>
 
-      {showDesktop && <VectorDesktop isVisible={showDesktop} />}
-      
-      <AchievementPopup 
-        achievement={currentAchievement}
-        onClose={() => setCurrentAchievement(null)}
-      />
+      {showDesktop && (
+        <VectorDesktop 
+          isVisible={showDesktop} 
+          currentAchievement={currentAchievement}
+          onAchievementClose={() => setCurrentAchievement(null)}
+        />
+      )}
     </div>
   );
 }

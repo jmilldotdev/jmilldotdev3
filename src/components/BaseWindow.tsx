@@ -14,6 +14,7 @@ interface BaseWindowProps {
   onClose: () => void;
   onToggleMaximize: () => void;
   onMouseDown: (e: React.MouseEvent) => void;
+  onResizeStart?: (e: React.MouseEvent, windowId: string) => void;
   children: React.ReactNode;
   className?: string;
   titleBarButtons?: React.ReactNode;
@@ -32,6 +33,7 @@ export const BaseWindow: React.FC<BaseWindowProps> = ({
   onClose,
   onToggleMaximize,
   onMouseDown,
+  onResizeStart,
   children,
   className = "",
   titleBarButtons,
@@ -88,6 +90,17 @@ export const BaseWindow: React.FC<BaseWindowProps> = ({
       >
         {children}
       </div>
+
+      {/* Resize Handle - Bottom Right Corner */}
+      {!isMaximized && onResizeStart && (
+        <div
+          className="absolute bottom-0 right-0 w-4 h-4 cursor-se-resize opacity-50 hover:opacity-100 transition-opacity"
+          onMouseDown={(e) => onResizeStart(e, id)}
+          style={{
+            background: 'linear-gradient(-45deg, transparent 30%, #00FFFF 30%, #00FFFF 35%, transparent 35%, transparent 65%, #00FFFF 65%, #00FFFF 70%, transparent 70%)',
+          }}
+        />
+      )}
     </div>
   );
 };

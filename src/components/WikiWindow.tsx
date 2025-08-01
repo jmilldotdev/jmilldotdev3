@@ -54,6 +54,7 @@ interface WikiWindowProps {
   height: number;
   zIndex: number;
   onMouseDown: (e: React.MouseEvent) => void;
+  onResizeStart?: (e: React.MouseEvent, windowId: string) => void;
 }
 
 interface Frontmatter {
@@ -78,6 +79,7 @@ export default function WikiWindow({
   height,
   zIndex,
   onMouseDown,
+  onResizeStart,
 }: WikiWindowProps) {
   const [currentContent, setCurrentContent] = useState<{
     source: unknown;
@@ -340,6 +342,7 @@ export default function WikiWindow({
       onClose={onClose}
       onToggleMaximize={onToggleMaximize}
       onMouseDown={onMouseDown}
+      onResizeStart={onResizeStart}
       titleBarButtons={
         <button
           onClick={loadRandomPage}
@@ -443,6 +446,22 @@ export default function WikiWindow({
               )}
             </div>
           </article>
+        ) : isLoading ? (
+          <div className="flex flex-col items-center justify-center h-64 space-y-4">
+            <div className="relative">
+              <div className="w-8 h-8 border-2 border-[#00FFFF] border-t-transparent rounded-full animate-spin"></div>
+              <div className="absolute inset-0 w-8 h-8 border-2 border-[#FF4800] border-r-transparent rounded-full animate-spin animate-reverse" style={{animationDuration: '1.5s'}}></div>
+            </div>
+            <div className="text-[#00FFFF] text-sm font-mono animate-pulse">
+              LOADING WIKI.MD
+              <span className="animate-pulse">...</span>
+            </div>
+            <div className="flex space-x-1">
+              <div className="w-2 h-2 bg-[#FF4800] rounded-full animate-bounce" style={{animationDelay: '0ms'}}></div>
+              <div className="w-2 h-2 bg-[#00FFFF] rounded-full animate-bounce" style={{animationDelay: '150ms'}}></div>
+              <div className="w-2 h-2 bg-[#FF4800] rounded-full animate-bounce" style={{animationDelay: '300ms'}}></div>
+            </div>
+          </div>
         ) : (
           <div className="text-[#00FFFF] opacity-60 italic text-sm">
             Failed to load content.

@@ -53,3 +53,8 @@ body::after {
   pointer-events: none;
   animation: flicker 5s infinite;
 }
+
+/* Custom animation for reverse spinning */
+.animate-reverse {
+  animation-direction: reverse;
+}

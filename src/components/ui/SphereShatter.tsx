@@ -160,9 +160,9 @@ export const createSphereShatterEmitter = (scene: THREE.Scene): SphereShatterEmi
         const remainingFragments = activeFragments.filter(fragment => {
           if (!fragment.parent) return false;
 
-          const velocity = (fragment as any).velocity as THREE.Vector3;
-          const rotationVelocity = (fragment as any).rotationVelocity as THREE.Vector3;
-          const fragmentFadeSpeed = (fragment as any).fadeSpeed as number;
+          const velocity = (fragment as unknown as { velocity: THREE.Vector3; rotationVelocity: THREE.Vector3; fadeSpeed: number }).velocity;
+          const rotationVelocity = (fragment as unknown as { velocity: THREE.Vector3; rotationVelocity: THREE.Vector3; fadeSpeed: number }).rotationVelocity;
+          const fragmentFadeSpeed = (fragment as unknown as { velocity: THREE.Vector3; rotationVelocity: THREE.Vector3; fadeSpeed: number }).fadeSpeed;
 
           fragment.position.add(velocity);
           fragment.rotation.x += rotationVelocity.x;
@@ -354,9 +354,9 @@ function createWireframeFragments(
         (Math.random() - 0.5) * 0.003
       );
 
-      (fragment as any).velocity = velocity;
-      (fragment as any).rotationVelocity = rotationVelocity;
-      (fragment as any).fadeSpeed = fadeSpeed;
+      (fragment as unknown as { velocity: THREE.Vector3; rotationVelocity: THREE.Vector3; fadeSpeed: number }).velocity = velocity;
+      (fragment as unknown as { velocity: THREE.Vector3; rotationVelocity: THREE.Vector3; fadeSpeed: number }).rotationVelocity = rotationVelocity;
+      (fragment as unknown as { velocity: THREE.Vector3; rotationVelocity: THREE.Vector3; fadeSpeed: number }).fadeSpeed = fadeSpeed;
 
       fragments.push(fragment);
     }

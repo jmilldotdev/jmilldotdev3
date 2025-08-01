@@ -99,9 +99,9 @@ export const createMiniSphereEffect = (scene: THREE.Scene): MiniSphereEffectEmit
           (Math.random() - 0.5) * 0.01
         );
 
-        (fragment as any).velocity = velocity;
-        (fragment as any).rotationVelocity = rotationVelocity;
-        (fragment as any).age = 0;
+        (fragment as unknown as { velocity: THREE.Vector3; rotationVelocity: THREE.Vector3; age: number }).velocity = velocity;
+        (fragment as unknown as { velocity: THREE.Vector3; rotationVelocity: THREE.Vector3; age: number }).rotationVelocity = rotationVelocity;
+        (fragment as unknown as { velocity: THREE.Vector3; rotationVelocity: THREE.Vector3; age: number }).age = 0;
 
         scene.add(fragment);
         fragments.push(fragment);
@@ -114,12 +114,12 @@ export const createMiniSphereEffect = (scene: THREE.Scene): MiniSphereEffectEmit
       const remainingFragments = fragments.filter(fragment => {
         if (!fragment.parent) return false;
         
-        const velocity = (fragment as any).velocity as THREE.Vector3;
-        const rotationVelocity = (fragment as any).rotationVelocity as THREE.Vector3;
+        const velocity = (fragment as unknown as { velocity: THREE.Vector3; rotationVelocity: THREE.Vector3; age: number }).velocity;
+        const rotationVelocity = (fragment as unknown as { velocity: THREE.Vector3; rotationVelocity: THREE.Vector3; age: number }).rotationVelocity;
         const material = fragment.material as THREE.LineBasicMaterial;
         
-        (fragment as any).age += 1;
-        const age = (fragment as any).age;
+        (fragment as unknown as { velocity: THREE.Vector3; rotationVelocity: THREE.Vector3; age: number }).age += 1;
+        const age = (fragment as unknown as { velocity: THREE.Vector3; rotationVelocity: THREE.Vector3; age: number }).age;
         
         // Fade in during first 10 frames
         if (age < 10) {

@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState, KeyboardEvent } from "react";
 import pages from "@/config/pages.json";
 import { Modal } from "./ui";
+import { AchievementsManager } from "@/lib/achievements";
 
 type Command = {
   name: string;
@@ -42,6 +43,16 @@ export default function CommandLine({ onInvalidCommand }: CommandLineProps) {
       alias: ["?"],
       description: "Show available commands",
       execute: () => setShowHelp(true),
+    },
+    {
+      name: "reset-achievements",
+      alias: ["ra"],
+      description: "Reset all achievements (clears localStorage)",
+      execute: () => {
+        const manager = AchievementsManager.getInstance();
+        manager.resetAll();
+        console.log("Achievements reset successfully");
+      },
     },
   ];
 

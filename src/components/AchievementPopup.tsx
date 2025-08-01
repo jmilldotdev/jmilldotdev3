@@ -1,42 +1,57 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Achievement } from "@/lib/achievements";
 
 interface AchievementPopupProps {
   achievement: Achievement | null;
   onClose: () => void;
+  onOpenAchievements?: () => void;
 }
 
 export const AchievementPopup: React.FC<AchievementPopupProps> = ({
   achievement,
   onClose,
+  onOpenAchievements,
 }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
 
-  useEffect(() => {
-    if (achievement) {
-      setIsVisible(true);
-      setIsClosing(false);
-      
-      // Auto-close after 5 seconds
-      const timer = setTimeout(() => {
-        handleClose();
-      }, 5000);
-
-      return () => clearTimeout(timer);
-    } else {
-      setIsVisible(false);
-    }
-  }, [achievement]);
-
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     setIsClosing(true);
     setTimeout(() => {
       setIsVisible(false);
       onClose();
     }, 300);
+  }, [onClose]);
+
+  useEffect(() => {
+    if (achievement) {
+      // Small delay for smooth entrance after desktop icons appear
+      const showTimer = setTimeout(() => {
+        setIsVisible(true);
+        setIsClosing(false);
+      }, 800); // Delay to let desktop settle
+      
+      // Auto-close after 5 seconds
+      const closeTimer = setTimeout(() => {
+        handleClose();
+      }, 6000); // 800ms delay + 5000ms display
+
+      return () => {
+        clearTimeout(showTimer);
+        clearTimeout(closeTimer);
+      };
+    } else {
+      setIsVisible(false);
+    }
+  }, [achievement, handleClose]);
+
+  const handleClick = () => {
+    handleClose();
+    if (onOpenAchievements) {
+      onOpenAchievements();
+    }
   };
 
   if (!achievement || !isVisible) return null;
@@ -45,12 +60,17 @@ export const AchievementPopup: React.FC<AchievementPopupProps> = ({
 
   return (
     <div
-      className={`fixed top-4 right-4 z-50 bg-black border-2 border-[#00FFFF] p-4 min-w-[280px] max-w-[320px] transition-all duration-300 ${
-        isClosing ? 'translate-x-full opacity-0' : 'translate-x-0 opacity-100'
+      className={`absolute top-4 right-4 z-50 bg-black border-2 border-[#00FFFF] p-4 min-w-[280px] max-w-[320px] transition-all duration-500 ease-out transform cursor-pointer hover:border-[#00FFFF]/80 ${
+        !isVisible 
+          ? 'translate-x-full opacity-0 scale-95' 
+          : isClosing 
+            ? 'translate-x-full opacity-0 scale-95' 
+            : 'translate-x-0 opacity-100 scale-100'
       }`}
       style={{
         boxShadow: '0 0 20px rgba(0, 255, 255, 0.3)',
       }}
+      onClick={handleClick}
     >
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
@@ -58,7 +78,10 @@ export const AchievementPopup: React.FC<AchievementPopupProps> = ({
           ACHIEVEMENT UNLOCKED
         </div>
         <button
-          onClick={handleClose}
+          onClick={(e) => {
+            e.stopPropagation();
+            handleClose();
+          }}
           className="text-[#00FFFF] hover:text-white transition-colors text-xl leading-none"
         >
           ×

@@ -138,7 +138,7 @@ export class AchievementsManager {
   }
 
   getTotalCount(): number {
-    return this.achievements.length;
+    return 49; // Total planned achievements
   }
 
   onAchievementUnlocked(listener: (achievement: Achievement) => void) {
@@ -149,6 +149,24 @@ export class AchievementsManager {
         this.listeners.splice(index, 1);
       }
     };
+  }
+
+  // Reset all achievements
+  resetAll(): void {
+    // Reset all achievements to unlocked: false
+    this.achievements = ACHIEVEMENT_DEFINITIONS.map(def => ({
+      ...def,
+      unlocked: false,
+      unlockedAt: undefined,
+    }));
+
+    // Clear localStorage
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem(ACHIEVEMENTS_STORAGE_KEY);
+    }
+
+    // Notify listeners that achievements have been reset (optional)
+    // You could add a separate reset listener system if needed
   }
 
   // Create a 7x7 grid representation
