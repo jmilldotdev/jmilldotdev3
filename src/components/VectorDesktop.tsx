@@ -1,12 +1,14 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
+import * as THREE from "three";
 import WikiWindow from "./WikiWindow";
 import { BaseWindow } from "./BaseWindow";
 import { AboutIcon } from "./icons/AboutIcon";
 import { WikiIcon } from "./icons/WikiIcon";
 import { TerminalIcon } from "./icons/TerminalIcon";
 import { JazzIcon } from "./icons/JazzIcon";
+import { createMiniSphereEffect, type MiniSphereEffectEmitter } from "./ui/MiniSphereEffect";
 
 interface Window {
   id: string;
@@ -43,6 +45,12 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({ isVisible }) => {
     offsetX: number;
     offsetY: number;
   }>({ windowId: null, offsetX: 0, offsetY: 0 });
+  
+  const sceneRef = useRef<THREE.Scene | null>(null);
+  const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
+  const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const miniSphereEffectRef = useRef<MiniSphereEffectEmitter | null>(null);
 
   const desktopIcons: DesktopIcon[] = [
     {
@@ -246,6 +254,125 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({ isVisible }) => {
     }
   }, [dragState, handleMouseMove]);
 
+  // Initialize THREE.js scene for sphere effects
+  useEffect(() => {
+    if (!isVisible) return;
+
+    // Small delay to ensure DOM is ready
+    const timer = setTimeout(() => {
+      const scene = new THREE.Scene();
+      sceneRef.current = scene;
+
+      // Add some ambient light
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+      scene.add(ambientLight);
+
+      // Get container dimensions
+      const container = document.querySelector('[data-desktop-container]') as HTMLElement;
+      if (!container) {
+        console.error('Desktop container not found');
+        return;
+      }
+      
+      const width = container.clientWidth;
+      const height = container.clientHeight;
+
+      const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
+      camera.position.z = 5;
+      cameraRef.current = camera;
+
+      const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+      renderer.setSize(width, height);
+      renderer.setClearColor(0x000000, 0);
+      renderer.domElement.style.position = 'absolute';
+      renderer.domElement.style.top = '0';
+      renderer.domElement.style.left = '0';
+      renderer.domElement.style.width = '100%';
+      renderer.domElement.style.height = '100%';
+      renderer.domElement.style.zIndex = '50'; // Higher z-index to be visible
+      renderer.domElement.style.pointerEvents = 'none';
+      
+      // Append to the desktop container
+      container.appendChild(renderer.domElement);
+      rendererRef.current = renderer;
+      canvasRef.current = renderer.domElement;
+
+      const animate = () => {
+        requestAnimationFrame(animate);
+        renderer.render(scene, camera);
+      };
+      animate();
+
+      const handleResize = () => {
+        if (cameraRef.current && rendererRef.current) {
+          const container = document.querySelector('[data-desktop-container]') as HTMLElement;
+          const width = container?.clientWidth || window.innerWidth;
+          const height = container?.clientHeight || window.innerHeight;
+          
+          cameraRef.current.aspect = width / height;
+          cameraRef.current.updateProjectionMatrix();
+          rendererRef.current.setSize(width, height);
+        }
+      };
+
+      window.addEventListener('resize', handleResize);
+      
+      // Create mini sphere effect emitter here, after scene is ready
+      const emitter = createMiniSphereEffect(scene);
+      miniSphereEffectRef.current = emitter;
+    }, 100); // 100ms delay
+
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('resize', () => {});
+      if (canvasRef.current && canvasRef.current.parentNode) {
+        canvasRef.current.parentNode.removeChild(canvasRef.current);
+      }
+      if (miniSphereEffectRef.current) {
+        miniSphereEffectRef.current.cleanup();
+      }
+      if (sceneRef.current) {
+        sceneRef.current.clear();
+      }
+    };
+  }, [isVisible]);
+
+  // Handle desktop mouse up for mini sphere effect
+  const handleDesktopMouseUp = useCallback((e: React.MouseEvent) => {
+    // Only trigger on direct desktop clicks, not on icons or windows
+    if ((e.target as HTMLElement).closest('.cursor-pointer') || 
+        (e.target as HTMLElement).closest('[data-window]')) {
+      return;
+    }
+
+    if (!miniSphereEffectRef.current || !cameraRef.current) {
+      return;
+    }
+
+    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+    
+    // Convert mouse coordinates to normalized device coordinates (-1 to +1)
+    const mouse = new THREE.Vector2();
+    mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+    mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+    
+    // Use raycaster to get proper world position
+    const raycaster = new THREE.Raycaster();
+    raycaster.setFromCamera(mouse, cameraRef.current);
+    
+    // Project onto a plane at z=0 (same depth as original sphere)
+    const intersectPoint = raycaster.ray.origin.clone().add(
+      raycaster.ray.direction.clone().multiplyScalar(
+        -raycaster.ray.origin.z / raycaster.ray.direction.z
+      )
+    );
+    
+    miniSphereEffectRef.current.trigger({
+      position: intersectPoint,
+      scale: 0.15,
+    });
+  }, []);
+
   // Handle escape key to close active window
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -270,7 +397,12 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({ isVisible }) => {
   if (!isVisible) return null;
 
   return (
-    <div className={`absolute inset-0 bg-black transition-opacity duration-2000 ${isVisible ? 'opacity-100' : 'opacity-0'}`} style={{ zIndex: 15 }}>
+    <div 
+      className={`absolute inset-0 bg-black transition-opacity duration-2000 ${isVisible ? 'opacity-100' : 'opacity-0'}`} 
+      style={{ zIndex: 15 }}
+      onMouseUp={handleDesktopMouseUp}
+      data-desktop-container
+    >
       {/* Subtle CRT Scanlines Effect */}
       <div className="absolute inset-0 pointer-events-none z-0">
         <div className="w-full h-full opacity-5 bg-gradient-to-b from-transparent via-[#00FFFF] to-transparent bg-[length:100%_8px]"></div>
@@ -376,6 +508,7 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({ isVisible }) => {
             onClose={() => closeWindow(window.id)}
             onToggleMaximize={() => toggleMaximize(window.id)}
             onMouseDown={(e) => handleMouseDown(e, window.id)}
+            data-window="true"
           >
             <div className="p-4 overflow-auto h-full">
               <pre className="text-[#00FFFF] font-mono text-sm whitespace-pre-wrap leading-relaxed">

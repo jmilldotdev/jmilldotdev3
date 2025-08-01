@@ -17,6 +17,7 @@ interface BaseWindowProps {
   children: React.ReactNode;
   className?: string;
   titleBarButtons?: React.ReactNode;
+  "data-window"?: string;
 }
 
 export const BaseWindow: React.FC<BaseWindowProps> = ({
@@ -34,6 +35,7 @@ export const BaseWindow: React.FC<BaseWindowProps> = ({
   children,
   className = "",
   titleBarButtons,
+  ...props
 }) => {
   return (
     <div
@@ -41,6 +43,7 @@ export const BaseWindow: React.FC<BaseWindowProps> = ({
         isMaximized ? "inset-4" : ""
       } ${className}`}
       key={id}
+      {...props}
       style={
         isMaximized
           ? {
