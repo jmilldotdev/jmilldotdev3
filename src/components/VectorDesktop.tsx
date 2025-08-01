@@ -8,7 +8,9 @@ import { AboutIcon } from "./icons/AboutIcon";
 import { WikiIcon } from "./icons/WikiIcon";
 import { TerminalIcon } from "./icons/TerminalIcon";
 import { JazzIcon } from "./icons/JazzIcon";
+import { AchievementsIcon } from "./icons/AchievementsIcon";
 import { createMiniSphereEffect, type MiniSphereEffectEmitter } from "./ui/MiniSphereEffect";
+import { AchievementsWindow } from "./AchievementsWindow";
 
 interface Window {
   id: string;
@@ -84,6 +86,14 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({ isVisible }) => {
       y: 80,
       content: "JAZZ_GIF",
       icon: <JazzIcon />
+    },
+    {
+      id: "achievements",
+      name: "ACHIEVE.SYS",
+      x: 150,
+      y: 180,
+      content: "ACHIEVEMENT_WINDOW",
+      icon: <AchievementsIcon />
     }
   ];
 
@@ -133,7 +143,7 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({ isVisible }) => {
       height: windowHeight,
       isMaximized: false,
       zIndex: nextZIndex,
-      type: icon.id === 'wiki' ? 'wiki' : icon.id === 'jazz' ? 'jazz' : 'default'
+      type: icon.id === 'wiki' ? 'wiki' : icon.id === 'jazz' ? 'jazz' : icon.id === 'achievements' ? 'achievements' : 'default'
     };
 
     setWindows(prev => [...prev, newWindow]);
@@ -150,6 +160,8 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({ isVisible }) => {
       (document.getElementById('terminal-cursor-terminal') as unknown as SVGAnimateElement)?.beginElement();
     } else if (icon.id === 'jazz') {
       (document.getElementById('jazz-body-jazz') as unknown as SVGAnimateElement)?.beginElement();
+    } else if (icon.id === 'achievements') {
+      // Achievements icon animation can be added here if needed
     }
   };
 
@@ -484,6 +496,21 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({ isVisible }) => {
         window.type === 'wiki' ? (
           <WikiWindow
             key={window.id}
+            onClose={() => closeWindow(window.id)}
+            isMaximized={window.isMaximized}
+            onToggleMaximize={() => toggleMaximize(window.id)}
+            x={window.x}
+            y={window.y}
+            width={window.width}
+            height={window.height}
+            zIndex={window.zIndex}
+            onMouseDown={(e) => handleMouseDown(e, window.id)}
+          />
+        ) : window.type === 'achievements' ? (
+          <AchievementsWindow
+            key={window.id}
+            id={window.id}
+            title={window.title}
             onClose={() => closeWindow(window.id)}
             isMaximized={window.isMaximized}
             onToggleMaximize={() => toggleMaximize(window.id)}
