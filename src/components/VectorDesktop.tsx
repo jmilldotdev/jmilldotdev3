@@ -3,6 +3,10 @@
 import { useState, useEffect, useCallback } from "react";
 import WikiWindow from "./WikiWindow";
 import { BaseWindow } from "./BaseWindow";
+import { AboutIcon } from "./icons/AboutIcon";
+import { WikiIcon } from "./icons/WikiIcon";
+import { TerminalIcon } from "./icons/TerminalIcon";
+import { JazzIcon } from "./icons/JazzIcon";
 
 interface Window {
   id: string;
@@ -47,18 +51,7 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({ isVisible }) => {
       x: 50,
       y: 80,
       content: "JMILL OPERATING SYSTEM v2.1\n\nCopyright (c) 2024 JMILL Industries\nAll rights reserved.\n\nSYSTEM SPECIFICATIONS:\n- Neural Processing Unit: Active\n- Memory Core: 64GB Quantum RAM\n- Storage: 2TB Holographic Drive\n- Network: Quantum Entanglement Enabled\n\nSTATUS: OPERATIONAL",
-      icon: (
-        <svg viewBox="0 0 24 24" className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth="1">
-          <circle cx="12" cy="12" r="10">
-            <animate attributeName="stroke-dasharray" values="0 63;63 0" dur="2s" begin="indefinite" repeatCount="indefinite" id="about-circle-about"/>
-          </circle>
-          <path d="M9,9h6v6H9z"/>
-          <path d="M12,6v3"/>
-          <path d="M12,15v3"/>
-          <path d="M6,12h3"/>
-          <path d="M15,12h3"/>
-        </svg>
-      )
+      icon: <AboutIcon />
     },
     {
       id: "wiki",
@@ -66,21 +59,7 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({ isVisible }) => {
       x: 50,
       y: 180,
       content: "WIKI SYSTEM ACCESS\n\nBrowse random pages from the knowledge base:\n\n• Projects & Creative Works\n• Concepts & Theories\n• Tools & Resources\n• Bookmarks & References\n\nClick 'RND' to load a random page\nContent rendered with MDX\nInteractive links enabled",
-      icon: (
-        <svg viewBox="0 0 24 24" className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth="1">
-          <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2Z"/>
-          <path d="M14,2V8H20"/>
-          <path d="M16,13H8" strokeDasharray="8 0">
-            <animate attributeName="stroke-dasharray" values="8 0;0 8;8 0" dur="1.5s" begin="indefinite" repeatCount="indefinite" id="wiki-line1-wiki"/>
-          </path>
-          <path d="M16,17H8" strokeDasharray="8 0">
-            <animate attributeName="stroke-dasharray" values="8 0;0 8;8 0" dur="1.5s" begin="indefinite" repeatCount="indefinite" id="wiki-line2-wiki"/>
-          </path>
-          <path d="M10,9H8" strokeDasharray="2 0">
-            <animate attributeName="stroke-dasharray" values="2 0;0 2;2 0" dur="1.5s" begin="indefinite" repeatCount="indefinite" id="wiki-line3-wiki"/>
-          </path>
-        </svg>
-      )
+      icon: <WikiIcon />
     },
     {
       id: "terminal",
@@ -88,17 +67,15 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({ isVisible }) => {
       x: 50,
       y: 280,
       content: "JMILL OS TERMINAL v2.1\n\njmill@quantum:~$ whoami\njmill\n\njmill@quantum:~$ uname -a\nJMILL OS 2.1.0 quantum-kernel #1 SMP\n\njmill@quantum:~$ ps aux\nPID  TTY  STAT  TIME  COMMAND\n001  tty1 Ssl   0:01  /sbin/init\n002  tty1 R     0:00  neural_proc\n003  tty1 S     0:03  quantum_sim\n004  tty1 R     0:00  vector_ui\n\njmill@quantum:~$ █",
-      icon: (
-        <svg viewBox="0 0 24 24" className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth="1">
-          <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
-          <path d="M8,21H16"/>
-          <path d="M12,17V21"/>
-          <path d="M6,7L10,10L6,13"/>
-          <path d="M13,13H17">
-            <animate attributeName="opacity" values="1;0;1" dur="1s" repeatCount="indefinite" begin="indefinite" id="terminal-cursor-terminal"/>
-          </path>
-        </svg>
-      )
+      icon: <TerminalIcon />
+    },
+    {
+      id: "jazz",
+      name: "jazz.asar",
+      x: 150,
+      y: 80,
+      content: "JAZZ_GIF",
+      icon: <JazzIcon />
     }
   ];
 
@@ -148,7 +125,7 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({ isVisible }) => {
       height: windowHeight,
       isMaximized: false,
       zIndex: nextZIndex,
-      type: icon.id === 'wiki' ? 'wiki' : 'default'
+      type: icon.id === 'wiki' ? 'wiki' : icon.id === 'jazz' ? 'jazz' : 'default'
     };
 
     setWindows(prev => [...prev, newWindow]);
@@ -163,6 +140,8 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({ isVisible }) => {
       setTimeout(() => (document.getElementById('wiki-line2-wiki') as unknown as SVGAnimateElement)?.beginElement(), 1000);
     } else if (icon.id === 'terminal') {
       (document.getElementById('terminal-cursor-terminal') as unknown as SVGAnimateElement)?.beginElement();
+    } else if (icon.id === 'jazz') {
+      (document.getElementById('jazz-body-jazz') as unknown as SVGAnimateElement)?.beginElement();
     }
   };
 
@@ -315,6 +294,8 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({ isVisible }) => {
                 setTimeout(() => (document.getElementById('wiki-line2-wiki') as unknown as SVGAnimateElement)?.beginElement(), 1000);
               } else if (icon.id === 'terminal') {
                 (document.getElementById('terminal-cursor-terminal') as unknown as SVGAnimateElement)?.beginElement();
+              } else if (icon.id === 'jazz') {
+                (document.getElementById('jazz-body-jazz') as unknown as SVGAnimateElement)?.beginElement();
               }
             }
           }}
@@ -329,6 +310,8 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({ isVisible }) => {
                 (document.getElementById('wiki-line3-wiki') as unknown as SVGAnimateElement)?.endElement();
               } else if (icon.id === 'terminal') {
                 (document.getElementById('terminal-cursor-terminal') as unknown as SVGAnimateElement)?.endElement();
+              } else if (icon.id === 'jazz') {
+                (document.getElementById('jazz-body-jazz') as unknown as SVGAnimateElement)?.endElement();
               }
             }
           }}
@@ -346,6 +329,26 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({ isVisible }) => {
 
       {/* Windows */}
       {windows.map(window => (
+        window.type === 'jazz' ? (
+          <BaseWindow
+            key={window.id}
+            id={window.id}
+            title={'self-driving jazz 🚗🎷'}
+            x={window.x}
+            y={window.y}
+            width={window.width}
+            height={window.height}
+            isMaximized={window.isMaximized}
+            zIndex={window.zIndex}
+            onClose={() => closeWindow(window.id)}
+            onToggleMaximize={() => toggleMaximize(window.id)}
+            onMouseDown={(e) => handleMouseDown(e, window.id)}
+          >
+            <div className="p-4 overflow-auto h-full flex items-center justify-center cursor-pointer" onClick={() => globalThis.open('https://selfdrivingjazz.com', '_blank')}>
+              <img src="/IO5M.gif" alt="Jazz" className="max-w-full max-h-full object-contain" />
+            </div>
+          </BaseWindow>
+        ) :
         window.type === 'wiki' ? (
           <WikiWindow
             key={window.id}
