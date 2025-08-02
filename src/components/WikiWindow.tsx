@@ -45,6 +45,7 @@ class ErrorBoundary extends React.Component<
 }
 
 interface WikiWindowProps {
+  id: string;
   onClose: () => void;
   isMaximized: boolean;
   onToggleMaximize: () => void;
@@ -70,6 +71,7 @@ interface Frontmatter {
 let MDX_FILES: string[] = [];
 
 export default function WikiWindow({
+  id,
   onClose,
   isMaximized,
   onToggleMaximize,
@@ -329,9 +331,10 @@ export default function WikiWindow({
     },
   };
 
+
   return (
     <BaseWindow
-      id="wiki-window"
+      id={id}
       title={`WIKI.MD${currentFile ? ` - ${currentFile.toUpperCase()}` : ""}`}
       x={x}
       y={y}
@@ -352,10 +355,11 @@ export default function WikiWindow({
           {isLoading ? "..." : "RND"}
         </button>
       }
+      data-window="true"
     >
-      <div className="p-4 overflow-auto h-full">
+      <div className="p-4 overflow-auto" style={{ height: 'calc(100% - 32px)' }}>
         {currentContent ? (
-          <article className="w-full">
+          <article className="w-full max-w-full overflow-visible">
             {/* Frontmatter Header */}
             {currentContent.frontmatter.title && (
               <header className="mb-6 border-l-4 border-[#FF4800] pl-4 py-2">
@@ -416,7 +420,7 @@ export default function WikiWindow({
             )}
 
             {/* MDX Content */}
-            <div className="text-[#eef2ff] leading-relaxed tracking-[0.3px] font-mono prose prose-invert prose-headings:text-[#FF4800] prose-h1:text-2xl prose-h1:border-b prose-h1:border-[#FF4800]/30 prose-h1:pb-1 prose-h1:mt-4 prose-h1:mb-2 prose-h2:text-xl prose-h2:mt-4 prose-h2:mb-2 prose-h3:text-lg prose-h3:mt-4 prose-h3:mb-2 prose-p:text-sm prose-p:mb-3 prose-a:text-[#00FFFF] prose-a:no-underline prose-a:border-b prose-a:border-dotted prose-a:border-[#00FFFF] hover:prose-a:text-white hover:prose-a:border-white prose-ul:ml-4 prose-ul:mb-3 prose-ul:text-sm prose-ol:ml-4 prose-ol:mb-3 prose-ol:text-sm prose-li:mb-1 prose-code:bg-black/30 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:text-sm prose-pre:bg-black/50 prose-pre:p-4 prose-pre:rounded prose-pre:border-l-2 prose-pre:border-[#00FFFF] prose-blockquote:border-l-4 prose-blockquote:border-[#00FFFF] prose-blockquote:pl-4 prose-blockquote:py-1 prose-blockquote:my-3 prose-blockquote:italic prose-blockquote:text-gray-400 prose-blockquote:bg-black/20 prose-img:border prose-img:border-gray-700 prose-img:my-3 prose-img:max-w-full prose-img:h-auto prose-table:w-full prose-table:border-collapse prose-table:mb-3 prose-th:border prose-th:border-gray-700 prose-th:p-2 prose-th:text-left prose-th:bg-black/50 prose-th:text-[#FF4800] prose-td:border prose-td:border-gray-700 prose-td:p-2 max-w-none prose-sm [&_iframe]:max-w-full [&_iframe]:h-auto [&_iframe]:max-h-96 [&_video]:max-w-full [&_video]:h-auto [&_embed]:max-w-full [&_embed]:h-auto [&_object]:max-w-full [&_object]:h-auto">
+            <div className="text-[#eef2ff] leading-relaxed tracking-[0.3px] font-mono prose prose-invert prose-headings:text-[#FF4800] prose-h1:text-2xl prose-h1:border-b prose-h1:border-[#FF4800]/30 prose-h1:pb-1 prose-h1:mt-4 prose-h1:mb-2 prose-h2:text-xl prose-h2:mt-4 prose-h2:mb-2 prose-h3:text-lg prose-h3:mt-4 prose-h3:mb-2 prose-p:text-sm prose-p:mb-3 prose-a:text-[#00FFFF] prose-a:no-underline prose-a:border-b prose-a:border-dotted prose-a:border-[#00FFFF] hover:prose-a:text-white hover:prose-a:border-white prose-ul:ml-4 prose-ul:mb-3 prose-ul:text-sm prose-ol:ml-4 prose-ol:mb-3 prose-ol:text-sm prose-li:mb-1 prose-code:bg-black/30 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:text-sm prose-pre:bg-black/50 prose-pre:p-4 prose-pre:rounded prose-pre:border-l-2 prose-pre:border-[#00FFFF] prose-pre:overflow-x-auto prose-blockquote:border-l-4 prose-blockquote:border-[#00FFFF] prose-blockquote:pl-4 prose-blockquote:py-1 prose-blockquote:my-3 prose-blockquote:italic prose-blockquote:text-gray-400 prose-blockquote:bg-black/20 prose-img:border prose-img:border-gray-700 prose-img:my-3 prose-img:max-w-full prose-img:h-auto prose-table:w-full prose-table:border-collapse prose-table:mb-3 prose-th:border prose-th:border-gray-700 prose-th:p-2 prose-th:text-left prose-th:bg-black/50 prose-th:text-[#FF4800] prose-td:border prose-td:border-gray-700 prose-td:p-2 prose-sm prose-img:object-contain">
               {currentContent.source ? (
                 <ErrorBoundary>
                   <MDXRemote

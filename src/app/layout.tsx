@@ -1,7 +1,6 @@
 import React from "react";
 import type { Metadata } from "next";
 import "./globals.css";
-import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import Script from "next/script";
 import QuickSwitcher from "@/components/QuickSwitcher";
@@ -28,12 +27,14 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       />
       <body className="min-h-screen bg-black">
         <QuickSwitcher pageMetadata={pageMetadata} tagData={tagData}>
-          <div id="app" className="grid grid-rows-[80px_1fr_80px] h-screen p-2.5 gap-2.5">
+          <div
+            id="app"
+            className="grid grid-rows-[80px_1fr] h-screen p-2.5 gap-2.5"
+          >
             <Header />
             <main className="relative border border-gray-700 bg-gray-900/70 flex flex-col justify-start overflow-auto">
               {children}
             </main>
-            <Footer />
           </div>
         </QuickSwitcher>
       </body>

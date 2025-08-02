@@ -16,6 +16,8 @@ import {
 } from "./ui/MiniSphereEffect";
 import { AchievementsWindow } from "./AchievementsWindow";
 import { AchievementPopup } from "./AchievementPopup";
+import { AboutWindow } from "./AboutWindow";
+import { DesktopIcon, DESKTOP_ICON_DIMENSIONS } from "./DesktopIcon";
 import { Achievement } from "@/lib/achievements";
 
 interface Window {
@@ -88,6 +90,7 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({
   const [iconPositions, setIconPositions] = useState<
     Record<string, { x: number; y: number }>
   >({});
+  const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
 
   const sceneRef = useRef<THREE.Scene | null>(null);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
@@ -95,75 +98,113 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const miniSphereEffectRef = useRef<MiniSphereEffectEmitter | null>(null);
 
-  // Grid configuration
-  const ICON_GRID = {
-    startX: 50, // Left margin
-    startY: 80, // Top margin
-    iconSize: 100, // Icon + label height spacing
-    iconWidth: 120, // Icon + label width spacing
-    columns: 5, // Max icons per row
-  };
+  // Dynamic grid configuration based on container size
+  const getResponsiveIconGrid = useMemo(() => {
+    const container = document.querySelector("main");
+    const containerWidth =
+      containerSize.width || container?.clientWidth || window.innerWidth;
+    const containerHeight =
+      containerSize.height || container?.clientHeight || window.innerHeight;
+
+    // Use actual icon dimensions from component
+    const margin = Math.max(20, containerWidth * 0.02); // 2% margin with minimum 20px
+    const iconWidth = DESKTOP_ICON_DIMENSIONS.width + 10; // Add small gap between icons
+    const iconHeight = DESKTOP_ICON_DIMENSIONS.height + 10; // Add small gap between rows
+
+    // Calculate how many columns can fit
+    const availableWidth = containerWidth - 2 * margin;
+    const columns = Math.max(1, Math.floor(availableWidth / iconWidth));
+
+    return {
+      startX: margin,
+      startY: Math.min(60, containerHeight * 0.08), // 8% from top with max 60px
+      iconSize: iconHeight,
+      iconWidth,
+      columns,
+    };
+  }, [containerSize]);
 
   // Helper function to calculate absolute position from grid coordinates or custom position
-  const getIconPosition = (icon: DesktopIcon) => {
-    const customPos = iconPositions[icon.id];
-    if (customPos) {
-      return customPos;
-    }
-    // Use absolute position if set, otherwise calculate from grid
-    if (icon.x !== undefined && icon.y !== undefined) {
-      return { x: icon.x, y: icon.y };
-    }
-    return {
-      x: ICON_GRID.startX + icon.gridX * ICON_GRID.iconWidth,
-      y: ICON_GRID.startY + icon.gridY * ICON_GRID.iconSize,
-    };
-  };
+  const getIconPosition = useCallback(
+    (icon: DesktopIcon) => {
+      const customPos = iconPositions[icon.id];
+      if (customPos) {
+        return customPos;
+      }
+      // Use absolute position if set, otherwise calculate from grid
+      if (icon.x !== undefined && icon.y !== undefined) {
+        return { x: icon.x, y: icon.y };
+      }
+
+      const grid = getResponsiveIconGrid;
+      const container = document.querySelector("main");
+      const containerHeight = container?.clientHeight || window.innerHeight;
+
+      // Calculate maximum rows that can fit vertically
+      const availableHeight = containerHeight - grid.startY - 60; // 60px bottom margin
+      const maxRows = Math.max(1, Math.floor(availableHeight / grid.iconSize));
+
+      // Calculate actual position with overflow handling
+      let actualColumn = icon.gridX;
+      let actualRow = icon.gridY;
+
+      // If this icon's row exceeds max rows, move to next column
+      if (actualRow >= maxRows) {
+        actualColumn = Math.floor(actualRow / maxRows);
+        actualRow = actualRow % maxRows;
+      }
+
+      return {
+        x: grid.startX + actualColumn * grid.iconWidth,
+        y: grid.startY + actualRow * grid.iconSize,
+      };
+    },
+    [getResponsiveIconGrid, iconPositions]
+  );
 
   const desktopIcons: DesktopIcon[] = useMemo(
     () => [
       {
         id: "about",
         name: "ABOUT.SYS",
-        gridX: 0, // Column 0
-        gridY: 0, // Row 0
-        content:
-          "JMILL OPERATING SYSTEM v2.1\n\nCopyright (c) 2024 JMILL Industries\nAll rights reserved.\n\nSYSTEM SPECIFICATIONS:\n- Neural Processing Unit: Active\n- Memory Core: 64GB Quantum RAM\n- Storage: 2TB Holographic Drive\n- Network: Quantum Entanglement Enabled\n\nSTATUS: OPERATIONAL",
+        gridX: 0,
+        gridY: 0,
+        content: "ABOUT_WINDOW",
         icon: <AboutIcon />,
-      },
-      {
-        id: "jazz",
-        name: "JAZZ.ASAR",
-        gridX: 0, // Column 1
-        gridY: 4, // Row 0
-        content: "JAZZ_GIF",
-        icon: <JazzIcon />,
       },
       {
         id: "wiki",
         name: "WIKI.MD",
-        gridX: 0, // Column 0
-        gridY: 1, // Row 1
+        gridX: 0,
+        gridY: 1,
         content:
           "WIKI SYSTEM ACCESS\n\nBrowse random pages from the knowledge base:\n\n• Projects & Creative Works\n• Concepts & Theories\n• Tools & Resources\n• Bookmarks & References\n\nClick 'RND' to load a random page\nContent rendered with MDX\nInteractive links enabled",
         icon: <WikiIcon />,
       },
       {
+        id: "terminal",
+        name: "TERM.CMD",
+        gridX: 0,
+        gridY: 2,
+        content:
+          "JMILL OS TERMINAL v2.1\n\njmill@quantum:~$ whoami\njmill\n\njmill@quantum:~$ uname -a\nJMILL OS 2.1.0 quantum-kernel #1 SMP\n\njmill@quantum:~$ ps aux\nPID  TTY  STAT  TIME  COMMAND\n001  tty1 Ssl   0:01  /sbin/init\n002  tty1 R     0:00  neural_proc\n003  tty1 S     0:03  quantum_sim\n004  tty1 R     0:00  vector_ui\n\njmill@quantum:~$ █",
+        icon: <TerminalIcon />,
+      },
+      {
         id: "achievements",
-        name: "ACHEIVE.M",
-        gridX: 0, // Column 1
-        gridY: 3, // Row 1
+        name: "WINS.TRO",
+        gridX: 0,
+        gridY: 3,
         content: "ACHIEVEMENT_WINDOW",
         icon: <AchievementsIcon />,
       },
       {
-        id: "terminal",
-        name: "TERM.CMD",
-        gridX: 0, // Column 0
-        gridY: 2, // Row 2
-        content:
-          "JMILL OS TERMINAL v2.1\n\njmill@quantum:~$ whoami\njmill\n\njmill@quantum:~$ uname -a\nJMILL OS 2.1.0 quantum-kernel #1 SMP\n\njmill@quantum:~$ ps aux\nPID  TTY  STAT  TIME  COMMAND\n001  tty1 Ssl   0:01  /sbin/init\n002  tty1 R     0:00  neural_proc\n003  tty1 S     0:03  quantum_sim\n004  tty1 R     0:00  vector_ui\n\njmill@quantum:~$ █",
-        icon: <TerminalIcon />,
+        id: "jazz",
+        name: "JAZZ.ASAR",
+        gridX: 0,
+        gridY: 4,
+        content: "JAZZ_GIF",
+        icon: <JazzIcon />,
       },
     ],
     []
@@ -236,6 +277,32 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({
             viewportHeight - actionBarHeight - 2 * margin,
             600
           );
+        } else if (icon.id === "about") {
+          // About window: aggressive space usage with content-aware sizing
+          const availableWidth = viewportWidth - 2 * margin;
+          const availableHeight = viewportHeight - actionBarHeight - 2 * margin;
+
+          if (availableWidth >= 1200) {
+            // Large desktop: use most of available width, reasonable height
+            windowWidth = Math.min(availableWidth * 0.8, 1000);
+            windowHeight = Math.min(availableHeight * 0.7, 650);
+          } else if (availableWidth >= 800) {
+            // Medium desktop: use significant portion of space
+            windowWidth = Math.min(availableWidth * 0.85, 800);
+            windowHeight = Math.min(availableHeight * 0.75, 600);
+          } else if (availableWidth >= 600) {
+            // Tablet: nearly full width, tall enough for content
+            windowWidth = availableWidth * 0.9;
+            windowHeight = Math.min(availableHeight * 0.8, 700);
+          } else {
+            // Mobile: full width available, optimized height
+            windowWidth = availableWidth;
+            windowHeight = Math.min(availableHeight * 0.85, 650);
+          }
+
+          // Ensure minimum usable size
+          windowWidth = Math.max(350, windowWidth);
+          windowHeight = Math.max(400, windowHeight);
         } else {
           windowWidth = Math.min(
             viewportWidth - 2 * margin,
@@ -246,16 +313,15 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({
             icon.id === "wiki" ? 550 : 350
           );
         }
-        windowX =
-          margin +
-          Math.random() * Math.max(0, viewportWidth - windowWidth - 2 * margin);
-        windowY =
-          margin +
-          Math.random() *
-            Math.max(
-              0,
-              viewportHeight - windowHeight - actionBarHeight - 2 * margin
-            );
+        // Ensure safe random positioning within bounds
+        const maxX = Math.max(margin, viewportWidth - windowWidth - margin);
+        const maxY = Math.max(
+          margin,
+          viewportHeight - windowHeight - actionBarHeight - margin
+        );
+
+        windowX = margin + Math.random() * Math.max(0, maxX - margin);
+        windowY = margin + Math.random() * Math.max(0, maxY - margin);
       }
 
       const newWindow: Window = {
@@ -269,7 +335,9 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({
         isMaximized: false,
         zIndex: nextZIndex,
         type:
-          icon.id === "wiki"
+          icon.id === "about"
+            ? "about"
+            : icon.id === "wiki"
             ? "wiki"
             : icon.id === "jazz"
             ? "jazz"
@@ -360,19 +428,19 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({
             } else if (correspondingIcon.id === "wiki") {
               (
                 document.getElementById(
-                  "wiki-line1-wiki"
+                  "wiki-line1-stop-wiki"
                 ) as unknown as SVGAnimateElement
-              )?.endElement();
+              )?.beginElement();
               (
                 document.getElementById(
-                  "wiki-line2-wiki"
+                  "wiki-line2-stop-wiki"
                 ) as unknown as SVGAnimateElement
-              )?.endElement();
+              )?.beginElement();
               (
                 document.getElementById(
-                  "wiki-line3-wiki"
+                  "wiki-line3-stop-wiki"
                 ) as unknown as SVGAnimateElement
-              )?.endElement();
+              )?.beginElement();
             } else if (correspondingIcon.id === "terminal") {
               (
                 document.getElementById(
@@ -526,14 +594,14 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({
           const newX = Math.max(
             margin,
             Math.min(
-              containerWidth - 120 - margin, // Account for icon width
+              containerWidth - DESKTOP_ICON_DIMENSIONS.width - margin,
               adjustedX - iconDragState.offsetX
             )
           );
           const newY = Math.max(
             margin,
             Math.min(
-              containerHeight - 100 - margin, // Account for icon height
+              containerHeight - DESKTOP_ICON_DIMENSIONS.height - margin,
               adjustedY - iconDragState.offsetY
             )
           );
@@ -658,6 +726,141 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({
       };
     }
   }, [dragState, resizeState, iconDragState, handleMouseMove, handleMouseUp]);
+
+  // Add resize observer to track container size changes
+  useEffect(() => {
+    if (!isVisible) return;
+
+    const container = document.querySelector("main");
+    if (!container) return;
+
+    const resizeObserver = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        const { width, height } = entry.contentRect;
+        setContainerSize({ width, height });
+      }
+    });
+
+    resizeObserver.observe(container);
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, [isVisible]);
+
+  // Clear custom icon positions when container size changes significantly to allow reflow
+  useEffect(() => {
+    // Only clear positions if we have significant size change and custom positions exist
+    if (Object.keys(iconPositions).length > 0 && containerSize.width > 0) {
+      // You could add logic here to clear positions if needed for reflow
+      // For now, we'll let the user-dragged positions persist
+    }
+  }, [containerSize, iconPositions]);
+
+  // Helper functions for icon animations
+  const handleIconMouseEnter = useCallback(
+    (iconId: string) => {
+      const isWindowOpen = windows.some(
+        (w) => w.title === desktopIcons.find((i) => i.id === iconId)?.name
+      );
+      if (!isWindowOpen) {
+        if (iconId === "about") {
+          (
+            document.getElementById(
+              "about-circle-about"
+            ) as unknown as SVGAnimateElement
+          )?.beginElement();
+        } else if (iconId === "wiki") {
+          setTimeout(
+            () =>
+              (
+                document.getElementById(
+                  "wiki-line3-wiki"
+                ) as unknown as SVGAnimateElement
+              )?.beginElement(),
+            0
+          );
+          setTimeout(
+            () =>
+              (
+                document.getElementById(
+                  "wiki-line1-wiki"
+                ) as unknown as SVGAnimateElement
+              )?.beginElement(),
+            500
+          );
+          setTimeout(
+            () =>
+              (
+                document.getElementById(
+                  "wiki-line2-wiki"
+                ) as unknown as SVGAnimateElement
+              )?.beginElement(),
+            1000
+          );
+        } else if (iconId === "terminal") {
+          (
+            document.getElementById(
+              "terminal-cursor-terminal"
+            ) as unknown as SVGAnimateElement
+          )?.beginElement();
+        } else if (iconId === "jazz") {
+          (
+            document.getElementById(
+              "jazz-body-jazz"
+            ) as unknown as SVGAnimateElement
+          )?.beginElement();
+        }
+      }
+    },
+    [windows, desktopIcons]
+  );
+
+  const handleIconMouseLeave = useCallback(
+    (iconId: string) => {
+      const isWindowOpen = windows.some(
+        (w) => w.title === desktopIcons.find((i) => i.id === iconId)?.name
+      );
+      if (!isWindowOpen) {
+        if (iconId === "about") {
+          (
+            document.getElementById(
+              "about-circle-about"
+            ) as unknown as SVGAnimateElement
+          )?.endElement();
+        } else if (iconId === "wiki") {
+          (
+            document.getElementById(
+              "wiki-line1-stop-wiki"
+            ) as unknown as SVGAnimateElement
+          )?.beginElement();
+          (
+            document.getElementById(
+              "wiki-line2-stop-wiki"
+            ) as unknown as SVGAnimateElement
+          )?.beginElement();
+          (
+            document.getElementById(
+              "wiki-line3-stop-wiki"
+            ) as unknown as SVGAnimateElement
+          )?.beginElement();
+        } else if (iconId === "terminal") {
+          (
+            document.getElementById(
+              "terminal-cursor-terminal"
+            ) as unknown as SVGAnimateElement
+          )?.endElement();
+        } else if (iconId === "jazz") {
+          (
+            document.getElementById(
+              "jazz-body-jazz"
+            ) as unknown as SVGAnimateElement
+          )?.endElement();
+        }
+      }
+    },
+    [windows, desktopIcons]
+  );
 
   // Initialize THREE.js scene for sphere effects
   useEffect(() => {
@@ -842,136 +1045,43 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({
         const position = getIconPosition(icon);
         const isDragging =
           iconDragState.iconId === icon.id && iconDragState.isDragging;
+        const isWindowOpen = windows.some((w) => w.title === icon.name);
+
         return (
-          <div
+          <DesktopIcon
             key={icon.id}
-            className={`absolute flex flex-col items-center group z-20 ${
-              isDragging ? "cursor-grabbing select-none" : "cursor-pointer"
-            }`}
-            style={{
-              left: position.x,
-              top: position.y,
-              userSelect: "none",
-              transition: isDragging ? "none" : "all 0.2s ease-out",
-            }}
-            onMouseDown={(e) => {
-              if (e.button === 0) {
-                // Left mouse button only
-                handleIconMouseDown(e, icon.id);
-              }
-            }}
-            onMouseEnter={() => {
-              const isWindowOpen = windows.some((w) => w.title === icon.name);
-              if (!isWindowOpen) {
-                if (icon.id === "about") {
-                  (
-                    document.getElementById(
-                      "about-circle-about"
-                    ) as unknown as SVGAnimateElement
-                  )?.beginElement();
-                } else if (icon.id === "wiki") {
-                  setTimeout(
-                    () =>
-                      (
-                        document.getElementById(
-                          "wiki-line3-wiki"
-                        ) as unknown as SVGAnimateElement
-                      )?.beginElement(),
-                    0
-                  );
-                  setTimeout(
-                    () =>
-                      (
-                        document.getElementById(
-                          "wiki-line1-wiki"
-                        ) as unknown as SVGAnimateElement
-                      )?.beginElement(),
-                    500
-                  );
-                  setTimeout(
-                    () =>
-                      (
-                        document.getElementById(
-                          "wiki-line2-wiki"
-                        ) as unknown as SVGAnimateElement
-                      )?.beginElement(),
-                    1000
-                  );
-                } else if (icon.id === "terminal") {
-                  (
-                    document.getElementById(
-                      "terminal-cursor-terminal"
-                    ) as unknown as SVGAnimateElement
-                  )?.beginElement();
-                } else if (icon.id === "jazz") {
-                  (
-                    document.getElementById(
-                      "jazz-body-jazz"
-                    ) as unknown as SVGAnimateElement
-                  )?.beginElement();
-                }
-              }
-            }}
-            onMouseLeave={() => {
-              const isWindowOpen = windows.some((w) => w.title === icon.name);
-              if (!isWindowOpen) {
-                if (icon.id === "about") {
-                  (
-                    document.getElementById(
-                      "about-circle-about"
-                    ) as unknown as SVGAnimateElement
-                  )?.endElement();
-                } else if (icon.id === "wiki") {
-                  (
-                    document.getElementById(
-                      "wiki-line1-wiki"
-                    ) as unknown as SVGAnimateElement
-                  )?.endElement();
-                  (
-                    document.getElementById(
-                      "wiki-line2-wiki"
-                    ) as unknown as SVGAnimateElement
-                  )?.endElement();
-                  (
-                    document.getElementById(
-                      "wiki-line3-wiki"
-                    ) as unknown as SVGAnimateElement
-                  )?.endElement();
-                } else if (icon.id === "terminal") {
-                  (
-                    document.getElementById(
-                      "terminal-cursor-terminal"
-                    ) as unknown as SVGAnimateElement
-                  )?.endElement();
-                } else if (icon.id === "jazz") {
-                  (
-                    document.getElementById(
-                      "jazz-body-jazz"
-                    ) as unknown as SVGAnimateElement
-                  )?.endElement();
-                }
-              }
-            }}
-          >
-            <div
-              className={`text-[#00FFFF] p-3 border border-[#00FFFF] transition-all flex items-center justify-center w-16 h-16 ${
-                windows.some((w) => w.title === icon.name)
-                  ? "border-opacity-100 shadow-[0_0_10px_#00FFFF]"
-                  : "border-opacity-50 group-hover:border-opacity-100 group-hover:shadow-[0_0_10px_#00FFFF]"
-              }`}
-            >
-              {icon.icon}
-            </div>
-            <span className="text-[#00FFFF] text-xs mt-1 text-center font-mono">
-              {icon.name}
-            </span>
-          </div>
+            id={icon.id}
+            name={icon.name}
+            icon={icon.icon}
+            position={position}
+            isDragging={isDragging}
+            isWindowOpen={isWindowOpen}
+            onMouseDown={handleIconMouseDown}
+            onMouseEnter={() => handleIconMouseEnter(icon.id)}
+            onMouseLeave={() => handleIconMouseLeave(icon.id)}
+          />
         );
       })}
 
       {/* Windows */}
       {windows.map((window) =>
-        window.type === "jazz" ? (
+        window.type === "about" ? (
+          <AboutWindow
+            key={window.id}
+            id={window.id}
+            title={window.title}
+            x={window.x}
+            y={window.y}
+            width={window.width}
+            height={window.height}
+            isMaximized={window.isMaximized}
+            zIndex={window.zIndex}
+            onClose={() => closeWindow(window.id)}
+            onToggleMaximize={() => toggleMaximize(window.id)}
+            onMouseDown={(e) => handleMouseDown(e, window.id)}
+            onResizeStart={handleResizeStart}
+          />
+        ) : window.type === "jazz" ? (
           <BaseWindow
             key={window.id}
             id={window.id}
@@ -1006,6 +1116,7 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({
         ) : window.type === "wiki" ? (
           <WikiWindow
             key={window.id}
+            id={window.id}
             onClose={() => closeWindow(window.id)}
             isMaximized={window.isMaximized}
             onToggleMaximize={() => toggleMaximize(window.id)}

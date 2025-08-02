@@ -37,7 +37,16 @@ export const AchievementsWindow: React.FC<AchievementsWindowProps> = (
   const totalCount = 49;
 
   return (
-    <BaseWindow {...props} data-window="true">
+    <BaseWindow 
+      {...props} 
+      width="auto"
+      height="auto"
+      minWidth={600}
+      maxWidth={1200}
+      minHeight={500}
+      maxHeight={900}
+      data-window="true"
+    >
       <div className="p-4 h-full flex flex-col">
         {/* Header Stats */}
         <div className="mb-4">

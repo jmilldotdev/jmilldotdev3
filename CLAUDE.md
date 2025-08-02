@@ -2,6 +2,10 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## IMPORTANT: NO RANDOM ADHOC TESTING BY RUNNING DEV SERVERS
+
+Do not run `pnpm dev` or start development servers just to test changes. Only run development servers when explicitly requested by the user.
+
 ## Overview
 
 This is a Next.js 15 personal website/wiki system that processes MDX content from an Obsidian vault and serves it as a web application with a unique Windows 95-inspired UI.
@@ -76,3 +80,23 @@ When modifying content generation:
 - The site uses React 19 and Next.js 15 - ensure compatibility when adding dependencies
 - MDX content automatically imports Next.js Link component when needed
 - The Windows 95 aesthetic is intentional - maintain consistency in UI additions
+
+## App Color Palette
+
+Use these consistent colors throughout the application:
+
+- **Wireframe/Primary**: `#00ffff` (cyan) - Used for window borders, primary UI elements
+- **Inner/Accent**: `#ff4800` (orange-red) - Used for links, interactive elements, highlights
+- **Success/Status**: `text-green-400` - Used for success states and operational status
+
+## Window Architecture
+
+**IMPORTANT**: All window behavior should be implemented in `BaseWindow.tsx`, NOT in individual window components.
+
+- **BaseWindow**: The core window component that handles positioning, resizing, viewport management, and all common window behaviors
+- **Specific Windows** (AboutWindow, WikiWindow, etc.): Should only contain content and pass props through to BaseWindow
+- **Avoid Window-Specific Logic**: Never add window-type-specific handling in VectorDesktop or other parent components
+- **Responsive Behavior**: BaseWindow should handle all responsive sizing, positioning, and viewport changes automatically
+- **Consistency**: This ensures all windows behave identically and reduces maintenance overhead
+
+When adding new window features, always implement them in BaseWindow so all windows benefit from the improvement.
