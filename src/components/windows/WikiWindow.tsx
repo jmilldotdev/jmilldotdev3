@@ -56,6 +56,7 @@ interface WikiWindowProps {
   zIndex: number;
   onMouseDown: (e: React.MouseEvent) => void;
   onResizeStart?: (e: React.MouseEvent, windowId: string) => void;
+  initialSlug?: string;
 }
 
 interface Frontmatter {
@@ -82,6 +83,7 @@ export default function WikiWindow({
   zIndex,
   onMouseDown,
   onResizeStart,
+  initialSlug,
 }: WikiWindowProps) {
   const [currentContent, setCurrentContent] = useState<{
     source: unknown;
@@ -182,10 +184,14 @@ export default function WikiWindow({
           ];
         }
 
-        // Then load a random page
-        const randomFile =
-          MDX_FILES[Math.floor(Math.random() * MDX_FILES.length)];
-        await loadSpecificPage(randomFile);
+        // Load initial page (slug if provided, otherwise random)
+        if (initialSlug && MDX_FILES.includes(initialSlug)) {
+          await loadSpecificPage(initialSlug);
+        } else {
+          const randomFile =
+            MDX_FILES[Math.floor(Math.random() * MDX_FILES.length)];
+          await loadSpecificPage(randomFile);
+        }
       } catch (error) {
         console.error("Error initializing wiki:", error);
         // Fallback
@@ -196,7 +202,11 @@ export default function WikiWindow({
           "wicked-problems",
           "multipolar-traps",
         ];
-        await loadSpecificPage("index");
+        if (initialSlug) {
+          await loadSpecificPage(initialSlug);
+        } else {
+          await loadSpecificPage("index");
+        }
       }
       setIsLoading(false);
     };

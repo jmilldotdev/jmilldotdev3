@@ -1,57 +1,94 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState, KeyboardEvent } from "react";
+import { useState, KeyboardEvent, useEffect, useRef } from "react";
 import pages from "@/config/pages.json";
-import { Modal } from "./ui";
 import { AchievementsManager } from "@/lib/achievements";
 
 type Command = {
   name: string;
   alias?: string[];
   description: string;
-  execute: () => void;
+  execute: () => string;
+  private?: boolean;
 };
 
 interface CommandLineProps {
   onInvalidCommand?: () => void;
+  onOpenWikiWindow?: (slug?: string) => void;
 }
 
-export default function CommandLine({ onInvalidCommand }: CommandLineProps) {
+export default function CommandLine({ onInvalidCommand, onOpenWikiWindow }: CommandLineProps) {
   const router = useRouter();
   const [input, setInput] = useState("");
-  const [showHelp, setShowHelp] = useState(false);
+  const [history, setHistory] = useState<Array<{command: string, response: string}>>([]);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const historyRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    // Auto-focus the input when component mounts
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, []);
+
+  // Auto-scroll to bottom when history updates
+  useEffect(() => {
+    if (historyRef.current) {
+      historyRef.current.scrollTop = historyRef.current.scrollHeight;
+    }
+  }, [history]);
 
   const commands: Command[] = [
     {
-      name: "home",
-      alias: ["~", "root", "h"],
-      description: "Navigate to the home page",
-      execute: () => router.push("/"),
-    },
-    {
       name: "random",
       alias: ["r"],
-      description: "Navigate to a random page",
+      description: "Open a random wiki page in window",
       execute: () => {
-        const randomPage = pages[Math.floor(Math.random() * pages.length)];
-        router.push(randomPage);
+        if (onOpenWikiWindow) {
+          const randomPage = pages[Math.floor(Math.random() * pages.length)];
+          const slug = randomPage.replace('/c/', '');
+          onOpenWikiWindow(slug);
+          return `opened wiki page: ${slug}`;
+        } else {
+          const randomPage = pages[Math.floor(Math.random() * pages.length)];
+          router.push(randomPage);
+          return `navigating to ${randomPage}`;
+        }
       },
     },
     {
       name: "help",
       alias: ["?"],
       description: "Show available commands",
-      execute: () => setShowHelp(true),
+      execute: () => {
+        const helpText = commands
+          .filter(cmd => !cmd.private)
+          .map(cmd => {
+            const aliases = cmd.alias ? ` (${cmd.alias.join(", ")})` : "";
+            return `  ${cmd.name}${aliases} - ${cmd.description}`;
+          }).join("\n");
+        return `Available commands:\n${helpText}`;
+      },
+    },
+    {
+      name: "clear",
+      alias: ["c"],
+      description: "Clear the terminal history",
+      execute: () => {
+        setHistory([]);
+        return "";
+      },
     },
     {
       name: "reset-achievements",
       alias: ["ra"],
       description: "Reset all achievements (clears localStorage)",
+      private: true,
       execute: () => {
         const manager = AchievementsManager.getInstance();
         manager.resetAll();
-        console.log("Achievements reset successfully");
+        return "achievements reset successfully";
       },
     },
   ];
@@ -64,8 +101,13 @@ export default function CommandLine({ onInvalidCommand }: CommandLineProps) {
     );
     if (cmd) {
       console.log(`Executing command: ${cmd.name}`);
-      cmd.execute();
+      const response = cmd.execute();
+      // Only add to history if response is not empty (for clear command)
+      if (response !== "") {
+        setHistory(prev => [...prev, { command, response }]);
+      }
     } else {
+      setHistory(prev => [...prev, { command, response: `unknown command: ${command}` }]);
       onInvalidCommand?.();
     }
   };
@@ -91,7 +133,18 @@ export default function CommandLine({ onInvalidCommand }: CommandLineProps) {
   };
 
   return (
-    <>
+    <div className="h-full flex flex-col">
+      {/* History */}
+      <div ref={historyRef} className="flex-1 overflow-auto mb-4 space-y-2">
+        {history.map((entry, index) => (
+          <div key={index} className="text-sm">
+            <div className="text-[#FF4800]">CMD&gt; <span className="text-[#00FFFF]">{entry.command}</span></div>
+            <div className="text-[#00FFFF] whitespace-pre-wrap pl-6">{entry.response}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Current command input */}
       <form onSubmit={handleSubmit} className="w-full">
         <div
           className={`flex items-center w-full cursor-text`}
@@ -105,37 +158,16 @@ export default function CommandLine({ onInvalidCommand }: CommandLineProps) {
         >
           <span className="text-[#FF4800] mr-2.5">CMD&gt;</span>
           <input
+            ref={inputRef}
             type="text"
-            className="flex-1 bg-transparent text-[#00FFFF] font-mono text-base outline-none border border-transparent transition-colors duration-200"
-            placeholder="ENTER COMMAND"
+            className="flex-1 bg-transparent text-[#00FFFF] font-mono text-base outline-none border border-transparent transition-colors duration-200 placeholder-[#00FFFF]/50"
+            placeholder=""
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
           />
         </div>
       </form>
-
-      <Modal
-        isOpen={showHelp}
-        onClose={() => setShowHelp(false)}
-        title="Available Commands"
-      >
-        <div className="space-y-4">
-          {commands.map((cmd) => (
-            <div key={cmd.name} className="flex items-baseline gap-2">
-              <div className="font-mono text-white">
-                {cmd.name}
-                {cmd.alias && (
-                  <span className="ml-2 text-gray-400">
-                    ({cmd.alias.join(", ")})
-                  </span>
-                )}
-              </div>
-              <div className="text-gray-400">— {cmd.description}</div>
-            </div>
-          ))}
-        </div>
-      </Modal>
-    </>
+    </div>
   );
 }

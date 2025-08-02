@@ -3,8 +3,8 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import * as THREE from "three";
 import Image from "next/image";
-import WikiWindow from "./WikiWindow";
-import { BaseWindow } from "./BaseWindow";
+import WikiWindow from "./windows/WikiWindow";
+import { BaseWindow } from "./windows/BaseWindow";
 import { AboutIcon } from "./icons/AboutIcon";
 import { WikiIcon } from "./icons/WikiIcon";
 import { TerminalIcon } from "./icons/TerminalIcon";
@@ -14,9 +14,10 @@ import {
   createMiniSphereEffect,
   type MiniSphereEffectEmitter,
 } from "./ui/MiniSphereEffect";
-import { AchievementsWindow } from "./AchievementsWindow";
+import { AchievementsWindow } from "./windows/AchievementsWindow";
 import { AchievementPopup } from "./AchievementPopup";
-import { AboutWindow } from "./AboutWindow";
+import { AboutWindow } from "./windows/AboutWindow";
+import { TerminalWindow } from "./windows/TerminalWindow";
 import { DesktopIcon, DESKTOP_ICON_DIMENSIONS } from "./DesktopIcon";
 import { Achievement } from "@/lib/achievements";
 
@@ -343,6 +344,8 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({
             ? "jazz"
             : icon.id === "achievements"
             ? "achievements"
+            : icon.id === "terminal"
+            ? "terminal"
             : "default",
       };
 
@@ -479,6 +482,18 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({
       createWindow(achievementsIcon);
     }
   };
+
+  const openWikiWindow = useCallback((slug?: string) => {
+    // Find wiki icon
+    const wikiIcon = desktopIcons.find((icon) => icon.id === "wiki");
+    if (wikiIcon) {
+      const wikiWindow = {
+        ...wikiIcon,
+        content: slug || "random" // Pass the slug to the window
+      };
+      createWindow(wikiWindow);
+    }
+  }, [desktopIcons, createWindow]);
 
   const handleMouseDown = (e: React.MouseEvent, windowId: string) => {
     e.preventDefault();
@@ -1127,6 +1142,7 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({
             zIndex={window.zIndex}
             onMouseDown={(e) => handleMouseDown(e, window.id)}
             onResizeStart={handleResizeStart}
+            initialSlug={window.content !== "WIKI SYSTEM ACCESS\n\nBrowse random pages from the knowledge base:\n\n• Projects & Creative Works\n• Concepts & Theories\n• Tools & Resources\n• Bookmarks & References\n\nClick 'RND' to load a random page\nContent rendered with MDX\nInteractive links enabled" ? window.content : undefined}
           />
         ) : window.type === "achievements" ? (
           <AchievementsWindow
@@ -1143,6 +1159,23 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({
             zIndex={window.zIndex}
             onMouseDown={(e) => handleMouseDown(e, window.id)}
             onResizeStart={handleResizeStart}
+          />
+        ) : window.type === "terminal" ? (
+          <TerminalWindow
+            key={window.id}
+            id={window.id}
+            title={window.title}
+            onClose={() => closeWindow(window.id)}
+            isMaximized={window.isMaximized}
+            onToggleMaximize={() => toggleMaximize(window.id)}
+            x={window.x}
+            y={window.y}
+            width={window.width}
+            height={window.height}
+            zIndex={window.zIndex}
+            onMouseDown={(e) => handleMouseDown(e, window.id)}
+            onResizeStart={handleResizeStart}
+            onOpenWikiWindow={openWikiWindow}
           />
         ) : (
           <BaseWindow
