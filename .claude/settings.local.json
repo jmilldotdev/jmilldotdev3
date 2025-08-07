@@ -15,7 +15,8 @@
       "Bash(pnpm exec:*)",
       "Bash(touch:*)",
       "Bash(chmod:*)",
-      "Bash(pnpm dev:*)"
+      "Bash(pnpm dev:*)",
+      "Bash(pnpm generate:content:*)"
     ],
     "deny": []
   }

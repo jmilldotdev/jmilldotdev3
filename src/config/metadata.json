@@ -1201,12 +1201,12 @@
     "path": "/c/zembrin"
   },
   {
-    "slug": "zone-de-sensibilit-picturale-immatrielle",
-    "title": "Zone de Sensibilité Picturale Immatérielle",
+    "slug": "zone-de-sensibilite-picturale-immaterielle",
+    "title": "Zone de Sensibilité Picturale Immatérielle",
     "tags": [
       "entity"
     ],
-    "path": "/c/zone-de-sensibilit-picturale-immatrielle"
+    "path": "/c/zone-de-sensibilite-picturale-immaterielle"
   },
   {
     "slug": "copy-to-clipboard-share-game-results",
@@ -2782,6 +2782,16 @@
     "path": "/c/rive"
   },
   {
+    "slug": "soot",
+    "title": "SOOT",
+    "created": "2025-08-02 08:29",
+    "tags": [
+      "bookmark"
+    ],
+    "url": "https://www.soot.com/",
+    "path": "/c/soot"
+  },
+  {
     "slug": "sseance",
     "title": "SSeance",
     "tags": [
@@ -2958,6 +2968,16 @@
     ],
     "url": "https://www.tango.us/",
     "path": "/c/tango"
+  },
+  {
+    "slug": "tarotpunk-tech-bro-tarot-deck",
+    "title": "Tarotpunk Tech Bro Tarot Deck",
+    "created": "2025-08-02 08:25",
+    "tags": [
+      "bookmark"
+    ],
+    "url": "https://tarotpunk.app/deck-1",
+    "path": "/c/tarotpunk-tech-bro-tarot-deck"
   },
   {
     "slug": "text-generation-ui",
@@ -3684,109 +3704,148 @@
     "path": "/c/yousim"
   },
   {
+    "slug": "bella-coven",
+    "title": "Bella Coven",
+    "tags": [
+      "publish/project",
+      "publish/project/digital",
+      "publish/project/bcad"
+    ],
+    "url": "https://www.bcad.one/project/3",
+    "tagline": "Tarot reader automaton.",
+    "year": "2023",
+    "path": "/c/bella-coven"
+  },
+  {
     "slug": "bombay-beachy-yami-ichi",
     "title": "Bombay Beachy Yami Ichi",
-    "tags": [],
+    "tags": [
+      "publish/project",
+      "publish/project/interactive",
+      "publish/project/bcad"
+    ],
     "url": "https://www.bbyi.fyi/",
+    "year": "2023",
     "path": "/c/bombay-beachy-yami-ichi"
   },
   {
     "slug": "coke-diffusion",
     "title": "Coke Diffusion",
-    "tags": [],
+    "tags": [
+      "publish/project",
+      "publish/project/digital",
+      "publish/project/bcad"
+    ],
     "url": "https://x.com/coke_diffusion/status/1629173900197371904",
+    "year": "2023",
     "path": "/c/coke-diffusion"
   },
   {
     "slug": "doomer",
     "title": "Doomer",
-    "tags": [],
+    "tags": [
+      "publish/project",
+      "publish/project/digital"
+    ],
     "url": "https://github.com/jmilldotdev/doomer2",
+    "year": "2021",
     "path": "/c/doomer"
   },
   {
-    "slug": "eibg",
-    "title": "EIBG",
-    "tags": [],
+    "slug": "introverse",
+    "title": "Introverse",
+    "tags": [
+      "publish/project",
+      "publish/project/game",
+      "publish/project/bcad",
+      "publish/project/physical"
+    ],
     "url": "https://eibg.one/",
-    "path": "/c/eibg"
+    "year": "2024",
+    "path": "/c/introverse"
   },
   {
     "slug": "mulabonding",
     "title": "Mulabonding",
-    "tags": [],
+    "tags": [
+      "publish/project",
+      "publish/project/writing",
+      "publish/project/physical"
+    ],
     "url": "https://drive.google.com/file/d/1-cUBuPIWJx8XtJQGxdj65_E3y80yvb4o/view?usp=sharing",
+    "year": "2022",
     "path": "/c/mulabonding"
-  },
-  {
-    "slug": "obsidian-canvas-randomnote",
-    "title": "Obsidian Canvas Randomnote",
-    "tags": [],
-    "url": "https://github.com/jmilldotdev/obsidian-canvas-randomnote",
-    "path": "/c/obsidian-canvas-randomnote"
-  },
-  {
-    "slug": "obsidian-frontmatter-tag-suggest",
-    "title": "Obsidian Frontmatter Tag Suggest",
-    "tags": [],
-    "url": "https://github.com/jmilldotdev/obsidian-frontmatter-tag-suggest",
-    "path": "/c/obsidian-frontmatter-tag-suggest"
-  },
-  {
-    "slug": "obsidian-gpt",
-    "title": "Obsidian GPT",
-    "tags": [],
-    "url": "https://github.com/jmilldotdev/obsidian-gpt",
-    "path": "/c/obsidian-gpt"
-  },
-  {
-    "slug": "obsidian-wikipedia",
-    "title": "Obsidian Wikipedia",
-    "tags": [],
-    "url": "https://github.com/jmilldotdev/obsidian-wikipedia",
-    "path": "/c/obsidian-wikipedia"
   },
   {
     "slug": "pepperstake",
     "title": "Pepperstake",
-    "tags": [],
+    "tags": [
+      "publish/project",
+      "publish/project/crypto",
+      "publish/project/bcad"
+    ],
     "url": "https://ethglobal.com/showcase/pepperstake-ksjxn",
+    "year": "2022",
     "path": "/c/pepperstake"
-  },
-  {
-    "slug": "roadmaps-nft",
-    "title": "Roadmaps NFT",
-    "tags": [],
-    "url": "https://github.com/moribetamidori/RoadmapNFT",
-    "path": "/c/roadmaps-nft"
   },
   {
     "slug": "spaghettify",
     "title": "Spaghettify",
-    "tags": [],
+    "tags": [
+      "publish/project",
+      "publish/project/digital",
+      "publish/project/bcad"
+    ],
     "url": "https://www.spaghettify.dev/",
+    "year": "2023",
     "path": "/c/spaghettify"
-  },
-  {
-    "slug": "swappy",
-    "title": "Swappy",
-    "tags": [],
-    "url": null,
-    "path": "/c/swappy"
   },
   {
     "slug": "vibe-check",
     "title": "Vibe Check",
-    "tags": [],
+    "tags": [
+      "publish/project",
+      "publish/project/digital",
+      "publish/project/bcad"
+    ],
     "url": "https://www.vibecheck.lol/",
+    "year": "2023",
     "path": "/c/vibe-check"
   },
   {
     "slug": "viperbot",
     "title": "ViperBot",
-    "tags": [],
+    "tags": [
+      "publish/project",
+      "publish/project/digital"
+    ],
     "url": "https://github.com/jmilldotdev/viperbot",
+    "year": "2021",
     "path": "/c/viperbot"
+  },
+  {
+    "slug": "whalechess",
+    "title": "Whalechess",
+    "tags": [
+      "publish/project",
+      "publish/project/crypto",
+      "publish/project/bcad"
+    ],
+    "url": null,
+    "year": "2024",
+    "path": "/c/whalechess"
+  },
+  {
+    "slug": "whoup",
+    "title": "WhoUp",
+    "tags": [
+      "publish/project",
+      "publish/project/digital",
+      "publish/project/bcad"
+    ],
+    "url": "https://whoup.now",
+    "year": "2024",
+    "path": "/c/whoup"
   },
   {
     "slug": "index",
@@ -3813,8 +3872,12 @@
   {
     "slug": "t-project-writeup",
     "title": "{t} Project Writeup",
-    "tags": [],
+    "tags": [
+      "publish/project"
+    ],
     "url": null,
+    "tagline": null,
+    "year": null,
     "path": "/c/t-project-writeup"
   }
 ]

@@ -1,0 +1,170 @@
+[
+  {
+    "id": "bella-coven",
+    "title": "Bella Coven",
+    "cover": "/project-covers/bella-coven.webp",
+    "fallbackCover": "/project-covers/bella-coven.png",
+    "artist": "jmill",
+    "year": "2023",
+    "genre": "Digital",
+    "project_tags": [
+      "digital",
+      "bcad"
+    ],
+    "tagline": "Tarot reader automaton.",
+    "url": "https://www.bcad.one/project/3"
+  },
+  {
+    "id": "bombay-beachy-yami-ichi",
+    "title": "Bombay Beachy Yami Ichi",
+    "cover": "/project-covers/bombay-beachy-yami-ichi.webp",
+    "fallbackCover": "/project-covers/bombay-beachy-yami-ichi.png",
+    "artist": "jmill",
+    "year": "2023",
+    "genre": "Interactive",
+    "project_tags": [
+      "interactive",
+      "bcad"
+    ],
+    "url": "https://www.bbyi.fyi/"
+  },
+  {
+    "id": "coke-diffusion",
+    "title": "Coke Diffusion",
+    "cover": "/project-covers/coke-diffusion.webp",
+    "fallbackCover": "/project-covers/coke-diffusion.png",
+    "artist": "jmill",
+    "year": "2023",
+    "genre": "Digital",
+    "project_tags": [
+      "digital",
+      "bcad"
+    ],
+    "url": "https://x.com/coke_diffusion/status/1629173900197371904"
+  },
+  {
+    "id": "doomer",
+    "title": "Doomer",
+    "cover": "/project-covers/doomer.webp",
+    "fallbackCover": "/project-covers/doomer.png",
+    "artist": "jmill",
+    "year": "2021",
+    "genre": "Digital",
+    "project_tags": [
+      "digital"
+    ],
+    "url": "https://github.com/jmilldotdev/doomer2"
+  },
+  {
+    "id": "introverse",
+    "title": "Introverse",
+    "cover": "/project-covers/introverse.webp",
+    "fallbackCover": "/project-covers/introverse.png",
+    "artist": "jmill",
+    "year": "2024",
+    "genre": "Game",
+    "project_tags": [
+      "game",
+      "bcad",
+      "physical"
+    ],
+    "url": "https://eibg.one/"
+  },
+  {
+    "id": "mulabonding",
+    "title": "Mulabonding",
+    "cover": "/project-covers/mulabonding.webp",
+    "fallbackCover": "/project-covers/mulabonding.png",
+    "artist": "jmill",
+    "year": "2022",
+    "genre": "Writing",
+    "project_tags": [
+      "writing",
+      "physical"
+    ],
+    "url": "https://drive.google.com/file/d/1-cUBuPIWJx8XtJQGxdj65_E3y80yvb4o/view?usp=sharing"
+  },
+  {
+    "id": "pepperstake",
+    "title": "Pepperstake",
+    "cover": "/project-covers/pepperstake.webp",
+    "fallbackCover": "/project-covers/pepperstake.png",
+    "artist": "jmill",
+    "year": "2022",
+    "genre": "Crypto",
+    "project_tags": [
+      "crypto",
+      "bcad"
+    ],
+    "url": "https://ethglobal.com/showcase/pepperstake-ksjxn"
+  },
+  {
+    "id": "spaghettify",
+    "title": "Spaghettify",
+    "cover": "/project-covers/spaghettify.webp",
+    "fallbackCover": "/project-covers/spaghettify.png",
+    "artist": "jmill",
+    "year": "2023",
+    "genre": "Digital",
+    "project_tags": [
+      "digital",
+      "bcad"
+    ],
+    "url": "https://www.spaghettify.dev/"
+  },
+  {
+    "id": "vibe-check",
+    "title": "Vibe Check",
+    "cover": "/project-covers/vibe-check.webp",
+    "fallbackCover": "/project-covers/vibe-check.png",
+    "artist": "jmill",
+    "year": "2023",
+    "genre": "Digital",
+    "project_tags": [
+      "digital",
+      "bcad"
+    ],
+    "url": "https://www.vibecheck.lol/"
+  },
+  {
+    "id": "viperbot",
+    "title": "ViperBot",
+    "cover": "/project-covers/viperbot.webp",
+    "fallbackCover": "/project-covers/viperbot.png",
+    "artist": "jmill",
+    "year": "2021",
+    "genre": "Digital",
+    "project_tags": [
+      "digital"
+    ],
+    "url": "https://github.com/jmilldotdev/viperbot"
+  },
+  {
+    "id": "whalechess",
+    "title": "Whalechess",
+    "cover": "/project-covers/whalechess.webp",
+    "fallbackCover": "/project-covers/whalechess.png",
+    "artist": "jmill",
+    "year": "2024",
+    "genre": "Crypto",
+    "project_tags": [
+      "crypto",
+      "bcad"
+    ],
+    "url": null
+  },
+  {
+    "id": "whoup",
+    "title": "WhoUp",
+    "cover": "/project-covers/whoup.webp",
+    "fallbackCover": "/project-covers/whoup.png",
+    "artist": "jmill",
+    "year": "2024",
+    "genre": "Digital",
+    "project_tags": [
+      "digital",
+      "bcad"
+    ],
+    "url": "https://whoup.now"
+  }
+]

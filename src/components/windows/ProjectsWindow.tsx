@@ -23,79 +23,101 @@ interface Project {
   id: string;
   title: string;
   cover: string;
+  fallbackCover?: string;
   artist?: string;
   year?: string;
   genre?: string;
-  description?: string;
-  url?: string;
+  tagline?: string | null;
+  url?: string | null;
 }
 
-const projects: Project[] = [
-  {
-    id: "bella-coven",
-    title: "Bella Coven",
-    cover: "/project-covers/bella-coven.webp",
-    artist: "jmill",
-    year: "2024",
-    genre: "Digital Art",
-    description: "Mystical digital coven experience"
-  },
-  {
-    id: "bombay-beachy",
-    title: "Bombay Beachy",
-    cover: "/project-covers/bombay-beachy.webp",
-    artist: "jmill",
-    year: "2024",
-    genre: "Interactive",
-    description: "Beach-inspired interactive installation"
-  },
-  {
-    id: "jellyfish",
-    title: "Jellyfish Dreams",
-    cover: "/project-covers/jellyfish.webp",
-    artist: "jmill",
-    year: "2023",
-    genre: "Generative Art",
-    description: "Ethereal jellyfish simulations"
-  },
-  {
-    id: "mulabonding",
-    title: "Mula Bonding",
-    cover: "/project-covers/mulabonding.webp",
-    artist: "self-driving jazz",
-    year: "2024",
-    genre: "Experimental",
-    description: "Exploring digital connection rituals"
-  },
-  {
-    id: "whalechess",
-    title: "Whale Chess",
-    cover: "/project-covers/whalechess.webp",
-    artist: "jmill",
-    year: "2023",
-    genre: "Game",
-    description: "Strategic game with oceanic themes"
-  },
-  {
-    id: "whoup",
-    title: "Whoup",
-    cover: "/project-covers/whoup.webp",
-    artist: "jmill",
-    year: "2024",
-    genre: "Audio/Visual",
-    description: "Synaesthetic audio-visual experience"
-  },
-  {
-    id: "yami-ichi",
-    title: "Yami Ichi",
-    cover: "/project-covers/yami-ichi.webp",
-    artist: "Mars College",
-    year: "2024",
-    genre: "Marketplace",
-    description: "Internet black market IRL",
-    url: "https://mars.college"
+// Import generated projects data
+import projectsData from "@/config/projects.json";
+
+// Parse date from year field (MM-YYYY or YYYY format)
+const parseProjectDate = (yearStr: string | undefined): Date => {
+  if (!yearStr) return new Date('2000-01-01');
+  
+  if (yearStr.includes('-')) {
+    // MM-YYYY format
+    const [month, year] = yearStr.split('-');
+    return new Date(parseInt(year), parseInt(month) - 1, 1);
+  } else {
+    // YYYY format - assume January (month 0)
+    return new Date(parseInt(yearStr), 0, 1);
   }
-];
+};
+
+// Sort projects by date (newest first)
+const allProjects: Project[] = projectsData.sort((a, b) => {
+  const dateA = parseProjectDate(a.year);
+  const dateB = parseProjectDate(b.year);
+  return dateB.getTime() - dateA.getTime();
+});
+
+// Get unique genres from projects data
+const getUniqueGenres = (): string[] => {
+  const genres = new Set<string>();
+  allProjects.forEach(project => {
+    if (project.genre) {
+      genres.add(project.genre);
+    }
+  });
+  return Array.from(genres).sort();
+};
+
+const uniqueGenres = getUniqueGenres();
+const libraryFilters = ["All Projects", ...uniqueGenres];
+const playlistFilters = ["Featured", "Recent", "Favorites"];
+
+// Filter projects based on active filter
+const getFilteredProjects = (filter: string): Project[] => {
+  switch (filter) {
+    case "All Projects":
+      return allProjects;
+    case "Featured":
+      return allProjects.filter(p => p.url !== null).slice(0, 6);
+    case "Recent":
+      return allProjects.slice(0, 8);
+    case "Favorites":
+      return allProjects.filter(p => p.tagline !== null && p.tagline !== undefined);
+    default:
+      // Filter by genre
+      return allProjects.filter(p => p.genre === filter);
+  }
+};
+
+// Component to handle fallback images
+const ProjectImage: React.FC<{ project: Project; className?: string; fill?: boolean; sizes?: string; priority?: boolean }> = ({ 
+  project, 
+  className = "", 
+  fill = false, 
+  sizes,
+  priority = false 
+}) => {
+  const [imageSrc, setImageSrc] = React.useState(project.cover);
+
+  const handleError = () => {
+    if (imageSrc === project.cover && project.fallbackCover) {
+      setImageSrc(project.fallbackCover);
+    } else if (imageSrc === project.fallbackCover) {
+      // Final fallback to jellyfish.webp
+      setImageSrc('/project-covers/jellyfish.webp');
+    }
+  };
+
+  return (
+    <Image
+      src={imageSrc}
+      alt={project.title}
+      fill={fill}
+      sizes={sizes}
+      className={className}
+      priority={priority}
+      onError={handleError}
+    />
+  );
+};
 
 export const ProjectsWindow: React.FC<ProjectWindowProps> = ({
   id,
@@ -113,6 +135,7 @@ export const ProjectsWindow: React.FC<ProjectWindowProps> = ({
 }) => {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [activeFilter, setActiveFilter] = useState<string>("All Projects");
 
   return (
     <BaseWindow
@@ -140,20 +163,38 @@ export const ProjectsWindow: React.FC<ProjectWindowProps> = ({
           <div className="p-4 border-b border-zinc-800">
             <h2 className="text-[#00FFFF] font-bold text-sm mb-3">LIBRARY</h2>
             <ul className="space-y-2 text-xs">
-              <li className="text-[#00FFFF] hover:text-[#ff4800] cursor-pointer transition-colors">All Projects</li>
-              <li className="text-zinc-500 hover:text-[#ff4800] cursor-pointer transition-colors">Interactive</li>
-              <li className="text-zinc-500 hover:text-[#ff4800] cursor-pointer transition-colors">Generative</li>
-              <li className="text-zinc-500 hover:text-[#ff4800] cursor-pointer transition-colors">AI/ML</li>
-              <li className="text-zinc-500 hover:text-[#ff4800] cursor-pointer transition-colors">Experimental</li>
+              {libraryFilters.map((filter) => (
+                <li 
+                  key={filter}
+                  onClick={() => setActiveFilter(filter)}
+                  className={`cursor-pointer transition-colors ${
+                    activeFilter === filter 
+                      ? "text-[#00FFFF]" 
+                      : "text-zinc-500 hover:text-[#ff4800]"
+                  }`}
+                >
+                  {filter}
+                </li>
+              ))}
             </ul>
           </div>
           
           <div className="p-4 flex-grow">
             <h3 className="text-[#00FFFF] font-bold text-sm mb-3">PLAYLISTS</h3>
             <ul className="space-y-2 text-xs">
-              <li className="text-zinc-500 hover:text-[#ff4800] cursor-pointer transition-colors">Featured</li>
-              <li className="text-zinc-500 hover:text-[#ff4800] cursor-pointer transition-colors">Recent</li>
-              <li className="text-zinc-500 hover:text-[#ff4800] cursor-pointer transition-colors">Favorites</li>
+              {playlistFilters.map((playlist) => (
+                <li 
+                  key={playlist}
+                  onClick={() => setActiveFilter(playlist)}
+                  className={`cursor-pointer transition-colors ${
+                    activeFilter === playlist 
+                      ? "text-[#00FFFF]" 
+                      : "text-zinc-500 hover:text-[#ff4800]"
+                  }`}
+                >
+                  {playlist}
+                </li>
+              ))}
             </ul>
           </div>
         </div>
@@ -165,9 +206,8 @@ export const ProjectsWindow: React.FC<ProjectWindowProps> = ({
             {selectedProject ? (
               <>
                 <div className="w-12 h-12 relative bg-zinc-800 rounded">
-                  <Image
-                    src={selectedProject.cover}
-                    alt={selectedProject.title}
+                  <ProjectImage
+                    project={selectedProject}
                     fill
                     sizes="48px"
                     className="object-cover rounded"
@@ -177,8 +217,8 @@ export const ProjectsWindow: React.FC<ProjectWindowProps> = ({
                 <div className="flex-1">
                   <div className="text-[#00FFFF] font-semibold text-sm">{selectedProject.title}</div>
                   <div className="text-zinc-500 text-xs">{selectedProject.artist} • {selectedProject.year}</div>
-                  {selectedProject.description && (
-                    <div className="text-zinc-600 text-xs mt-1">{selectedProject.description}</div>
+                  {selectedProject.tagline && (
+                    <div className="text-zinc-600 text-xs mt-1">{selectedProject.tagline}</div>
                   )}
                 </div>
                 <div className="flex items-center gap-2">
@@ -203,7 +243,7 @@ export const ProjectsWindow: React.FC<ProjectWindowProps> = ({
                   </button>
                   {selectedProject.url && (
                     <button 
-                      onClick={() => window.open(selectedProject.url, '_blank')}
+                      onClick={() => selectedProject.url && window.open(selectedProject.url, '_blank')}
                       className="text-zinc-500 hover:text-[#ff4800] transition-colors"
                       title="Open project"
                     >
@@ -222,7 +262,7 @@ export const ProjectsWindow: React.FC<ProjectWindowProps> = ({
           {/* Project Grid */}
           <div className="flex-1 overflow-y-auto p-6">
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-              {projects.map((project) => (
+              {getFilteredProjects(activeFilter).map((project) => (
                 <div
                   key={project.id}
                   onClick={() => {
@@ -232,9 +272,8 @@ export const ProjectsWindow: React.FC<ProjectWindowProps> = ({
                   className="group cursor-pointer"
                 >
                   <div className="relative w-full aspect-square bg-zinc-900 rounded-lg overflow-hidden mb-2">
-                    <Image
-                      src={project.cover}
-                      alt={project.title}
+                    <ProjectImage
+                      project={project}
                       fill
                       sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                       className="object-cover group-hover:scale-105 transition-transform duration-300"
@@ -248,9 +287,9 @@ export const ProjectsWindow: React.FC<ProjectWindowProps> = ({
                     <div className="text-zinc-300 text-xs truncate">
                       {project.genre} • {project.year}
                     </div>
-                    {project.description && (
+                    {project.tagline && (
                       <div className="text-zinc-400 text-xs mt-1 line-clamp-2">
-                        {project.description}
+                        {project.tagline}
                       </div>
                     )}
                   </div>

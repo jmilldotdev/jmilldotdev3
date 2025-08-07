@@ -1188,12 +1188,12 @@
       "path": "/c/zembrin"
     },
     {
-      "slug": "zone-de-sensibilit-picturale-immatrielle",
-      "title": "Zone de Sensibilité Picturale Immatérielle",
+      "slug": "zone-de-sensibilite-picturale-immaterielle",
+      "title": "Zone de Sensibilité Picturale Immatérielle",
       "tags": [
         "entity"
       ],
-      "path": "/c/zone-de-sensibilit-picturale-immatrielle"
+      "path": "/c/zone-de-sensibilite-picturale-immaterielle"
     },
     {
       "slug": "five-imaginary-lives",
@@ -1221,6 +1221,26 @@
     }
   ],
   "bookmark": [
+    {
+      "slug": "soot",
+      "title": "SOOT",
+      "created": "2025-08-02 08:29",
+      "tags": [
+        "bookmark"
+      ],
+      "url": "https://www.soot.com/",
+      "path": "/c/soot"
+    },
+    {
+      "slug": "tarotpunk-tech-bro-tarot-deck",
+      "title": "Tarotpunk Tech Bro Tarot Deck",
+      "created": "2025-08-02 08:25",
+      "tags": [
+        "bookmark"
+      ],
+      "url": "https://tarotpunk.app/deck-1",
+      "path": "/c/tarotpunk-tech-bro-tarot-deck"
+    },
     {
       "slug": "freetierfyi",
       "title": "Freetier.fyi",
@@ -3686,6 +3706,456 @@
       ],
       "url": "https://anthonyhobday.com/sideprojects/saferules/",
       "path": "/c/visual-design-rules"
+    }
+  ],
+  "publish/project": [
+    {
+      "slug": "bella-coven",
+      "title": "Bella Coven",
+      "tags": [
+        "publish/project",
+        "publish/project/digital",
+        "publish/project/bcad"
+      ],
+      "url": "https://www.bcad.one/project/3",
+      "tagline": "Tarot reader automaton.",
+      "year": "2023",
+      "path": "/c/bella-coven"
+    },
+    {
+      "slug": "bombay-beachy-yami-ichi",
+      "title": "Bombay Beachy Yami Ichi",
+      "tags": [
+        "publish/project",
+        "publish/project/interactive",
+        "publish/project/bcad"
+      ],
+      "url": "https://www.bbyi.fyi/",
+      "year": "2023",
+      "path": "/c/bombay-beachy-yami-ichi"
+    },
+    {
+      "slug": "coke-diffusion",
+      "title": "Coke Diffusion",
+      "tags": [
+        "publish/project",
+        "publish/project/digital",
+        "publish/project/bcad"
+      ],
+      "url": "https://x.com/coke_diffusion/status/1629173900197371904",
+      "year": "2023",
+      "path": "/c/coke-diffusion"
+    },
+    {
+      "slug": "doomer",
+      "title": "Doomer",
+      "tags": [
+        "publish/project",
+        "publish/project/digital"
+      ],
+      "url": "https://github.com/jmilldotdev/doomer2",
+      "year": "2021",
+      "path": "/c/doomer"
+    },
+    {
+      "slug": "introverse",
+      "title": "Introverse",
+      "tags": [
+        "publish/project",
+        "publish/project/game",
+        "publish/project/bcad",
+        "publish/project/physical"
+      ],
+      "url": "https://eibg.one/",
+      "year": "2024",
+      "path": "/c/introverse"
+    },
+    {
+      "slug": "mulabonding",
+      "title": "Mulabonding",
+      "tags": [
+        "publish/project",
+        "publish/project/writing",
+        "publish/project/physical"
+      ],
+      "url": "https://drive.google.com/file/d/1-cUBuPIWJx8XtJQGxdj65_E3y80yvb4o/view?usp=sharing",
+      "year": "2022",
+      "path": "/c/mulabonding"
+    },
+    {
+      "slug": "pepperstake",
+      "title": "Pepperstake",
+      "tags": [
+        "publish/project",
+        "publish/project/crypto",
+        "publish/project/bcad"
+      ],
+      "url": "https://ethglobal.com/showcase/pepperstake-ksjxn",
+      "year": "2022",
+      "path": "/c/pepperstake"
+    },
+    {
+      "slug": "spaghettify",
+      "title": "Spaghettify",
+      "tags": [
+        "publish/project",
+        "publish/project/digital",
+        "publish/project/bcad"
+      ],
+      "url": "https://www.spaghettify.dev/",
+      "year": "2023",
+      "path": "/c/spaghettify"
+    },
+    {
+      "slug": "vibe-check",
+      "title": "Vibe Check",
+      "tags": [
+        "publish/project",
+        "publish/project/digital",
+        "publish/project/bcad"
+      ],
+      "url": "https://www.vibecheck.lol/",
+      "year": "2023",
+      "path": "/c/vibe-check"
+    },
+    {
+      "slug": "viperbot",
+      "title": "ViperBot",
+      "tags": [
+        "publish/project",
+        "publish/project/digital"
+      ],
+      "url": "https://github.com/jmilldotdev/viperbot",
+      "year": "2021",
+      "path": "/c/viperbot"
+    },
+    {
+      "slug": "whalechess",
+      "title": "Whalechess",
+      "tags": [
+        "publish/project",
+        "publish/project/crypto",
+        "publish/project/bcad"
+      ],
+      "url": null,
+      "year": "2024",
+      "path": "/c/whalechess"
+    },
+    {
+      "slug": "whoup",
+      "title": "WhoUp",
+      "tags": [
+        "publish/project",
+        "publish/project/digital",
+        "publish/project/bcad"
+      ],
+      "url": "https://whoup.now",
+      "year": "2024",
+      "path": "/c/whoup"
+    },
+    {
+      "slug": "t-project-writeup",
+      "title": "{t} Project Writeup",
+      "tags": [
+        "publish/project"
+      ],
+      "url": null,
+      "tagline": null,
+      "year": null,
+      "path": "/c/t-project-writeup"
+    }
+  ],
+  "publish/project/digital": [
+    {
+      "slug": "bella-coven",
+      "title": "Bella Coven",
+      "tags": [
+        "publish/project",
+        "publish/project/digital",
+        "publish/project/bcad"
+      ],
+      "url": "https://www.bcad.one/project/3",
+      "tagline": "Tarot reader automaton.",
+      "year": "2023",
+      "path": "/c/bella-coven"
+    },
+    {
+      "slug": "coke-diffusion",
+      "title": "Coke Diffusion",
+      "tags": [
+        "publish/project",
+        "publish/project/digital",
+        "publish/project/bcad"
+      ],
+      "url": "https://x.com/coke_diffusion/status/1629173900197371904",
+      "year": "2023",
+      "path": "/c/coke-diffusion"
+    },
+    {
+      "slug": "doomer",
+      "title": "Doomer",
+      "tags": [
+        "publish/project",
+        "publish/project/digital"
+      ],
+      "url": "https://github.com/jmilldotdev/doomer2",
+      "year": "2021",
+      "path": "/c/doomer"
+    },
+    {
+      "slug": "spaghettify",
+      "title": "Spaghettify",
+      "tags": [
+        "publish/project",
+        "publish/project/digital",
+        "publish/project/bcad"
+      ],
+      "url": "https://www.spaghettify.dev/",
+      "year": "2023",
+      "path": "/c/spaghettify"
+    },
+    {
+      "slug": "vibe-check",
+      "title": "Vibe Check",
+      "tags": [
+        "publish/project",
+        "publish/project/digital",
+        "publish/project/bcad"
+      ],
+      "url": "https://www.vibecheck.lol/",
+      "year": "2023",
+      "path": "/c/vibe-check"
+    },
+    {
+      "slug": "viperbot",
+      "title": "ViperBot",
+      "tags": [
+        "publish/project",
+        "publish/project/digital"
+      ],
+      "url": "https://github.com/jmilldotdev/viperbot",
+      "year": "2021",
+      "path": "/c/viperbot"
+    },
+    {
+      "slug": "whoup",
+      "title": "WhoUp",
+      "tags": [
+        "publish/project",
+        "publish/project/digital",
+        "publish/project/bcad"
+      ],
+      "url": "https://whoup.now",
+      "year": "2024",
+      "path": "/c/whoup"
+    }
+  ],
+  "publish/project/bcad": [
+    {
+      "slug": "bella-coven",
+      "title": "Bella Coven",
+      "tags": [
+        "publish/project",
+        "publish/project/digital",
+        "publish/project/bcad"
+      ],
+      "url": "https://www.bcad.one/project/3",
+      "tagline": "Tarot reader automaton.",
+      "year": "2023",
+      "path": "/c/bella-coven"
+    },
+    {
+      "slug": "bombay-beachy-yami-ichi",
+      "title": "Bombay Beachy Yami Ichi",
+      "tags": [
+        "publish/project",
+        "publish/project/interactive",
+        "publish/project/bcad"
+      ],
+      "url": "https://www.bbyi.fyi/",
+      "year": "2023",
+      "path": "/c/bombay-beachy-yami-ichi"
+    },
+    {
+      "slug": "coke-diffusion",
+      "title": "Coke Diffusion",
+      "tags": [
+        "publish/project",
+        "publish/project/digital",
+        "publish/project/bcad"
+      ],
+      "url": "https://x.com/coke_diffusion/status/1629173900197371904",
+      "year": "2023",
+      "path": "/c/coke-diffusion"
+    },
+    {
+      "slug": "introverse",
+      "title": "Introverse",
+      "tags": [
+        "publish/project",
+        "publish/project/game",
+        "publish/project/bcad",
+        "publish/project/physical"
+      ],
+      "url": "https://eibg.one/",
+      "year": "2024",
+      "path": "/c/introverse"
+    },
+    {
+      "slug": "pepperstake",
+      "title": "Pepperstake",
+      "tags": [
+        "publish/project",
+        "publish/project/crypto",
+        "publish/project/bcad"
+      ],
+      "url": "https://ethglobal.com/showcase/pepperstake-ksjxn",
+      "year": "2022",
+      "path": "/c/pepperstake"
+    },
+    {
+      "slug": "spaghettify",
+      "title": "Spaghettify",
+      "tags": [
+        "publish/project",
+        "publish/project/digital",
+        "publish/project/bcad"
+      ],
+      "url": "https://www.spaghettify.dev/",
+      "year": "2023",
+      "path": "/c/spaghettify"
+    },
+    {
+      "slug": "vibe-check",
+      "title": "Vibe Check",
+      "tags": [
+        "publish/project",
+        "publish/project/digital",
+        "publish/project/bcad"
+      ],
+      "url": "https://www.vibecheck.lol/",
+      "year": "2023",
+      "path": "/c/vibe-check"
+    },
+    {
+      "slug": "whalechess",
+      "title": "Whalechess",
+      "tags": [
+        "publish/project",
+        "publish/project/crypto",
+        "publish/project/bcad"
+      ],
+      "url": null,
+      "year": "2024",
+      "path": "/c/whalechess"
+    },
+    {
+      "slug": "whoup",
+      "title": "WhoUp",
+      "tags": [
+        "publish/project",
+        "publish/project/digital",
+        "publish/project/bcad"
+      ],
+      "url": "https://whoup.now",
+      "year": "2024",
+      "path": "/c/whoup"
+    }
+  ],
+  "publish/project/interactive": [
+    {
+      "slug": "bombay-beachy-yami-ichi",
+      "title": "Bombay Beachy Yami Ichi",
+      "tags": [
+        "publish/project",
+        "publish/project/interactive",
+        "publish/project/bcad"
+      ],
+      "url": "https://www.bbyi.fyi/",
+      "year": "2023",
+      "path": "/c/bombay-beachy-yami-ichi"
+    }
+  ],
+  "publish/project/game": [
+    {
+      "slug": "introverse",
+      "title": "Introverse",
+      "tags": [
+        "publish/project",
+        "publish/project/game",
+        "publish/project/bcad",
+        "publish/project/physical"
+      ],
+      "url": "https://eibg.one/",
+      "year": "2024",
+      "path": "/c/introverse"
+    }
+  ],
+  "publish/project/physical": [
+    {
+      "slug": "introverse",
+      "title": "Introverse",
+      "tags": [
+        "publish/project",
+        "publish/project/game",
+        "publish/project/bcad",
+        "publish/project/physical"
+      ],
+      "url": "https://eibg.one/",
+      "year": "2024",
+      "path": "/c/introverse"
+    },
+    {
+      "slug": "mulabonding",
+      "title": "Mulabonding",
+      "tags": [
+        "publish/project",
+        "publish/project/writing",
+        "publish/project/physical"
+      ],
+      "url": "https://drive.google.com/file/d/1-cUBuPIWJx8XtJQGxdj65_E3y80yvb4o/view?usp=sharing",
+      "year": "2022",
+      "path": "/c/mulabonding"
+    }
+  ],
+  "publish/project/writing": [
+    {
+      "slug": "mulabonding",
+      "title": "Mulabonding",
+      "tags": [
+        "publish/project",
+        "publish/project/writing",
+        "publish/project/physical"
+      ],
+      "url": "https://drive.google.com/file/d/1-cUBuPIWJx8XtJQGxdj65_E3y80yvb4o/view?usp=sharing",
+      "year": "2022",
+      "path": "/c/mulabonding"
+    }
+  ],
+  "publish/project/crypto": [
+    {
+      "slug": "pepperstake",
+      "title": "Pepperstake",
+      "tags": [
+        "publish/project",
+        "publish/project/crypto",
+        "publish/project/bcad"
+      ],
+      "url": "https://ethglobal.com/showcase/pepperstake-ksjxn",
+      "year": "2022",
+      "path": "/c/pepperstake"
+    },
+    {
+      "slug": "whalechess",
+      "title": "Whalechess",
+      "tags": [
+        "publish/project",
+        "publish/project/crypto",
+        "publish/project/bcad"
+      ],
+      "url": null,
+      "year": "2024",
+      "path": "/c/whalechess"
     }
   ]
 }

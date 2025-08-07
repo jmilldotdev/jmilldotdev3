@@ -15,6 +15,8 @@ interface PageMetadata {
   date?: string;
   tags?: string[];
   url?: string;
+  tagline?: string;
+  year?: string;
   path: string;
 }
 
@@ -284,6 +286,8 @@ title: "${title}"
           date: data.date,
           tags: cleanedTags,
           url: data.URL,
+          tagline: data.tagline,
+          year: data.year,
           path: `/c/${slugifiedFileName}`,
         };
 
@@ -422,5 +426,38 @@ if (fs.existsSync(contentImagesDir)) {
 } else {
   console.log("No content/Images directory found");
 }
+
+// Generate projects index from project-tagged content (exclude templates)
+const projectPages = pageMetadata.filter(page => 
+  page.tags?.some(tag => tag.startsWith('publish/project')) &&
+  !page.title.toLowerCase().includes('template') &&
+  !page.title.toLowerCase().includes('writeup') &&
+  !page.slug.includes('t-project')
+);
+
+const projects = projectPages.map((page) => {
+  const slug = page.slug.replace('.mdx', '');
+  // Extract all project type tags from publish/project/type format
+  const projectTypes = page.tags?.filter(tag => tag.startsWith('publish/project/')) || [];
+  const projectTags = projectTypes.map(tag => tag.replace('publish/project/', '')).filter(tag => tag !== '');
+  const mainProjectType = projectTags[0] || 'digital';
+  
+  return {
+    id: slug,
+    title: page.title,
+    cover: `/project-covers/${slug}.webp`,
+    fallbackCover: `/project-covers/${slug}.png`,
+    artist: page.tags?.find(tag => tag.startsWith('artist/'))?.replace('artist/', '') || 'jmill',
+    year: page.year || page.tags?.find(tag => /^\d{4}$/.test(tag)) || new Date(page.created || page.date || '2024').getFullYear().toString(),
+    genre: mainProjectType.charAt(0).toUpperCase() + mainProjectType.slice(1),
+    project_tags: projectTags,
+    tagline: page.tagline,
+    url: page.url
+  };
+});
+
+const projectsIndexPath = path.join(configDir, "projects.json");
+fs.writeFileSync(projectsIndexPath, JSON.stringify(projects, null, 2));
+console.log(`Generated projects index at: ${projectsIndexPath}`);
 
 console.log("Finished copying and modifying published files.");
