@@ -100,3 +100,25 @@ Use these consistent colors throughout the application:
 - **Consistency**: This ensures all windows behave identically and reduces maintenance overhead
 
 When adding new window features, always implement them in BaseWindow so all windows benefit from the improvement.
+
+## Creating a New App/Window
+
+To add a new application to the VectorDesktop, follow these steps:
+
+1. **Create the Window Component**: Create a new window component in `/src/components/windows/` that extends BaseWindow
+   - Follow the pattern of existing windows (AboutWindow, WikiWindow, etc.)
+   - Accept standard window props and pass them to BaseWindow
+   - Add your content as children of BaseWindow
+
+2. **Create an Icon**: Create a new icon component in `/src/components/icons/`
+   - Use SVG with 48x48 viewBox
+   - Use the app color palette (#00ffff for primary, #ff4800 for accents)
+   - Export as a React component
+
+3. **Add to VectorDesktop**:
+   - Import both the window and icon components
+   - Add to the `desktopIcons` array with appropriate grid position
+   - Add a window type case in the render logic
+   - Handle any special window behavior if needed
+
+4. **Optional**: Add animations or special effects to the icon on hover/click

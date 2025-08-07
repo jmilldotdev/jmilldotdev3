@@ -11,7 +11,9 @@
     "generate:og": "tsx ./src/scripts/generate-opengraph-images",
     "generate:content": "tsx ./src/scripts/generate-content",
     "generate:rss": "tsx ./src/scripts/generate-rss",
-    "generate:sitemap": "tsx ./src/scripts/generate-sitemap"
+    "generate:sitemap": "tsx ./src/scripts/generate-sitemap",
+    "optimize:images": "node ./scripts/optimize-images.js",
+    "prepare": "husky"
   },
   "dependencies": {
     "@mdx-js/loader": "^2.3.0",
@@ -29,6 +31,8 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "sharp": "^0.33.0",
+    "husky": "^9.0.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",

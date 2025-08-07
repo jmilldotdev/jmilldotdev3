@@ -1,0 +1,10 @@
+#!/bin/sh
+
+# Run image optimization for project covers
+if [ -d "public/project-covers" ]; then
+  echo "Optimizing project cover images..."
+  pnpm run optimize:images
+  
+  # Stage any new webp files that were created
+  git add public/project-covers/*.webp 2>/dev/null || true
+fi

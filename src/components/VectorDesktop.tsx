@@ -10,6 +10,7 @@ import { WikiIcon } from "./icons/WikiIcon";
 import { TerminalIcon } from "./icons/TerminalIcon";
 import { JazzIcon } from "./icons/JazzIcon";
 import { AchievementsIcon } from "./icons/AchievementsIcon";
+import { ProjectsIcon } from "./icons/ProjectsIcon";
 import {
   createMiniSphereEffect,
   type MiniSphereEffectEmitter,
@@ -18,6 +19,7 @@ import { AchievementsWindow } from "./windows/AchievementsWindow";
 import { AchievementPopup } from "./AchievementPopup";
 import { AboutWindow } from "./windows/AboutWindow";
 import { TerminalWindow } from "./windows/TerminalWindow";
+import { ProjectsWindow } from "./windows/ProjectsWindow";
 import { DesktopIcon, DESKTOP_ICON_DIMENSIONS } from "./DesktopIcon";
 import { Achievement } from "@/lib/achievements";
 
@@ -177,7 +179,7 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({
         id: "wiki",
         name: "WIKI.MD",
         gridX: 0,
-        gridY: 1,
+        gridY: 2,
         content:
           "WIKI SYSTEM ACCESS\n\nBrowse random pages from the knowledge base:\n\n• Projects & Creative Works\n• Concepts & Theories\n• Tools & Resources\n• Bookmarks & References\n\nClick 'RND' to load a random page\nContent rendered with MDX\nInteractive links enabled",
         icon: <WikiIcon />,
@@ -186,7 +188,7 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({
         id: "terminal",
         name: "TERM.CMD",
         gridX: 0,
-        gridY: 2,
+        gridY: 3,
         content:
           "JMILL OS TERMINAL v2.1\n\njmill@quantum:~$ whoami\njmill\n\njmill@quantum:~$ uname -a\nJMILL OS 2.1.0 quantum-kernel #1 SMP\n\njmill@quantum:~$ ps aux\nPID  TTY  STAT  TIME  COMMAND\n001  tty1 Ssl   0:01  /sbin/init\n002  tty1 R     0:00  neural_proc\n003  tty1 S     0:03  quantum_sim\n004  tty1 R     0:00  vector_ui\n\njmill@quantum:~$ █",
         icon: <TerminalIcon />,
@@ -195,7 +197,7 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({
         id: "achievements",
         name: "WINS.TRO",
         gridX: 0,
-        gridY: 3,
+        gridY: 4,
         content: "ACHIEVEMENT_WINDOW",
         icon: <AchievementsIcon />,
       },
@@ -203,9 +205,17 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({
         id: "jazz",
         name: "JAZZ.ASAR",
         gridX: 0,
-        gridY: 4,
+        gridY: 5,
         content: "JAZZ_GIF",
         icon: <JazzIcon />,
+      },
+      {
+        id: "projects",
+        name: "PROJ.INFO",
+        gridX: 0,
+        gridY: 1,
+        content: "PROJECTS_WINDOW",
+        icon: <ProjectsIcon />,
       },
     ],
     []
@@ -304,6 +314,16 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({
           // Ensure minimum usable size
           windowWidth = Math.max(350, windowWidth);
           windowHeight = Math.max(400, windowHeight);
+        } else if (icon.id === "projects") {
+          // Projects window: media player size
+          windowWidth = Math.min(viewportWidth - 2 * margin, 1100);
+          windowHeight = Math.min(
+            viewportHeight - actionBarHeight - 2 * margin,
+            700
+          );
+          // Ensure minimum usable size for media player
+          windowWidth = Math.max(800, windowWidth);
+          windowHeight = Math.max(600, windowHeight);
         } else {
           windowWidth = Math.min(
             viewportWidth - 2 * margin,
@@ -346,6 +366,8 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({
             ? "achievements"
             : icon.id === "terminal"
             ? "terminal"
+            : icon.id === "projects"
+            ? "projects"
             : "default",
       };
 
@@ -483,17 +505,20 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({
     }
   };
 
-  const openWikiWindow = useCallback((slug?: string) => {
-    // Find wiki icon
-    const wikiIcon = desktopIcons.find((icon) => icon.id === "wiki");
-    if (wikiIcon) {
-      const wikiWindow = {
-        ...wikiIcon,
-        content: slug || "random" // Pass the slug to the window
-      };
-      createWindow(wikiWindow);
-    }
-  }, [desktopIcons, createWindow]);
+  const openWikiWindow = useCallback(
+    (slug?: string) => {
+      // Find wiki icon
+      const wikiIcon = desktopIcons.find((icon) => icon.id === "wiki");
+      if (wikiIcon) {
+        const wikiWindow = {
+          ...wikiIcon,
+          content: slug || "random", // Pass the slug to the window
+        };
+        createWindow(wikiWindow);
+      }
+    },
+    [desktopIcons, createWindow]
+  );
 
   const handleMouseDown = (e: React.MouseEvent, windowId: string) => {
     e.preventDefault();
@@ -1142,7 +1167,12 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({
             zIndex={window.zIndex}
             onMouseDown={(e) => handleMouseDown(e, window.id)}
             onResizeStart={handleResizeStart}
-            initialSlug={window.content !== "WIKI SYSTEM ACCESS\n\nBrowse random pages from the knowledge base:\n\n• Projects & Creative Works\n• Concepts & Theories\n• Tools & Resources\n• Bookmarks & References\n\nClick 'RND' to load a random page\nContent rendered with MDX\nInteractive links enabled" ? window.content : undefined}
+            initialSlug={
+              window.content !==
+              "WIKI SYSTEM ACCESS\n\nBrowse random pages from the knowledge base:\n\n• Projects & Creative Works\n• Concepts & Theories\n• Tools & Resources\n• Bookmarks & References\n\nClick 'RND' to load a random page\nContent rendered with MDX\nInteractive links enabled"
+                ? window.content
+                : undefined
+            }
           />
         ) : window.type === "achievements" ? (
           <AchievementsWindow
@@ -1176,6 +1206,22 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({
             onMouseDown={(e) => handleMouseDown(e, window.id)}
             onResizeStart={handleResizeStart}
             onOpenWikiWindow={openWikiWindow}
+          />
+        ) : window.type === "projects" ? (
+          <ProjectsWindow
+            key={window.id}
+            id={window.id}
+            title={window.title}
+            onClose={() => closeWindow(window.id)}
+            isMaximized={window.isMaximized}
+            onToggleMaximize={() => toggleMaximize(window.id)}
+            x={window.x}
+            y={window.y}
+            width={window.width}
+            height={window.height}
+            zIndex={window.zIndex}
+            onMouseDown={(e) => handleMouseDown(e, window.id)}
+            onResizeStart={handleResizeStart}
           />
         ) : (
           <BaseWindow
