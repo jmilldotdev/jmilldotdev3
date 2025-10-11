@@ -1222,6 +1222,216 @@
   ],
   "bookmark": [
     {
+      "slug": "nyxrun",
+      "title": "Nyx.run",
+      "created": "2025-10-04 08:20",
+      "tags": [
+        "bookmark"
+      ],
+      "url": "https://nyx.run/",
+      "path": "/c/nyxrun"
+    },
+    {
+      "slug": "competitive-socializing",
+      "title": "Competitive Socializing",
+      "created": "2025-10-04 08:18",
+      "tags": [
+        "bookmark"
+      ],
+      "url": "https://scyy.fi/compsoc-filler",
+      "path": "/c/competitive-socializing"
+    },
+    {
+      "slug": "puzzled-pint",
+      "title": "Puzzled Pint",
+      "created": "2025-09-12 07:09",
+      "tags": [
+        "bookmark"
+      ],
+      "url": "https://puzzledpint.org/",
+      "path": "/c/puzzled-pint"
+    },
+    {
+      "slug": "alterego",
+      "title": "Alterego",
+      "created": "2025-09-12 07:08",
+      "tags": [
+        "bookmark"
+      ],
+      "url": "https://www.alterego.io/",
+      "path": "/c/alterego"
+    },
+    {
+      "slug": "thymer",
+      "title": "Thymer",
+      "created": "2025-09-02 17:25",
+      "tags": [
+        "bookmark"
+      ],
+      "url": "https://thymer.com/",
+      "path": "/c/thymer"
+    },
+    {
+      "slug": "midnight-madness-nyc",
+      "title": "Midnight Madness NYC",
+      "created": "2025-09-02 17:24",
+      "tags": [
+        "bookmark"
+      ],
+      "url": "https://midnightmadness.nyc/",
+      "path": "/c/midnight-madness-nyc"
+    },
+    {
+      "slug": "puzzle-hunt-calendar",
+      "title": "Puzzle Hunt Calendar",
+      "created": "2025-09-02 17:24",
+      "tags": [
+        "bookmark"
+      ],
+      "url": "https://puzzlehuntcalendar.com/",
+      "path": "/c/puzzle-hunt-calendar"
+    },
+    {
+      "slug": "rotato",
+      "title": "Rotato",
+      "created": "2025-09-02 17:23",
+      "tags": [
+        "bookmark"
+      ],
+      "url": "https://rotato.app/",
+      "path": "/c/rotato"
+    },
+    {
+      "slug": "sacredcomputer",
+      "title": "Sacred.computer",
+      "created": "2025-09-02 17:23",
+      "tags": [
+        "bookmark"
+      ],
+      "url": "https://www.sacred.computer/",
+      "path": "/c/sacredcomputer"
+    },
+    {
+      "slug": "eden-online",
+      "title": "Eden Online",
+      "created": "2025-09-02 17:22",
+      "tags": [
+        "bookmark"
+      ],
+      "url": "https://edenonline.ubisoft.com/",
+      "path": "/c/eden-online"
+    },
+    {
+      "slug": "manifesthumantech",
+      "title": "Manifest.human.tech",
+      "created": "2025-09-02 17:22",
+      "tags": [
+        "bookmark"
+      ],
+      "url": "https://www.manifest.human.tech/",
+      "path": "/c/manifesthumantech"
+    },
+    {
+      "slug": "school-founders-world-conference",
+      "title": "School Founders World Conference",
+      "created": "2025-09-02 17:20",
+      "tags": [
+        "bookmark"
+      ],
+      "url": "https://www.sfwhgse.com/",
+      "path": "/c/school-founders-world-conference"
+    },
+    {
+      "slug": "prophet-arena",
+      "title": "Prophet Arena",
+      "created": "2025-09-02 17:19",
+      "tags": [
+        "bookmark"
+      ],
+      "url": "https://www.prophetarena.co/",
+      "path": "/c/prophet-arena"
+    },
+    {
+      "slug": "public-works-resources",
+      "title": "Public Works Resources",
+      "created": "2025-09-02 17:19",
+      "tags": [
+        "bookmark"
+      ],
+      "url": "https://b00k.club/resources/",
+      "path": "/c/public-works-resources"
+    },
+    {
+      "slug": "kinoai",
+      "title": "Kino.ai",
+      "created": "2025-08-14 17:58",
+      "tags": [
+        "bookmark"
+      ],
+      "url": "https://kino.ai/",
+      "path": "/c/kinoai"
+    },
+    {
+      "slug": "radicle",
+      "title": "Radicle",
+      "created": "2025-08-12 16:49",
+      "tags": [
+        "bookmark"
+      ],
+      "url": "https://radicle.xyz/",
+      "path": "/c/radicle"
+    },
+    {
+      "slug": "death-clock",
+      "title": "Death Clock",
+      "created": "2025-08-12 16:48",
+      "tags": [
+        "bookmark"
+      ],
+      "url": "https://inqfactory.com/pages/death-clock",
+      "path": "/c/death-clock"
+    },
+    {
+      "slug": "simplebench",
+      "title": "SimpleBench",
+      "created": "2025-08-12 16:47",
+      "tags": [
+        "bookmark"
+      ],
+      "url": "https://simple-bench.com/",
+      "path": "/c/simplebench"
+    },
+    {
+      "slug": "parsebot",
+      "title": "Parse.bot",
+      "created": "2025-08-08 08:03",
+      "tags": [
+        "bookmark"
+      ],
+      "url": "https://www.parse.bot/",
+      "path": "/c/parsebot"
+    },
+    {
+      "slug": "billions-network",
+      "title": "Billions network",
+      "created": "2025-08-08 08:02",
+      "tags": [
+        "bookmark"
+      ],
+      "url": "https://billions.network/",
+      "path": "/c/billions-network"
+    },
+    {
+      "slug": "termius",
+      "title": "Termius",
+      "created": "2025-08-08 08:01",
+      "tags": [
+        "bookmark"
+      ],
+      "url": "https://termius.com/index.html",
+      "path": "/c/termius"
+    },
+    {
       "slug": "soot",
       "title": "SOOT",
       "created": "2025-08-02 08:29",

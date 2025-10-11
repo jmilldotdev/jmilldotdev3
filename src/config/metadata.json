@@ -409,6 +409,13 @@
     "path": "/c/frisson"
   },
   {
+    "slug": "futarchy",
+    "title": "Futarchy",
+    "created": "2025-08-14 07:44",
+    "tags": [],
+    "path": "/c/futarchy"
+  },
+  {
     "slug": "gpt-anomaly-tokens",
     "title": "GPT Anomaly Tokens",
     "tags": [
@@ -1232,6 +1239,13 @@
     "path": "/c/humans-cant-generate-random-numbers"
   },
   {
+    "slug": "orphaned-code",
+    "title": "Orphaned code",
+    "created": "2025-08-13 06:52",
+    "tags": [],
+    "path": "/c/orphaned-code"
+  },
+  {
     "slug": "r9k-mode",
     "title": "R9k mode",
     "tags": [
@@ -1379,6 +1393,16 @@
     ],
     "url": "https://www.altered.gg/",
     "path": "/c/altered-tcg"
+  },
+  {
+    "slug": "alterego",
+    "title": "Alterego",
+    "created": "2025-09-12 07:08",
+    "tags": [
+      "bookmark"
+    ],
+    "url": "https://www.alterego.io/",
+    "path": "/c/alterego"
   },
   {
     "slug": "amulet-garden",
@@ -1609,6 +1633,16 @@
     "path": "/c/cody-by-sourcegraph"
   },
   {
+    "slug": "competitive-socializing",
+    "title": "Competitive Socializing",
+    "created": "2025-10-04 08:18",
+    "tags": [
+      "bookmark"
+    ],
+    "url": "https://scyy.fi/compsoc-filler",
+    "path": "/c/competitive-socializing"
+  },
+  {
     "slug": "computer-science-major-arcana",
     "title": "Computer Science Major Arcana",
     "tags": [
@@ -1626,6 +1660,16 @@
     ],
     "url": "https://www.cosmos.so/",
     "path": "/c/cosmosso"
+  },
+  {
+    "slug": "death-clock",
+    "title": "Death Clock",
+    "created": "2025-08-12 16:48",
+    "tags": [
+      "bookmark"
+    ],
+    "url": "https://inqfactory.com/pages/death-clock",
+    "path": "/c/death-clock"
   },
   {
     "slug": "deception-arena-chatroom",
@@ -1730,6 +1774,16 @@
     ],
     "url": "https://dvorakgame.co.uk/index.php/Main_Page",
     "path": "/c/dvorak-game"
+  },
+  {
+    "slug": "eden-online",
+    "title": "Eden Online",
+    "created": "2025-09-02 17:22",
+    "tags": [
+      "bookmark"
+    ],
+    "url": "https://edenonline.ubisoft.com/",
+    "path": "/c/eden-online"
   },
   {
     "slug": "endemic",
@@ -2135,6 +2189,16 @@
     "path": "/c/jasper52"
   },
   {
+    "slug": "kinoai",
+    "title": "Kino.ai",
+    "created": "2025-08-14 17:58",
+    "tags": [
+      "bookmark"
+    ],
+    "url": "https://kino.ai/",
+    "path": "/c/kinoai"
+  },
+  {
     "slug": "larpa",
     "title": "LARPA",
     "created": "2024-12-03 07:21",
@@ -2266,6 +2330,16 @@
     "path": "/c/maneken"
   },
   {
+    "slug": "manifesthumantech",
+    "title": "Manifest.human.tech",
+    "created": "2025-09-02 17:22",
+    "tags": [
+      "bookmark"
+    ],
+    "url": "https://www.manifest.human.tech/",
+    "path": "/c/manifesthumantech"
+  },
+  {
     "slug": "marginalia-search",
     "title": "Marginalia Search",
     "tags": [
@@ -2330,6 +2404,16 @@
     ],
     "url": "https://www.metasploit.com/",
     "path": "/c/metasploit"
+  },
+  {
+    "slug": "midnight-madness-nyc",
+    "title": "Midnight Madness NYC",
+    "created": "2025-09-02 17:24",
+    "tags": [
+      "bookmark"
+    ],
+    "url": "https://midnightmadness.nyc/",
+    "path": "/c/midnight-madness-nyc"
   },
   {
     "slug": "mindstone",
@@ -2651,6 +2735,16 @@
     "path": "/c/project-89"
   },
   {
+    "slug": "prophet-arena",
+    "title": "Prophet Arena",
+    "created": "2025-09-02 17:19",
+    "tags": [
+      "bookmark"
+    ],
+    "url": "https://www.prophetarena.co/",
+    "path": "/c/prophet-arena"
+  },
+  {
     "slug": "psiloscoby",
     "title": "Psiloscoby",
     "tags": [
@@ -2658,6 +2752,36 @@
     ],
     "url": "https://www.psiloscoby.com/",
     "path": "/c/psiloscoby"
+  },
+  {
+    "slug": "public-works-resources",
+    "title": "Public Works Resources",
+    "created": "2025-09-02 17:19",
+    "tags": [
+      "bookmark"
+    ],
+    "url": "https://b00k.club/resources/",
+    "path": "/c/public-works-resources"
+  },
+  {
+    "slug": "puzzle-hunt-calendar",
+    "title": "Puzzle Hunt Calendar",
+    "created": "2025-09-02 17:24",
+    "tags": [
+      "bookmark"
+    ],
+    "url": "https://puzzlehuntcalendar.com/",
+    "path": "/c/puzzle-hunt-calendar"
+  },
+  {
+    "slug": "puzzled-pint",
+    "title": "Puzzled Pint",
+    "created": "2025-09-12 07:09",
+    "tags": [
+      "bookmark"
+    ],
+    "url": "https://puzzledpint.org/",
+    "path": "/c/puzzled-pint"
   },
   {
     "slug": "puzzles-for-progress",
@@ -2705,6 +2829,16 @@
     ],
     "url": "https://quartz.jzhao.xyz/",
     "path": "/c/quartz-site-builder"
+  },
+  {
+    "slug": "radicle",
+    "title": "Radicle",
+    "created": "2025-08-12 16:49",
+    "tags": [
+      "bookmark"
+    ],
+    "url": "https://radicle.xyz/",
+    "path": "/c/radicle"
   },
   {
     "slug": "radioooooo",
@@ -2782,6 +2916,16 @@
     "path": "/c/rive"
   },
   {
+    "slug": "rotato",
+    "title": "Rotato",
+    "created": "2025-09-02 17:23",
+    "tags": [
+      "bookmark"
+    ],
+    "url": "https://rotato.app/",
+    "path": "/c/rotato"
+  },
+  {
     "slug": "soot",
     "title": "SOOT",
     "created": "2025-08-02 08:29",
@@ -2808,6 +2952,16 @@
     ],
     "url": "https://sarcophagus.io/",
     "path": "/c/sarcophagusio"
+  },
+  {
+    "slug": "school-founders-world-conference",
+    "title": "School Founders World Conference",
+    "created": "2025-09-02 17:20",
+    "tags": [
+      "bookmark"
+    ],
+    "url": "https://www.sfwhgse.com/",
+    "path": "/c/school-founders-world-conference"
   },
   {
     "slug": "sciphi",
@@ -2857,6 +3011,16 @@
     ],
     "url": "https://www.simpleanalytics.com/",
     "path": "/c/simple-analytics"
+  },
+  {
+    "slug": "simplebench",
+    "title": "SimpleBench",
+    "created": "2025-08-12 16:47",
+    "tags": [
+      "bookmark"
+    ],
+    "url": "https://simple-bench.com/",
+    "path": "/c/simplebench"
   },
   {
     "slug": "slowjamastan",
@@ -3128,6 +3292,16 @@
     "path": "/c/thomas-frank---how-to-be-a-youtuber"
   },
   {
+    "slug": "thymer",
+    "title": "Thymer",
+    "created": "2025-09-02 17:25",
+    "tags": [
+      "bookmark"
+    ],
+    "url": "https://thymer.com/",
+    "path": "/c/thymer"
+  },
+  {
     "slug": "tigris-data",
     "title": "Tigris Data",
     "created": "2025-04-12 08:38",
@@ -3372,6 +3546,16 @@
     "path": "/c/archivesdesign"
   },
   {
+    "slug": "billions-network",
+    "title": "Billions network",
+    "created": "2025-08-08 08:02",
+    "tags": [
+      "bookmark"
+    ],
+    "url": "https://billions.network/",
+    "path": "/c/billions-network"
+  },
+  {
     "slug": "botsbotsbots",
     "title": "Botsbotsbots",
     "created": "2025-03-29 08:26",
@@ -3590,6 +3774,26 @@
     "path": "/c/nothingtech"
   },
   {
+    "slug": "nyxrun",
+    "title": "Nyx.run",
+    "created": "2025-10-04 08:20",
+    "tags": [
+      "bookmark"
+    ],
+    "url": "https://nyx.run/",
+    "path": "/c/nyxrun"
+  },
+  {
+    "slug": "parsebot",
+    "title": "Parse.bot",
+    "created": "2025-08-08 08:03",
+    "tags": [
+      "bookmark"
+    ],
+    "url": "https://www.parse.bot/",
+    "path": "/c/parsebot"
+  },
+  {
     "slug": "poetry-camera",
     "title": "Poetry camera",
     "created": "2025-07-11 07:36",
@@ -3618,6 +3822,16 @@
     "path": "/c/purpgame"
   },
   {
+    "slug": "sacredcomputer",
+    "title": "Sacred.computer",
+    "created": "2025-09-02 17:23",
+    "tags": [
+      "bookmark"
+    ],
+    "url": "https://www.sacred.computer/",
+    "path": "/c/sacredcomputer"
+  },
+  {
     "slug": "sameenergy",
     "title": "Same.energy",
     "tags": [
@@ -3644,6 +3858,16 @@
     ],
     "url": "https://apps.apple.com/us/app/status-sims-but-social-media/id6596771144",
     "path": "/c/status---sims-but-social-media"
+  },
+  {
+    "slug": "termius",
+    "title": "Termius",
+    "created": "2025-08-08 08:01",
+    "tags": [
+      "bookmark"
+    ],
+    "url": "https://termius.com/index.html",
+    "path": "/c/termius"
   },
   {
     "slug": "timefun",
