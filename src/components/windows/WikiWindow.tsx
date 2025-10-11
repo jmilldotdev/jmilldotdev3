@@ -341,7 +341,6 @@ export default function WikiWindow({
     },
   };
 
-
   return (
     <BaseWindow
       id={id}
@@ -371,7 +370,10 @@ export default function WikiWindow({
       }
       data-window="true"
     >
-      <div className="p-4 overflow-auto" style={{ height: 'calc(100% - 32px)' }}>
+      <div
+        className="p-4 overflow-auto"
+        style={{ height: "calc(100% - 32px)" }}
+      >
         {currentContent ? (
           <article className="w-full max-w-full overflow-visible">
             {/* Frontmatter Header */}
@@ -468,16 +470,28 @@ export default function WikiWindow({
           <div className="flex flex-col items-center justify-center h-64 space-y-4">
             <div className="relative">
               <div className="w-8 h-8 border-2 border-[#00FFFF] border-t-transparent rounded-full animate-spin"></div>
-              <div className="absolute inset-0 w-8 h-8 border-2 border-[#FF4800] border-r-transparent rounded-full animate-spin animate-reverse" style={{animationDuration: '1.5s'}}></div>
+              <div
+                className="absolute inset-0 w-8 h-8 border-2 border-[#FF4800] border-r-transparent rounded-full animate-spin animate-reverse"
+                style={{ animationDuration: "1.5s" }}
+              ></div>
             </div>
             <div className="text-[#00FFFF] text-sm font-mono animate-pulse">
               LOADING WIKI.MD
               <span className="animate-pulse">...</span>
             </div>
             <div className="flex space-x-1">
-              <div className="w-2 h-2 bg-[#FF4800] rounded-full animate-bounce" style={{animationDelay: '0ms'}}></div>
-              <div className="w-2 h-2 bg-[#00FFFF] rounded-full animate-bounce" style={{animationDelay: '150ms'}}></div>
-              <div className="w-2 h-2 bg-[#FF4800] rounded-full animate-bounce" style={{animationDelay: '300ms'}}></div>
+              <div
+                className="w-2 h-2 bg-[#FF4800] rounded-full animate-bounce"
+                style={{ animationDelay: "0ms" }}
+              ></div>
+              <div
+                className="w-2 h-2 bg-[#00FFFF] rounded-full animate-bounce"
+                style={{ animationDelay: "150ms" }}
+              ></div>
+              <div
+                className="w-2 h-2 bg-[#FF4800] rounded-full animate-bounce"
+                style={{ animationDelay: "300ms" }}
+              ></div>
             </div>
           </div>
         ) : (

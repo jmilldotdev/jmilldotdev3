@@ -41,10 +41,6 @@ export const BaseWindow: React.FC<BaseWindowProps> = ({
   children,
   className = "",
   titleBarButtons,
-  minWidth = 300,
-  maxWidth,
-  minHeight = 200,
-  maxHeight,
   ...props
 }) => {
   const windowRef = useRef<HTMLDivElement>(null);
@@ -107,7 +103,8 @@ export const BaseWindow: React.FC<BaseWindowProps> = ({
           className="absolute bottom-0 right-0 w-4 h-4 cursor-se-resize opacity-50 hover:opacity-100 transition-opacity z-50"
           onMouseDown={(e) => onResizeStart(e, id)}
           style={{
-            background: 'linear-gradient(-45deg, transparent 30%, #00FFFF 30%, #00FFFF 35%, transparent 35%, transparent 65%, #00FFFF 65%, #00FFFF 70%, transparent 70%)',
+            background:
+              "linear-gradient(-45deg, transparent 30%, #00FFFF 30%, #00FFFF 35%, transparent 35%, transparent 65%, #00FFFF 65%, #00FFFF 70%, transparent 70%)",
           }}
         />
       )}
