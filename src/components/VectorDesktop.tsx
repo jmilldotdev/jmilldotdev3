@@ -1068,17 +1068,13 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({
 
   return (
     <div
-      className={`absolute inset-0 bg-black transition-opacity duration-2000 ${
+      className={`absolute inset-0 transition-opacity duration-2000 ${
         isVisible ? "opacity-100" : "opacity-0"
       }`}
       style={{ zIndex: 15 }}
       onMouseUp={handleDesktopMouseUp}
       data-desktop-container
     >
-      {/* Subtle CRT Scanlines Effect */}
-      <div className="absolute inset-0 pointer-events-none z-0">
-        <div className="w-full h-full opacity-5 bg-gradient-to-b from-transparent via-[#00FFFF] to-transparent bg-[length:100%_8px]"></div>
-      </div>
 
       {/* Desktop Icons */}
       {desktopIcons.map((icon) => {

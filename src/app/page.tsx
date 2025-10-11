@@ -49,15 +49,15 @@ export default function Home() {
       achievementsManager.current.unlock("first-login");
     }
 
-    // Show desktop immediately when shatter starts
+    // Show desktop during shatter animation
     setTimeout(() => {
       setShowDesktop(true);
     }, 1500);
   };
 
   return (
-    <div className="w-full h-full bg-black flex flex-col relative">
-      <div className="flex-1 relative">
+    <div className="w-full h-full relative">
+      <div className="absolute inset-0">
         <SphereAnimation
           key={sphereResetKey}
           ref={sphereRef}
@@ -68,31 +68,31 @@ export default function Home() {
         />
       </div>
 
-      {!showDesktop && (
-        <div className="flex flex-col items-center justify-center gap-4 pb-8 relative z-30">
+      <div className={`absolute bottom-8 left-0 right-0 flex flex-col items-center justify-center gap-4 z-30 transition-opacity duration-500 ${
+        showDesktop ? "opacity-0 pointer-events-none" : "opacity-100"
+      }`}>
+        <Button
+          variant="secondary"
+          onClick={handleLoginClick}
+          className={`!border-[#00FFFF] !text-[#00FFFF] transition-opacity duration-500 ${
+            buttonClicked ? "opacity-0 pointer-events-none" : "opacity-100"
+          }`}
+        >
+          Login
+        </Button>
+        <Link href="/about">
           <Button
             variant="secondary"
-            onClick={handleLoginClick}
-            className={`!border-[#00FFFF] !text-[#00FFFF] transition-opacity duration-500 ${
-              buttonClicked ? "opacity-0 pointer-events-none" : "opacity-100"
+            className={`transition-opacity duration-300 ${
+              buttonClicked
+                ? "opacity-0 pointer-events-none"
+                : "opacity-60 hover:!opacity-100"
             }`}
           >
-            Login
+            Static
           </Button>
-          <Link href="/about">
-            <Button
-              variant="secondary"
-              className={`transition-opacity duration-300 ${
-                buttonClicked
-                  ? "opacity-0 pointer-events-none"
-                  : "opacity-60 hover:!opacity-100"
-              }`}
-            >
-              Static
-            </Button>
-          </Link>
-        </div>
-      )}
+        </Link>
+      </div>
 
       {showDesktop && (
         <VectorDesktop
