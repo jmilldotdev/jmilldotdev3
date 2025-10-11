@@ -16,6 +16,7 @@ export default function Home() {
   const [currentAchievement, setCurrentAchievement] =
     useState<Achievement | null>(null);
   const [sphereResetKey, setSphereResetKey] = useState(0);
+  const [isShortViewport, setIsShortViewport] = useState(false);
   const sphereRef = useRef<SphereAnimationRef>(null);
   const achievementsManager = useRef<AchievementsManager | null>(null);
 
@@ -30,6 +31,18 @@ export default function Home() {
     );
 
     return unsubscribe;
+  }, []);
+
+  // Monitor viewport height to adjust button layout
+  useEffect(() => {
+    const checkViewportHeight = () => {
+      setIsShortViewport(window.innerHeight < 700);
+    };
+
+    checkViewportHeight();
+    window.addEventListener("resize", checkViewportHeight);
+
+    return () => window.removeEventListener("resize", checkViewportHeight);
   }, []);
 
   // Reset state when desktop is hidden (logout)
@@ -68,7 +81,7 @@ export default function Home() {
         />
       </div>
 
-      <div className={`absolute bottom-8 left-0 right-0 flex flex-col items-center justify-center gap-4 z-30 transition-opacity duration-500 ${
+      <div className={`absolute bottom-8 left-0 right-0 flex ${isShortViewport ? 'flex-row' : 'flex-col'} items-center justify-center gap-4 z-30 transition-opacity duration-500 ${
         showDesktop ? "opacity-0 pointer-events-none" : "opacity-100"
       }`}>
         <Button

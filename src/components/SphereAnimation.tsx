@@ -396,8 +396,6 @@ export const SphereAnimation = forwardRef<
       return;
     }
 
-    console.log("Initializing THREE.js scene");
-
     // Initialize 3D scene
     const scene = new THREE.Scene();
     sceneRef.current = scene;
@@ -415,7 +413,6 @@ export const SphereAnimation = forwardRef<
     // Create renderer with explicit size
     const width = containerRef.current?.clientWidth || window.innerWidth;
     const height = containerRef.current?.clientHeight || window.innerHeight;
-    console.log("Container dimensions:", width, height);
 
     const renderer = new THREE.WebGLRenderer({
       antialias: true,
@@ -573,7 +570,6 @@ export const SphereAnimation = forwardRef<
     }
 
     // Initial render to make sure something shows up
-    console.log("Initial render");
     renderer.render(scene, camera);
 
     // Handle window resize
@@ -592,12 +588,10 @@ export const SphereAnimation = forwardRef<
     window.addEventListener("resize", handleResize);
 
     // Start animation
-    console.log("Starting animation");
     animate();
 
     // Cleanup
     return () => {
-      console.log("Cleaning up THREE.js scene");
       window.removeEventListener("resize", handleResize);
       if (canvasContainer && rendererRef.current) {
         canvasContainer.removeChild(rendererRef.current.domElement);
