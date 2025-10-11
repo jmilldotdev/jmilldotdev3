@@ -36,7 +36,7 @@ export default function Home() {
   // Monitor viewport height to adjust button layout
   useEffect(() => {
     const checkViewportHeight = () => {
-      setIsShortViewport(window.innerHeight < 700);
+      setIsShortViewport(window.innerHeight < 900);
     };
 
     checkViewportHeight();

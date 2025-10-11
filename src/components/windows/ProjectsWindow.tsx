@@ -100,6 +100,11 @@ const ProjectImage: React.FC<{
 }> = ({ project, className = "", fill = false, sizes, priority = false }) => {
   const [imageSrc, setImageSrc] = React.useState(project.cover);
 
+  // Update image source when project changes
+  React.useEffect(() => {
+    setImageSrc(project.cover);
+  }, [project.cover]);
+
   const handleError = () => {
     if (imageSrc === project.cover && project.fallbackCover) {
       setImageSrc(project.fallbackCover);
@@ -188,6 +193,38 @@ export const ProjectsWindow: React.FC<ProjectWindowProps> = ({
     setViewMode("grid");
   };
 
+  const handlePreviousProject = () => {
+    if (!selectedProject) return;
+    const filteredProjects = getFilteredProjects(activeFilter);
+    const currentIndex = filteredProjects.findIndex(p => p.id === selectedProject.id);
+    if (currentIndex > 0) {
+      handleProjectClick(filteredProjects[currentIndex - 1]);
+    }
+  };
+
+  const handleNextProject = () => {
+    if (!selectedProject) return;
+    const filteredProjects = getFilteredProjects(activeFilter);
+    const currentIndex = filteredProjects.findIndex(p => p.id === selectedProject.id);
+    if (currentIndex < filteredProjects.length - 1) {
+      handleProjectClick(filteredProjects[currentIndex + 1]);
+    }
+  };
+
+  const canGoPrevious = () => {
+    if (!selectedProject) return false;
+    const filteredProjects = getFilteredProjects(activeFilter);
+    const currentIndex = filteredProjects.findIndex(p => p.id === selectedProject.id);
+    return currentIndex > 0;
+  };
+
+  const canGoNext = () => {
+    if (!selectedProject) return false;
+    const filteredProjects = getFilteredProjects(activeFilter);
+    const currentIndex = filteredProjects.findIndex(p => p.id === selectedProject.id);
+    return currentIndex < filteredProjects.length - 1;
+  };
+
   // Progress timer effect - fills the bar based on totalDuration
   useEffect(() => {
     if (!selectedProject || !isPlaying || elapsedSeconds >= totalDuration) {
@@ -234,7 +271,7 @@ export const ProjectsWindow: React.FC<ProjectWindowProps> = ({
     >
       <div className="flex h-full bg-black">
         {/* Sidebar - hidden on small screens */}
-        <div className="md:block w-48 bg-zinc-900 border-r border-zinc-800 flex flex-col">
+        <div className="hidden md:block w-48 bg-zinc-900 border-r border-zinc-800 flex flex-col">
           <div className="p-4 border-b border-zinc-800">
             <h2 className="text-[#00FFFF] font-bold text-sm mb-3">LIBRARY</h2>
             <ul className="space-y-2 text-xs">
@@ -503,22 +540,40 @@ export const ProjectsWindow: React.FC<ProjectWindowProps> = ({
           <div className="bg-zinc-900 border-t border-zinc-800 p-3">
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
-                <button className="text-zinc-500 hover:text-[#00FFFF] transition-colors">
+                <button
+                  onClick={handlePreviousProject}
+                  disabled={!canGoPrevious()}
+                  className={`transition-colors ${
+                    canGoPrevious()
+                      ? "text-zinc-400 hover:text-[#00FFFF]"
+                      : "text-zinc-700 cursor-not-allowed"
+                  }`}
+                  title="Previous project"
+                >
                   <svg
-                    className="w-4 h-4"
+                    className="w-5 h-5"
                     fill="currentColor"
-                    viewBox="0 0 20 20"
+                    viewBox="0 0 24 24"
                   >
-                    <path d="M8.445 14.832A1 1 0 0010 14v-4a1 1 0 00-1.555-.832L5 11.528V9a1 1 0 00-2 0v6a1 1 0 002 0v-2.528l3.445 2.36z" />
+                    <path d="M6 6h2v12H6V6zm3.5 6l8.5 6V6l-8.5 6z" />
                   </svg>
                 </button>
-                <button className="text-zinc-500 hover:text-[#00FFFF] transition-colors">
+                <button
+                  onClick={handleNextProject}
+                  disabled={!canGoNext()}
+                  className={`transition-colors ${
+                    canGoNext()
+                      ? "text-zinc-400 hover:text-[#00FFFF]"
+                      : "text-zinc-700 cursor-not-allowed"
+                  }`}
+                  title="Next project"
+                >
                   <svg
-                    className="w-4 h-4"
+                    className="w-5 h-5"
                     fill="currentColor"
-                    viewBox="0 0 20 20"
+                    viewBox="0 0 24 24"
                   >
-                    <path d="M4.555 5.168A1 1 0 003 6v8a1 1 0 001.555.832L10 11.202V14a1 1 0 002 0V6a1 1 0 00-2 0v2.798L4.555 5.168z" />
+                    <path d="M6 18l8.5-6L6 6v12zm10-12v12h2V6h-2z" />
                   </svg>
                 </button>
               </div>

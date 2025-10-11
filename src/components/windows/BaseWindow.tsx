@@ -41,6 +41,14 @@ export const BaseWindow: React.FC<BaseWindowProps> = ({
   children,
   className = "",
   titleBarButtons,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  minWidth: _minWidth,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  maxWidth: _maxWidth,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  minHeight: _minHeight,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  maxHeight: _maxHeight,
   ...props
 }) => {
   const windowRef = useRef<HTMLDivElement>(null);
