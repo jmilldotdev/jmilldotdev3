@@ -100,6 +100,7 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const miniSphereEffectRef = useRef<MiniSphereEffectEmitter | null>(null);
+  const wikiAnimationTimersRef = useRef<NodeJS.Timeout[]>([]);
 
   // Dynamic grid configuration based on container size
   const getResponsiveIconGrid = useMemo(() => {
@@ -353,6 +354,10 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({
           ) as unknown as SVGAnimateElement
         )?.beginElement();
       } else if (icon.id === "wiki") {
+        // Clear any existing timers to avoid overlapping animations
+        wikiAnimationTimersRef.current.forEach(clearTimeout);
+        wikiAnimationTimersRef.current = [];
+
         setTimeout(
           () =>
             (
@@ -422,21 +427,25 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({
                 ) as unknown as SVGAnimateElement
               )?.endElement();
             } else if (correspondingIcon.id === "wiki") {
+              // Clear any pending animation timers
+              wikiAnimationTimersRef.current.forEach(clearTimeout);
+              wikiAnimationTimersRef.current = [];
+
               (
                 document.getElementById(
-                  "wiki-line1-stop-wiki"
+                  "wiki-line1-wiki"
                 ) as unknown as SVGAnimateElement
-              )?.beginElement();
+              )?.endElement();
               (
                 document.getElementById(
-                  "wiki-line2-stop-wiki"
+                  "wiki-line2-wiki"
                 ) as unknown as SVGAnimateElement
-              )?.beginElement();
+              )?.endElement();
               (
                 document.getElementById(
-                  "wiki-line3-stop-wiki"
+                  "wiki-line3-wiki"
                 ) as unknown as SVGAnimateElement
-              )?.beginElement();
+              )?.endElement();
             } else if (correspondingIcon.id === "terminal") {
               (
                 document.getElementById(
@@ -791,32 +800,43 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({
             ) as unknown as SVGAnimateElement
           )?.beginElement();
         } else if (iconId === "wiki") {
-          setTimeout(
-            () =>
-              (
-                document.getElementById(
-                  "wiki-line3-wiki"
-                ) as unknown as SVGAnimateElement
-              )?.beginElement(),
-            0
+          // Clear any existing timers
+          wikiAnimationTimersRef.current.forEach(clearTimeout);
+          wikiAnimationTimersRef.current = [];
+
+          // Store new timers
+          wikiAnimationTimersRef.current.push(
+            setTimeout(
+              () =>
+                (
+                  document.getElementById(
+                    "wiki-line3-wiki"
+                  ) as unknown as SVGAnimateElement
+                )?.beginElement(),
+              0
+            )
           );
-          setTimeout(
-            () =>
-              (
-                document.getElementById(
-                  "wiki-line1-wiki"
-                ) as unknown as SVGAnimateElement
-              )?.beginElement(),
-            500
+          wikiAnimationTimersRef.current.push(
+            setTimeout(
+              () =>
+                (
+                  document.getElementById(
+                    "wiki-line1-wiki"
+                  ) as unknown as SVGAnimateElement
+                )?.beginElement(),
+              500
+            )
           );
-          setTimeout(
-            () =>
-              (
-                document.getElementById(
-                  "wiki-line2-wiki"
-                ) as unknown as SVGAnimateElement
-              )?.beginElement(),
-            1000
+          wikiAnimationTimersRef.current.push(
+            setTimeout(
+              () =>
+                (
+                  document.getElementById(
+                    "wiki-line2-wiki"
+                  ) as unknown as SVGAnimateElement
+                )?.beginElement(),
+              1000
+            )
           );
         } else if (iconId === "terminal") {
           (
@@ -849,21 +869,26 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({
             ) as unknown as SVGAnimateElement
           )?.endElement();
         } else if (iconId === "wiki") {
+          // Clear any pending animation timers
+          wikiAnimationTimersRef.current.forEach(clearTimeout);
+          wikiAnimationTimersRef.current = [];
+
+          // Stop any running animations
           (
             document.getElementById(
-              "wiki-line1-stop-wiki"
+              "wiki-line1-wiki"
             ) as unknown as SVGAnimateElement
-          )?.beginElement();
+          )?.endElement();
           (
             document.getElementById(
-              "wiki-line2-stop-wiki"
+              "wiki-line2-wiki"
             ) as unknown as SVGAnimateElement
-          )?.beginElement();
+          )?.endElement();
           (
             document.getElementById(
-              "wiki-line3-stop-wiki"
+              "wiki-line3-wiki"
             ) as unknown as SVGAnimateElement
-          )?.beginElement();
+          )?.endElement();
         } else if (iconId === "terminal") {
           (
             document.getElementById(
