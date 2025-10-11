@@ -78,7 +78,7 @@ export default async function TagPage({
             No posts found for this tag.
           </p>
           <Link
-            href="/"
+            href="/about"
             className="inline-block mt-4 text-[var(--color-primary)] hover:underline"
           >
             ← Back to home
@@ -131,7 +131,7 @@ export default async function TagPage({
 
       <div className="mt-12 text-center">
         <Link
-          href="/"
+          href="/about"
           className="inline-block text-[var(--color-primary)] hover:underline"
         >
           ← Back to home

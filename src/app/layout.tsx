@@ -5,6 +5,7 @@ import Header from "@/components/Header";
 import Script from "next/script";
 import QuickSwitcher from "@/components/QuickSwitcher";
 import { getQuickSwitcherData } from "@/lib/quick-switcher-data";
+import { DesktopProvider } from "@/contexts/DesktopContext";
 
 export const metadata: Metadata = {
   title: "jmill",
@@ -26,17 +27,19 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         data-website-id="016992b7-62de-4ef5-84aa-b0274ddaabb0"
       />
       <body className="min-h-screen bg-black">
-        <QuickSwitcher pageMetadata={pageMetadata} tagData={tagData}>
-          <div
-            id="app"
-            className="grid grid-rows-[80px_1fr] h-screen p-2.5 gap-2.5"
-          >
-            <Header />
-            <main className="relative border border-gray-700 bg-gray-900/70 flex flex-col justify-start overflow-auto">
-              {children}
-            </main>
-          </div>
-        </QuickSwitcher>
+        <DesktopProvider>
+          <QuickSwitcher pageMetadata={pageMetadata} tagData={tagData}>
+            <div
+              id="app"
+              className="grid grid-rows-[80px_1fr] h-screen p-2.5 gap-2.5"
+            >
+              <Header />
+              <main className="relative border border-gray-700 bg-gray-900/70 flex flex-col justify-start overflow-auto">
+                {children}
+              </main>
+            </div>
+          </QuickSwitcher>
+        </DesktopProvider>
       </body>
     </html>
   );

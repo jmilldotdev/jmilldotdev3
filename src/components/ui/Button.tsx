@@ -23,10 +23,9 @@ export const Button: React.FC<ButtonProps> = ({
     "font-mono px-4 py-2 border transition-all duration-200 focus:outline-none";
 
   const variantClasses = {
-    primary: "border-primary text-primary hover:bg-primary hover:bg-opacity-20",
-    secondary:
-      "border-secondary text-secondary hover:bg-secondary hover:bg-opacity-20",
-    warning: "border-red-500 text-red-500 hover:bg-red-500 hover:bg-opacity-20",
+    primary: "border-primary text-primary hover:opacity-80",
+    secondary: "border-secondary text-secondary hover:opacity-80",
+    warning: "border-red-500 text-red-500 hover:opacity-80",
   };
 
   const disabledClasses = disabled
