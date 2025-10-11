@@ -37,10 +37,8 @@ export const AchievementsWindow: React.FC<AchievementsWindowProps> = (
   const totalCount = 49;
 
   return (
-    <BaseWindow 
-      {...props} 
-      width="auto"
-      height="auto"
+    <BaseWindow
+      {...props}
       minWidth={600}
       maxWidth={1200}
       minHeight={500}

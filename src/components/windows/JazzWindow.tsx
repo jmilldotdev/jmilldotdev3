@@ -1,11 +1,11 @@
 "use client";
 
+import React from "react";
+import Image from "next/image";
 import { BaseWindow } from "./BaseWindow";
-import CommandLine from "../CommandLine";
 
-interface TerminalWindowProps {
+interface JazzWindowProps {
   id: string;
-  title?: string;
   x: number;
   y: number;
   width: number;
@@ -15,13 +15,11 @@ interface TerminalWindowProps {
   onClose: () => void;
   onToggleMaximize: () => void;
   onMouseDown: (e: React.MouseEvent) => void;
-  onResizeStart?: (e: React.MouseEvent, windowId: string) => void;
-  onOpenWikiWindow?: (slug?: string) => void;
+  onResizeStart: (e: React.MouseEvent, windowId: string) => void;
 }
 
-export const TerminalWindow: React.FC<TerminalWindowProps> = ({
+export const JazzWindow: React.FC<JazzWindowProps> = ({
   id,
-  title = "TERM.CMD",
   x,
   y,
   width,
@@ -32,30 +30,36 @@ export const TerminalWindow: React.FC<TerminalWindowProps> = ({
   onToggleMaximize,
   onMouseDown,
   onResizeStart,
-  onOpenWikiWindow,
 }) => {
   return (
     <BaseWindow
       id={id}
-      title={title}
+      title={"🚗🎷"}
       x={x}
       y={y}
       width={width}
       height={height}
-      minWidth={400}
-      maxWidth={800}
-      minHeight={300}
-      maxHeight={700}
       isMaximized={isMaximized}
       zIndex={zIndex}
       onClose={onClose}
       onToggleMaximize={onToggleMaximize}
       onMouseDown={onMouseDown}
       onResizeStart={onResizeStart}
-      className="terminal-window"
     >
-      <div className="h-full bg-black p-4 font-mono">
-        <CommandLine onOpenWikiWindow={onOpenWikiWindow} />
+      <div
+        className="p-4 overflow-auto h-full flex items-center justify-center cursor-pointer"
+        onClick={() =>
+          globalThis.open("https://selfdrivingjazz.com", "_blank")
+        }
+      >
+        <Image
+          src="/IO5M.gif"
+          alt="Jazz"
+          width={400}
+          height={300}
+          className="max-w-full max-h-full object-contain"
+          unoptimized
+        />
       </div>
     </BaseWindow>
   );

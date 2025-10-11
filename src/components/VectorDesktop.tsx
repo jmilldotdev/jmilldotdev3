@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import * as THREE from "three";
-import Image from "next/image";
 import WikiWindow from "./windows/WikiWindow";
 import { BaseWindow } from "./windows/BaseWindow";
 import { AboutIcon } from "./icons/AboutIcon";
@@ -11,6 +10,7 @@ import { TerminalIcon } from "./icons/TerminalIcon";
 import { JazzIcon } from "./icons/JazzIcon";
 import { AchievementsIcon } from "./icons/AchievementsIcon";
 import { ProjectsIcon } from "./icons/ProjectsIcon";
+import { JazzWindow } from "./windows/JazzWindow";
 import {
   createMiniSphereEffect,
   type MiniSphereEffectEmitter,
@@ -223,7 +223,6 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({
 
   const createWindow = useCallback(
     (icon: DesktopIcon) => {
-      // Get the actual container dimensions instead of window dimensions
       const container = document.querySelector("main");
       const viewportWidth = container
         ? container.clientWidth
@@ -232,109 +231,22 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({
         ? container.clientHeight
         : window.innerHeight;
 
-      // Action bar height (approximate)
       const actionBarHeight = 60;
       const margin = 10;
+      const iconColumnWidth = 120; // Leave space for desktop icons
+      const rightMargin = 20;
 
-      // Calculate responsive dimensions
       let windowWidth: number;
       let windowHeight: number;
       let windowX: number;
       let windowY: number;
 
-      if (viewportWidth <= 768) {
-        // Mobile: use reasonable proportions, not full screen
-        windowWidth = Math.max(
-          300,
-          Math.min(viewportWidth - 2 * margin, icon.id === "wiki" ? 600 : 480)
-        );
-        windowHeight = Math.max(
-          250,
-          Math.min(
-            viewportHeight - actionBarHeight - 2 * margin,
-            icon.id === "wiki" ? 600 : 400
-          )
-        );
-        windowX = margin;
-        windowY = margin;
-      } else if (viewportWidth <= 1024) {
-        // Tablet landscape: reasonable proportions
-        windowWidth = Math.max(
-          400,
-          Math.min(viewportWidth - 2 * margin, icon.id === "wiki" ? 680 : 480)
-        );
-        windowHeight = Math.max(
-          300,
-          Math.min(
-            viewportHeight - actionBarHeight - 2 * margin,
-            icon.id === "wiki" ? 620 : 400
-          )
-        );
-        windowX =
-          margin +
-          Math.random() * Math.max(0, viewportWidth - windowWidth - 2 * margin);
-        windowY =
-          margin +
-          Math.random() *
-            Math.max(
-              0,
-              viewportHeight - windowHeight - actionBarHeight - 2 * margin
-            );
-      } else {
-        // Desktop: ensure windows fit within bounds
-        if (icon.id === "achievements") {
-          windowWidth = Math.min(viewportWidth - 2 * margin, 900);
-          windowHeight = Math.min(
-            viewportHeight - actionBarHeight - 2 * margin,
-            600
-          );
-        } else if (icon.id === "about") {
-          // About window: aggressive space usage with content-aware sizing
-          const availableWidth = viewportWidth - 2 * margin;
-          const availableHeight = viewportHeight - actionBarHeight - 2 * margin;
+      // Jazz window gets random positioning and fixed size
+      if (icon.id === "jazz") {
+        windowWidth = 450;
+        windowHeight = 380;
 
-          if (availableWidth >= 1200) {
-            // Large desktop: use most of available width, reasonable height
-            windowWidth = Math.min(availableWidth * 0.8, 1000);
-            windowHeight = Math.min(availableHeight * 0.7, 650);
-          } else if (availableWidth >= 800) {
-            // Medium desktop: use significant portion of space
-            windowWidth = Math.min(availableWidth * 0.85, 800);
-            windowHeight = Math.min(availableHeight * 0.75, 600);
-          } else if (availableWidth >= 600) {
-            // Tablet: nearly full width, tall enough for content
-            windowWidth = availableWidth * 0.9;
-            windowHeight = Math.min(availableHeight * 0.8, 700);
-          } else {
-            // Mobile: full width available, optimized height
-            windowWidth = availableWidth;
-            windowHeight = Math.min(availableHeight * 0.85, 650);
-          }
-
-          // Ensure minimum usable size
-          windowWidth = Math.max(350, windowWidth);
-          windowHeight = Math.max(400, windowHeight);
-        } else if (icon.id === "projects") {
-          // Projects window: media player size
-          windowWidth = Math.min(viewportWidth - 2 * margin, 1100);
-          windowHeight = Math.min(
-            viewportHeight - actionBarHeight - 2 * margin,
-            700
-          );
-          // Ensure minimum usable size for media player
-          windowWidth = Math.max(800, windowWidth);
-          windowHeight = Math.max(600, windowHeight);
-        } else {
-          windowWidth = Math.min(
-            viewportWidth - 2 * margin,
-            icon.id === "wiki" ? 700 : 500
-          );
-          windowHeight = Math.min(
-            viewportHeight - actionBarHeight - 2 * margin,
-            icon.id === "wiki" ? 550 : 350
-          );
-        }
-        // Ensure safe random positioning within bounds
+        // Random position within viewport
         const maxX = Math.max(margin, viewportWidth - windowWidth - margin);
         const maxY = Math.max(
           margin,
@@ -343,10 +255,69 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({
 
         windowX = margin + Math.random() * Math.max(0, maxX - margin);
         windowY = margin + Math.random() * Math.max(0, maxY - margin);
+      } else {
+        // Smart positioning and sizing for other windows
+        windowY = margin;
+
+        if (viewportWidth >= 1024) {
+          // Desktop: position after icon column with right margin
+          windowX = iconColumnWidth;
+          const availableWidth =
+            viewportWidth - iconColumnWidth - rightMargin - margin;
+
+          if (icon.id === "about") {
+            windowWidth = Math.min(1000, Math.max(600, availableWidth * 0.9));
+            windowHeight = Math.min(
+              800,
+              viewportHeight - actionBarHeight - 2 * margin
+            );
+          } else if (icon.id === "projects") {
+            windowWidth = Math.min(1200, Math.max(800, availableWidth * 0.95));
+            windowHeight = Math.min(
+              900,
+              viewportHeight - actionBarHeight - 2 * margin
+            );
+          } else if (icon.id === "achievements") {
+            windowWidth = Math.min(1200, Math.max(600, availableWidth * 0.9));
+            windowHeight = Math.min(
+              900,
+              viewportHeight - actionBarHeight - 2 * margin
+            );
+          } else if (icon.id === "wiki") {
+            windowWidth = Math.min(900, Math.max(600, availableWidth * 0.85));
+            windowHeight = Math.min(
+              800,
+              viewportHeight - actionBarHeight - 2 * margin
+            );
+          } else {
+            windowWidth = Math.min(800, Math.max(500, availableWidth * 0.8));
+            windowHeight = Math.min(
+              700,
+              viewportHeight - actionBarHeight - 2 * margin
+            );
+          }
+        } else if (viewportWidth >= 768) {
+          // Tablet: still leave some icon space
+          windowX = iconColumnWidth;
+          const availableWidth = viewportWidth - iconColumnWidth - margin;
+          windowWidth = Math.min(800, availableWidth * 0.95);
+          windowHeight = Math.min(
+            700,
+            viewportHeight - actionBarHeight - 2 * margin
+          );
+        } else {
+          // Mobile: full width
+          windowX = margin;
+          windowWidth = viewportWidth - 2 * margin;
+          windowHeight = Math.min(
+            650,
+            viewportHeight - actionBarHeight - 2 * margin
+          );
+        }
       }
 
       const newWindow: Window = {
-        id: `window-${Date.now()}`,
+        id: `window-${Date.now()}-${Math.random()}`, // Add random to ensure unique IDs for jazz spam
         title: icon.name,
         content: icon.content,
         x: windowX,
@@ -677,7 +648,16 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({
       // This was a click, not a drag - open the window
       const icon = desktopIcons.find((i) => i.id === iconDragState.iconId);
       if (icon) {
-        createWindow(icon);
+        // Special handling for jazz icon - open 8 windows popup-ad style
+        if (icon.id === "jazz") {
+          for (let i = 0; i < 8; i++) {
+            setTimeout(() => {
+              createWindow(icon);
+            }, i * 150); // 150ms delay between each window
+          }
+        } else {
+          createWindow(icon);
+        }
       }
     }
 
@@ -942,7 +922,7 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({
       renderer.domElement.style.left = "0";
       renderer.domElement.style.width = "100%";
       renderer.domElement.style.height = "100%";
-      renderer.domElement.style.zIndex = "50"; // Higher z-index to be visible
+      renderer.domElement.style.zIndex = "5"; // Behind windows but above desktop
       renderer.domElement.style.pointerEvents = "none";
 
       // Append to the desktop container
@@ -1075,7 +1055,6 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({
       onMouseUp={handleDesktopMouseUp}
       data-desktop-container
     >
-
       {/* Desktop Icons */}
       {desktopIcons.map((icon) => {
         const position = getIconPosition(icon);
@@ -1118,10 +1097,9 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({
             onResizeStart={handleResizeStart}
           />
         ) : window.type === "jazz" ? (
-          <BaseWindow
+          <JazzWindow
             key={window.id}
             id={window.id}
-            title={"🚗🎷"}
             x={window.x}
             y={window.y}
             width={window.width}
@@ -1132,23 +1110,7 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({
             onToggleMaximize={() => toggleMaximize(window.id)}
             onMouseDown={(e) => handleMouseDown(e, window.id)}
             onResizeStart={handleResizeStart}
-          >
-            <div
-              className="p-4 overflow-auto h-full flex items-center justify-center cursor-pointer"
-              onClick={() =>
-                globalThis.open("https://selfdrivingjazz.com", "_blank")
-              }
-            >
-              <Image
-                src="/IO5M.gif"
-                alt="Jazz"
-                width={400}
-                height={300}
-                className="max-w-full max-h-full object-contain"
-                unoptimized
-              />
-            </div>
-          </BaseWindow>
+          />
         ) : window.type === "wiki" ? (
           <WikiWindow
             key={window.id}

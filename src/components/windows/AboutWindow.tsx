@@ -24,6 +24,8 @@ export const AboutWindow: React.FC<AboutWindowProps> = ({
   title,
   x,
   y,
+  width,
+  height,
   isMaximized,
   zIndex,
   onClose,
@@ -37,8 +39,8 @@ export const AboutWindow: React.FC<AboutWindowProps> = ({
       title={title}
       x={x}
       y={y}
-      width="auto"
-      height="auto"
+      width={width}
+      height={height}
       minWidth={400}
       maxWidth={1000}
       minHeight={400}

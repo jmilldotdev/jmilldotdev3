@@ -350,6 +350,10 @@ export default function WikiWindow({
       y={y}
       width={width}
       height={height}
+      minWidth={400}
+      maxWidth={900}
+      minHeight={400}
+      maxHeight={800}
       isMaximized={isMaximized}
       zIndex={zIndex}
       onClose={onClose}
