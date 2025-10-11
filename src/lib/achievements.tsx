@@ -4,8 +4,8 @@ export interface Achievement {
   id: string;
   title: string;
   description: string;
-  x: number; // Grid position (0-6)
-  y: number; // Grid position (0-6)
+  x: number; // Grid position (0-4)
+  y: number; // Grid position (0-4)
   icon: React.ComponentType<{ className?: string }>;
   unlocked: boolean;
   unlockedAt?: Date;
@@ -38,6 +38,20 @@ const FirstLoginIcon: React.FC<{ className?: string }> = ({
   </svg>
 );
 
+const TestIcon: React.FC<{ className?: string }> = ({ className = "" }) => (
+  <svg
+    viewBox="0 0 24 24"
+    className={className}
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.5"
+  >
+    <rect x="4" y="4" width="16" height="16" />
+    <path d="M4 4l16 16" />
+    <path d="M20 4l-16 16" />
+  </svg>
+);
+
 // Achievement definitions
 export const ACHIEVEMENT_DEFINITIONS: Omit<
   Achievement,
@@ -47,9 +61,49 @@ export const ACHIEVEMENT_DEFINITIONS: Omit<
     id: "first-login",
     title: "First Login",
     description: "Welcome to my site.",
-    x: 3, // Center of 7x7 grid
-    y: 3,
+    x: 2, // Center of 5x5 grid
+    y: 2,
     icon: FirstLoginIcon,
+  },
+  {
+    id: "test-north",
+    title: "North Test",
+    description: "A test achievement to the north.",
+    x: 2,
+    y: 1,
+    icon: TestIcon,
+  },
+  {
+    id: "test-south",
+    title: "South Test",
+    description: "A test achievement to the south.",
+    x: 2,
+    y: 3,
+    icon: TestIcon,
+  },
+  {
+    id: "test-west",
+    title: "West Test",
+    description: "A test achievement to the west.",
+    x: 1,
+    y: 2,
+    icon: TestIcon,
+  },
+  {
+    id: "test-east",
+    title: "East Test",
+    description: "A test achievement to the east.",
+    x: 3,
+    y: 2,
+    icon: TestIcon,
+  },
+  {
+    id: "test-corner",
+    title: "Corner Test",
+    description: "A locked achievement not adjacent to unlocked ones.",
+    x: 0,
+    y: 0,
+    icon: TestIcon,
   },
 ];
 
@@ -169,23 +223,49 @@ export class AchievementsManager {
     // You could add a separate reset listener system if needed
   }
 
-  // Create a 7x7 grid representation
+  // Create a 5x5 grid representation
   getAchievementGrid(): (Achievement | null)[][] {
-    const grid: (Achievement | null)[][] = Array(7)
+    const grid: (Achievement | null)[][] = Array(5)
       .fill(null)
-      .map(() => Array(7).fill(null));
+      .map(() => Array(5).fill(null));
 
     this.achievements.forEach((achievement) => {
       if (
         achievement.x >= 0 &&
-        achievement.x < 7 &&
+        achievement.x < 5 &&
         achievement.y >= 0 &&
-        achievement.y < 7
+        achievement.y < 5
       ) {
         grid[achievement.y][achievement.x] = achievement;
       }
     });
 
     return grid;
+  }
+
+  // Get cardinal neighbors (up, down, left, right) of an achievement
+  getCardinalNeighbors(achievement: Achievement): Achievement[] {
+    const neighbors: Achievement[] = [];
+    const directions = [
+      { x: 0, y: -1 }, // up
+      { x: 0, y: 1 },  // down
+      { x: -1, y: 0 }, // left
+      { x: 1, y: 0 },  // right
+    ];
+
+    directions.forEach(({ x: dx, y: dy }) => {
+      const neighborX = achievement.x + dx;
+      const neighborY = achievement.y + dy;
+
+      const neighbor = this.achievements.find(
+        (a) => a.x === neighborX && a.y === neighborY
+      );
+
+      if (neighbor) {
+        neighbors.push(neighbor);
+      }
+    });
+
+    return neighbors;
   }
 }
