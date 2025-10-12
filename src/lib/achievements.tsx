@@ -371,7 +371,10 @@ export class AchievementsManager {
 
   unlock(achievementId: string): boolean {
     const achievement = this.achievements.find((a) => a.id === achievementId);
-    if (!achievement || achievement.unlocked) {
+    if (!achievement) {
+      return false;
+    }
+    if (achievement.unlocked) {
       return false;
     }
 
@@ -488,5 +491,6 @@ export function unlockAchievement(achievementId: string): boolean {
   }
 
   const manager = AchievementsManager.getInstance();
-  return manager.unlock(achievementId);
+  const result = manager.unlock(achievementId);
+  return result;
 }

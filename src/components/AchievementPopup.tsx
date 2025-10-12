@@ -32,7 +32,7 @@ export const AchievementPopup: React.FC<AchievementPopupProps> = ({
         setIsVisible(true);
         setIsClosing(false);
       }, 800); // Delay to let desktop settle
-      
+
       // Auto-close after 5 seconds
       const closeTimer = setTimeout(() => {
         handleClose();
