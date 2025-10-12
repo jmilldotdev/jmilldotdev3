@@ -7,7 +7,7 @@ import SphereAnimation, {
 } from "@/components/SphereAnimation";
 import VectorDesktop from "@/components/VectorDesktop";
 import Button from "@/components/ui/Button";
-import { AchievementsManager, type Achievement } from "@/lib/achievements";
+import { AchievementsManager, unlockAchievement, type Achievement } from "@/lib/achievements";
 import { useDesktop } from "@/contexts/DesktopContext";
 
 export default function Home() {
@@ -57,14 +57,13 @@ export default function Home() {
     setButtonClicked(true);
     sphereRef.current?.triggerShatter();
 
-    // Unlock first login achievement
-    if (achievementsManager.current) {
-      achievementsManager.current.unlock("first-login");
-    }
-
-    // Show desktop during shatter animation
+    // Show desktop during shatter animation, then unlock achievement
     setTimeout(() => {
       setShowDesktop(true);
+      // Unlock first login achievement after desktop is shown
+      setTimeout(() => {
+        unlockAchievement("first-login");
+      }, 100);
     }, 1500);
   };
 

@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState, KeyboardEvent, useEffect, useRef } from "react";
 import pages from "@/config/pages.json";
-import { AchievementsManager } from "@/lib/achievements";
+import { AchievementsManager, unlockAchievement } from "@/lib/achievements";
 
 type Command = {
   name: string;
@@ -89,6 +89,15 @@ export default function CommandLine({ onInvalidCommand, onOpenWikiWindow }: Comm
         const manager = AchievementsManager.getInstance();
         manager.resetAll();
         return "achievements reset successfully";
+      },
+    },
+    {
+      name: "commander",
+      alias: ["cmd"],
+      description: "Achievement hunter's secret",
+      execute: () => {
+        unlockAchievement("into-the-matrix");
+        return "achievement unlocked: Commander";
       },
     },
   ];

@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { BaseWindow } from "./BaseWindow";
 import Image from "next/image";
 import { MDXRemote, MDXRemoteSerializeResult } from "next-mdx-remote";
+import { unlockAchievement } from "@/lib/achievements";
 
 interface ProjectWindowProps {
   id: string;
@@ -154,6 +155,7 @@ export const ProjectsWindow: React.FC<ProjectWindowProps> = ({
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [totalDuration, setTotalDuration] = useState(0);
   const [shouldAnimate, setShouldAnimate] = useState(true);
+  const achievementUnlockedRef = useRef(false);
 
   const loadProjectContent = async (projectId: string) => {
     setIsLoadingContent(true);
@@ -196,7 +198,9 @@ export const ProjectsWindow: React.FC<ProjectWindowProps> = ({
   const handlePreviousProject = () => {
     if (!selectedProject) return;
     const filteredProjects = getFilteredProjects(activeFilter);
-    const currentIndex = filteredProjects.findIndex(p => p.id === selectedProject.id);
+    const currentIndex = filteredProjects.findIndex(
+      (p) => p.id === selectedProject.id
+    );
     if (currentIndex > 0) {
       handleProjectClick(filteredProjects[currentIndex - 1]);
     }
@@ -205,7 +209,9 @@ export const ProjectsWindow: React.FC<ProjectWindowProps> = ({
   const handleNextProject = () => {
     if (!selectedProject) return;
     const filteredProjects = getFilteredProjects(activeFilter);
-    const currentIndex = filteredProjects.findIndex(p => p.id === selectedProject.id);
+    const currentIndex = filteredProjects.findIndex(
+      (p) => p.id === selectedProject.id
+    );
     if (currentIndex < filteredProjects.length - 1) {
       handleProjectClick(filteredProjects[currentIndex + 1]);
     }
@@ -214,14 +220,18 @@ export const ProjectsWindow: React.FC<ProjectWindowProps> = ({
   const canGoPrevious = () => {
     if (!selectedProject) return false;
     const filteredProjects = getFilteredProjects(activeFilter);
-    const currentIndex = filteredProjects.findIndex(p => p.id === selectedProject.id);
+    const currentIndex = filteredProjects.findIndex(
+      (p) => p.id === selectedProject.id
+    );
     return currentIndex > 0;
   };
 
   const canGoNext = () => {
     if (!selectedProject) return false;
     const filteredProjects = getFilteredProjects(activeFilter);
-    const currentIndex = filteredProjects.findIndex(p => p.id === selectedProject.id);
+    const currentIndex = filteredProjects.findIndex(
+      (p) => p.id === selectedProject.id
+    );
     return currentIndex < filteredProjects.length - 1;
   };
 
@@ -241,6 +251,14 @@ export const ProjectsWindow: React.FC<ProjectWindowProps> = ({
 
     return () => clearInterval(timer);
   }, [selectedProject, isPlaying, elapsedSeconds, totalDuration]);
+
+  // Achievement unlock when progress reaches 100%
+  useEffect(() => {
+    if (progress >= 100 && !achievementUnlockedRef.current) {
+      achievementUnlockedRef.current = true;
+      unlockAchievement("good-listener");
+    }
+  }, [progress]);
 
   // Format seconds as MM:SS
   const formatTime = (seconds: number): string => {
@@ -271,7 +289,7 @@ export const ProjectsWindow: React.FC<ProjectWindowProps> = ({
     >
       <div className="flex h-full bg-black">
         {/* Sidebar - hidden on small screens */}
-        <div className="hidden md:block w-48 bg-zinc-900 border-r border-zinc-800 flex flex-col">
+        <div className="md:block w-48 bg-zinc-900 border-r border-zinc-800 flex flex-col">
           <div className="p-4 border-b border-zinc-800">
             <h2 className="text-[#00FFFF] font-bold text-sm mb-3">LIBRARY</h2>
             <ul className="space-y-2 text-xs">
@@ -585,7 +603,9 @@ export const ProjectsWindow: React.FC<ProjectWindowProps> = ({
                 <div className="flex-1 h-1 bg-zinc-800 rounded-full relative">
                   <div
                     className={`absolute inset-y-0 left-0 bg-[#00FFFF] rounded-full ${
-                      shouldAnimate ? "transition-all duration-1000 ease-linear" : ""
+                      shouldAnimate
+                        ? "transition-all duration-1000 ease-linear"
+                        : ""
                     }`}
                     style={{ width: selectedProject ? `${progress}%` : "0%" }}
                   ></div>

@@ -51,7 +51,7 @@ export const AchievementsWindow: React.FC<AchievementsWindowProps> = (
   }, []);
 
   const unlockedCount = achievements.filter((a) => a.unlocked).length;
-  const totalCount = 49;
+  const totalCount = achievements.length;
 
   return (
     <BaseWindow

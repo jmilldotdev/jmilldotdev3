@@ -21,7 +21,8 @@ import { AboutWindow } from "./windows/AboutWindow";
 import { TerminalWindow } from "./windows/TerminalWindow";
 import { ProjectsWindow } from "./windows/ProjectsWindow";
 import { DesktopIcon, DESKTOP_ICON_DIMENSIONS } from "./DesktopIcon";
-import { Achievement } from "@/lib/achievements";
+import { Achievement, unlockAchievement } from "@/lib/achievements";
+import { ACHIEVEMENTS_ENABLED } from "@/config";
 
 interface Window {
   id: string;
@@ -166,8 +167,8 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({
     [getResponsiveIconGrid, iconPositions]
   );
 
-  const desktopIcons: DesktopIcon[] = useMemo(
-    () => [
+  const desktopIcons: DesktopIcon[] = useMemo(() => {
+    const allIcons = [
       {
         id: "about",
         name: "ABOUT.SYS",
@@ -195,20 +196,20 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({
         icon: <TerminalIcon />,
       },
       {
-        id: "achievements",
-        name: "WINS.TRO",
-        gridX: 0,
-        gridY: 4,
-        content: "ACHIEVEMENT_WINDOW",
-        icon: <AchievementsIcon />,
-      },
-      {
         id: "jazz",
         name: "JAZZ.ASAR",
         gridX: 0,
-        gridY: 5,
+        gridY: 4,
         content: "JAZZ_GIF",
         icon: <JazzIcon />,
+      },
+      {
+        id: "achievements",
+        name: "WINS.TRO",
+        gridX: 0,
+        gridY: 5,
+        content: "ACHIEVEMENT_WINDOW",
+        icon: <AchievementsIcon />,
       },
       {
         id: "projects",
@@ -218,9 +219,13 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({
         content: "PROJECTS_WINDOW",
         icon: <ProjectsIcon />,
       },
-    ],
-    []
-  );
+    ];
+
+    // Filter out achievements icon if achievements are disabled
+    return allIcons.filter(
+      (icon) => icon.id !== "achievements" || ACHIEVEMENTS_ENABLED
+    );
+  }, []);
 
   const createWindow = useCallback(
     (icon: DesktopIcon) => {
@@ -659,6 +664,14 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({
       if (icon) {
         // Special handling for jazz icon - open 8 windows popup-ad style
         if (icon.id === "jazz") {
+          // Check if there are already 8+ jazz windows open for achievement
+          const jazzWindowCount = windows.filter(
+            (w) => w.type === "jazz"
+          ).length;
+          if (jazzWindowCount >= 8) {
+            unlockAchievement("jazz-lover");
+          }
+
           for (let i = 0; i < 8; i++) {
             setTimeout(() => {
               createWindow(icon);
@@ -691,6 +704,7 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({
     iconDragState.isDragging,
     desktopIcons,
     createWindow,
+    windows,
   ]);
 
   const handleIconMouseDown = (e: React.MouseEvent, iconId: string) => {

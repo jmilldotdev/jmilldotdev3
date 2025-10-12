@@ -1,4 +1,5 @@
 import React from "react";
+import { ACHIEVEMENTS_ENABLED } from "@/config";
 
 export interface Achievement {
   id: string;
@@ -38,7 +39,7 @@ const FirstLoginIcon: React.FC<{ className?: string }> = ({
   </svg>
 );
 
-const TestIcon: React.FC<{ className?: string }> = ({ className = "" }) => (
+const LockedIcon: React.FC<{ className?: string }> = ({ className = "" }) => (
   <svg
     viewBox="0 0 24 24"
     className={className}
@@ -46,64 +47,268 @@ const TestIcon: React.FC<{ className?: string }> = ({ className = "" }) => (
     stroke="currentColor"
     strokeWidth="1.5"
   >
-    <rect x="4" y="4" width="16" height="16" />
-    <path d="M4 4l16 16" />
-    <path d="M20 4l-16 16" />
+    <rect x="5" y="11" width="14" height="10" rx="2" />
+    <path d="M8 11V7a4 4 0 018 0v4" />
   </svg>
 );
 
-// Achievement definitions
+const JazzLoverIcon: React.FC<{ className?: string }> = ({
+  className = "",
+}) => (
+  <svg
+    viewBox="0 0 24 24"
+    className={className}
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.5"
+  >
+    <path d="M9 18V5l12-2v13" />
+    <circle cx="6" cy="18" r="3" />
+    <circle cx="18" cy="16" r="3" />
+  </svg>
+);
+
+const GoodListenerIcon: React.FC<{ className?: string }> = ({
+  className = "",
+}) => (
+  <svg
+    viewBox="0 0 24 24"
+    className={className}
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.5"
+  >
+    <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z" />
+    <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+    <line x1="12" y1="19" x2="12" y2="23" />
+    <line x1="8" y1="23" x2="16" y2="23" />
+  </svg>
+);
+
+const MatrixIcon: React.FC<{ className?: string }> = ({ className = "" }) => (
+  <svg
+    viewBox="0 0 24 24"
+    className={className}
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.5"
+  >
+    <rect x="4" y="4" width="6" height="6" rx="1" />
+    <rect x="14" y="4" width="6" height="6" rx="1" />
+    <rect x="4" y="14" width="6" height="6" rx="1" />
+    <rect x="14" y="14" width="6" height="6" rx="1" />
+  </svg>
+);
+
+// Achievement definitions - 5x5 grid (25 total)
 export const ACHIEVEMENT_DEFINITIONS: Omit<
   Achievement,
   "unlocked" | "unlockedAt"
 >[] = [
+  // Row 0
+  {
+    id: "locked-0-0",
+    title: "???",
+    description: "This achievement is locked.",
+    x: 0,
+    y: 0,
+    icon: LockedIcon,
+  },
+  {
+    id: "locked-1-0",
+    title: "???",
+    description: "This achievement is locked.",
+    x: 1,
+    y: 0,
+    icon: LockedIcon,
+  },
+  {
+    id: "locked-2-0",
+    title: "???",
+    description: "This achievement is locked.",
+    x: 2,
+    y: 0,
+    icon: LockedIcon,
+  },
+  {
+    id: "locked-3-0",
+    title: "???",
+    description: "This achievement is locked.",
+    x: 3,
+    y: 0,
+    icon: LockedIcon,
+  },
+  {
+    id: "locked-4-0",
+    title: "???",
+    description: "This achievement is locked.",
+    x: 4,
+    y: 0,
+    icon: LockedIcon,
+  },
+  // Row 1
+  {
+    id: "locked-0-1",
+    title: "???",
+    description: "This achievement is locked.",
+    x: 0,
+    y: 1,
+    icon: LockedIcon,
+  },
+  {
+    id: "locked-1-1",
+    title: "???",
+    description: "This achievement is locked.",
+    x: 1,
+    y: 1,
+    icon: LockedIcon,
+  },
+  {
+    id: "into-the-matrix",
+    title: "Commander",
+    description: "Discovered the secret command.",
+    x: 2,
+    y: 1,
+    icon: MatrixIcon,
+  },
+  {
+    id: "locked-3-1",
+    title: "???",
+    description: "This achievement is locked.",
+    x: 3,
+    y: 1,
+    icon: LockedIcon,
+  },
+  {
+    id: "locked-4-1",
+    title: "???",
+    description: "This achievement is locked.",
+    x: 4,
+    y: 1,
+    icon: LockedIcon,
+  },
+  // Row 2 (center row)
+  {
+    id: "locked-0-2",
+    title: "???",
+    description: "This achievement is locked.",
+    x: 0,
+    y: 2,
+    icon: LockedIcon,
+  },
+  {
+    id: "good-listener",
+    title: "Good Listener",
+    description: "Listened to a full project from start to finish.",
+    x: 1,
+    y: 2,
+    icon: GoodListenerIcon,
+  },
   {
     id: "first-login",
     title: "First Login",
     description: "Welcome to my site.",
-    x: 2, // Center of 5x5 grid
+    x: 2,
     y: 2,
     icon: FirstLoginIcon,
   },
   {
-    id: "test-north",
-    title: "North Test",
-    description: "A test achievement to the north.",
-    x: 2,
-    y: 1,
-    icon: TestIcon,
-  },
-  {
-    id: "test-south",
-    title: "South Test",
-    description: "A test achievement to the south.",
-    x: 2,
-    y: 3,
-    icon: TestIcon,
-  },
-  {
-    id: "test-west",
-    title: "West Test",
-    description: "A test achievement to the west.",
-    x: 1,
-    y: 2,
-    icon: TestIcon,
-  },
-  {
-    id: "test-east",
-    title: "East Test",
-    description: "A test achievement to the east.",
+    id: "jazz-lover",
+    title: "Jazz Lover",
+    description: "You can never have too much Jazz.",
     x: 3,
     y: 2,
-    icon: TestIcon,
+    icon: JazzLoverIcon,
   },
   {
-    id: "test-corner",
-    title: "Corner Test",
-    description: "A locked achievement not adjacent to unlocked ones.",
+    id: "locked-4-2",
+    title: "???",
+    description: "This achievement is locked.",
+    x: 4,
+    y: 2,
+    icon: LockedIcon,
+  },
+  // Row 3
+  {
+    id: "locked-0-3",
+    title: "???",
+    description: "This achievement is locked.",
     x: 0,
-    y: 0,
-    icon: TestIcon,
+    y: 3,
+    icon: LockedIcon,
+  },
+  {
+    id: "locked-1-3",
+    title: "???",
+    description: "This achievement is locked.",
+    x: 1,
+    y: 3,
+    icon: LockedIcon,
+  },
+  {
+    id: "locked-2-3",
+    title: "???",
+    description: "This achievement is locked.",
+    x: 2,
+    y: 3,
+    icon: LockedIcon,
+  },
+  {
+    id: "locked-3-3",
+    title: "???",
+    description: "This achievement is locked.",
+    x: 3,
+    y: 3,
+    icon: LockedIcon,
+  },
+  {
+    id: "locked-4-3",
+    title: "???",
+    description: "This achievement is locked.",
+    x: 4,
+    y: 3,
+    icon: LockedIcon,
+  },
+  // Row 4
+  {
+    id: "locked-0-4",
+    title: "???",
+    description: "This achievement is locked.",
+    x: 0,
+    y: 4,
+    icon: LockedIcon,
+  },
+  {
+    id: "locked-1-4",
+    title: "???",
+    description: "This achievement is locked.",
+    x: 1,
+    y: 4,
+    icon: LockedIcon,
+  },
+  {
+    id: "locked-2-4",
+    title: "???",
+    description: "This achievement is locked.",
+    x: 2,
+    y: 4,
+    icon: LockedIcon,
+  },
+  {
+    id: "locked-3-4",
+    title: "???",
+    description: "This achievement is locked.",
+    x: 3,
+    y: 4,
+    icon: LockedIcon,
+  },
+  {
+    id: "locked-4-4",
+    title: "???",
+    description: "This achievement is locked.",
+    x: 4,
+    y: 4,
+    icon: LockedIcon,
   },
 ];
 
@@ -192,7 +397,7 @@ export class AchievementsManager {
   }
 
   getTotalCount(): number {
-    return 49; // Total planned achievements
+    return this.achievements.length;
   }
 
   onAchievementUnlocked(listener: (achievement: Achievement) => void) {
@@ -268,4 +473,20 @@ export class AchievementsManager {
 
     return neighbors;
   }
+}
+
+/**
+ * Unlock an achievement if achievements are enabled.
+ * This is the recommended way to unlock achievements throughout the app.
+ *
+ * @param achievementId - The ID of the achievement to unlock
+ * @returns true if the achievement was unlocked, false otherwise
+ */
+export function unlockAchievement(achievementId: string): boolean {
+  if (!ACHIEVEMENTS_ENABLED) {
+    return false;
+  }
+
+  const manager = AchievementsManager.getInstance();
+  return manager.unlock(achievementId);
 }
