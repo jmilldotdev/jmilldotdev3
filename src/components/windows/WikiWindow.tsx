@@ -15,6 +15,7 @@ interface WikiWindowProps {
   zIndex: number;
   onMouseDown: (e: React.MouseEvent) => void;
   onResizeStart?: (e: React.MouseEvent, windowId: string) => void;
+  initialSlug?: string;
 }
 
 export default function WikiWindow({

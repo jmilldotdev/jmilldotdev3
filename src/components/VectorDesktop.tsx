@@ -291,14 +291,8 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({
             windowWidth = Math.min(1100, Math.max(650, availableWidth * 0.85));
             windowHeight = Math.min(900, maxUsableHeight);
           } else if (icon.id === "terminal") {
-            windowWidth = Math.max(
-              360,
-              Math.min(520, availableWidth * 0.45)
-            );
-            windowHeight = Math.min(
-              520,
-              Math.max(320, maxUsableHeight * 0.7)
-            );
+            windowWidth = Math.max(360, Math.min(520, availableWidth * 0.45));
+            windowHeight = Math.min(520, Math.max(320, maxUsableHeight * 0.7));
           } else {
             windowWidth = Math.min(850, Math.max(520, availableWidth * 0.75));
             windowHeight = Math.min(750, maxUsableHeight);
@@ -318,10 +312,7 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({
           if (icon.id === "projects" || icon.id === "wiki") {
             windowWidth = availableWidth;
           } else if (icon.id === "terminal") {
-            windowWidth = Math.max(
-              320,
-              Math.min(480, availableWidth * 0.6)
-            );
+            windowWidth = Math.max(320, Math.min(480, availableWidth * 0.6));
           } else {
             windowWidth = Math.min(800, availableWidth * 0.9);
           }
