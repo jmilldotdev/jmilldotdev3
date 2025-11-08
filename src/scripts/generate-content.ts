@@ -3,8 +3,9 @@ import path from "path";
 import matter from "gray-matter";
 import { CONTENT_DIR } from "../config";
 
-const sourceDir = "/Users/jmill/Documents/obsidian/nhx3b";
-const attachmentsDir = path.join(sourceDir, "Extras/Attachments");
+const vaultRoot = "/Users/jmill/Documents/obsidian/nhx4b";
+const sourceDir = path.join(vaultRoot, "me", "publish");
+const attachmentsDir = path.join(vaultRoot, "nobody/attachments");
 const destDir = CONTENT_DIR;
 
 // Add interface for page metadata
@@ -18,6 +19,8 @@ interface PageMetadata {
   tagline?: string;
   year?: string;
   path: string;
+  artist?: string;
+  category?: string;
 }
 
 // Convert backlink text to slug using same logic as filename processing
@@ -124,186 +127,223 @@ function copyPublishedFiles(
         tagMap,
         validSlugs
       );
-    } else if (path.extname(file) === ".md") {
+    } else if (path.extname(file).toLowerCase() === ".md") {
       const content = fs.readFileSync(fullPath, "utf8");
-      if (
-        content.includes('publish: "true"') ||
-        content.includes("publish: true")
-      ) {
-        // Calculate the relative path from the base directory
-        // const relativePath = path.relative(baseDir, fullPath);
-        // Remove emoji and space from the start of the filename
-        const destFileName = file.replace(
-          /^(\p{Emoji_Presentation}|\p{Emoji}\uFE0F|\s)+/gu,
-          ""
-        );
 
-        // Remove the .md extension before slugifying
-        const baseFileName = path.basename(destFileName, ".md");
+      // Remove emoji and space from the start of the filename
+      const destFileName = file.replace(
+        /^(\p{Emoji_Presentation}|\p{Emoji}\uFE0F|\s)+/gu,
+        ""
+      );
 
-        // Extract title from baseFileName (capitalize first letter of each word)
-        const title = baseFileName
-          .split(/[-_]/)
-          .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-          .join(" ");
+      // Remove the .md extension before slugifying
+      const baseFileName = path.basename(destFileName, ".md");
 
-        // Slugify the base file name
-        const slugifiedFileName = baseFileName
-          .toLowerCase()
-          .replace(/\s+/g, "-") // Replace spaces with hyphens
-          .replace(/[^a-z0-9-]/g, ""); // Remove non-alphanumeric characters except hyphens
+      // Extract title from baseFileName (capitalize first letter of each word)
+      const title = baseFileName
+        .split(/[-_]/)
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(" ");
 
-        // Append the .md extension back to the slugified file name
-        const finalFileName = `${slugifiedFileName}.mdx`;
+      // Slugify the base file name
+      const slugifiedFileName = baseFileName
+        .toLowerCase()
+        .replace(/\s+/g, "-") // Replace spaces with hyphens
+        .replace(/[^a-z0-9-]/g, ""); // Remove non-alphanumeric characters except hyphens
 
-        const destPath = path.join(destDir, finalFileName);
+      // Append the .md extension back to the slugified file name
+      const finalFileName = `${slugifiedFileName}.mdx`;
 
-        // Parse frontmatter to extract metadata
-        const { data } = matter(content);
+      const destPath = path.join(destDir, finalFileName);
 
-        // Remove H1 level headings (lines starting with a single #)
-        let modifiedContent = content
-          .split("\n")
-          .filter((line) => !line.trim().match(/^#\s/))
-          .join("\n");
+      // Parse frontmatter to extract metadata
+      const { data } = matter(content);
 
-        // Handle frontmatter
-        const hasFrontmatter = modifiedContent.startsWith("---");
-        let frontmatterPart = "";
-        let contentPart = "";
+      const relativeDir = path.relative(baseDir, path.dirname(fullPath));
+      const categorySegments = relativeDir
+        .split(path.sep)
+        .filter((segment) => segment && segment !== ".");
+      const category =
+        categorySegments[categorySegments.length - 1]?.toLowerCase() ||
+        "projects";
 
-        if (hasFrontmatter) {
-          // Extract existing frontmatter
-          const frontmatterEnd = modifiedContent.indexOf("---", 3);
-          frontmatterPart = modifiedContent.slice(0, frontmatterEnd + 3);
-          contentPart = modifiedContent.slice(frontmatterEnd + 3);
+      // Remove H1 level headings (lines starting with a single #)
+      let modifiedContent = content
+        .split("\n")
+        .filter((line) => !line.trim().match(/^#\s/))
+        .join("\n");
 
-          // Add/update title in frontmatter
-          frontmatterPart = frontmatterPart
-            .replace(/title:.*\n/, `title: "${title}"\n`)
-            .replace(/---\n/, `---\ntitle: "${title}"\n`);
+      // Handle frontmatter
+      const hasFrontmatter = modifiedContent.startsWith("---");
+      let frontmatterPart = "";
+      let contentPart = "";
 
-          // Clean up tags in frontmatter
-          frontmatterPart = frontmatterPart
-            .replace(/- c\/entity/g, "- entity")
-            .replace(/- sources\//g, "- ");
+      if (hasFrontmatter) {
+        // Extract existing frontmatter
+        const frontmatterEnd = modifiedContent.indexOf("---", 3);
+        frontmatterPart = modifiedContent.slice(0, frontmatterEnd + 3);
+        contentPart = modifiedContent.slice(frontmatterEnd + 3);
 
-          // Clean up related field by removing invalid link references
-          frontmatterPart = frontmatterPart.replace(
-            /related:\s*\n([\s\S]*?)(?=\n\w+:|$)/g,
-            (match, relatedContent) => {
-              if (!relatedContent) return match;
+        // Add/update title in frontmatter
+        frontmatterPart = frontmatterPart
+          .replace(/title:.*\n/, `title: "${title}"\n`)
+          .replace(/---\n/, `---\ntitle: "${title}"\n`);
 
-              const lines = relatedContent.split("\n");
-              const validLines = lines.filter((line: string) => {
-                // Remove lines that contain [[...]] references that don't correspond to valid pages
-                const linkMatch = line.match(/\[\[([^\]]+)\]\]/);
-                if (linkMatch) {
-                  const linkText = linkMatch[1];
-                  const actualLinkText = linkText.includes("|")
-                    ? linkText.split("|")[0].trim()
-                    : linkText;
-                  const slug = textToSlug(actualLinkText);
-                  const isValid = validSlugs.has(slug);
-                  if (!isValid) {
-                    console.log(
-                      `Warning: Removed invalid related link: ${linkText}`
-                    );
-                    return false;
-                  }
+        // Clean up tags in frontmatter
+        frontmatterPart = frontmatterPart
+          .replace(/- c\/entity/g, "- entity")
+          .replace(/- sources\//g, "- ");
+
+        // Clean up related field by removing invalid link references
+        frontmatterPart = frontmatterPart.replace(
+          /related:\s*\n([\s\S]*?)(?=\n\w+:|$)/g,
+          (match, relatedContent) => {
+            if (!relatedContent) return match;
+
+            const lines = relatedContent.split("\n");
+            const validLines = lines.filter((line: string) => {
+              // Remove lines that contain [[...]] references that don't correspond to valid pages
+              const linkMatch = line.match(/\[\[([^\]]+)\]\]/);
+              if (linkMatch) {
+                const linkText = linkMatch[1];
+                const actualLinkText = linkText.includes("|")
+                  ? linkText.split("|")[0].trim()
+                  : linkText;
+                const slug = textToSlug(actualLinkText);
+                const isValid = validSlugs.has(slug);
+                if (!isValid) {
+                  console.log(
+                    `Warning: Removed invalid related link: ${linkText}`
+                  );
+                  return false;
                 }
-                return true;
-              });
+              }
+              return true;
+            });
 
-              return validLines.length > 1
-                ? `related:\n${validLines.join("\n")}`
-                : "";
-            }
-          );
-        } else {
-          // Add new frontmatter if none exists
-          frontmatterPart = `---
-title: "${title}"
----`;
-          contentPart = modifiedContent;
-        }
-
-        // Copy attachments and update links (only in content part)
-        contentPart = copyAttachment(contentPart, sourceDir, destDir);
-
-        // Replace c/entity with entity in content (only in content part)
-        contentPart = contentPart.replace(/c\/entity/g, "entity");
-
-        // Process image references first (![[ ]] syntax)
-        contentPart = contentPart.replace(
-          /!\[\[([^\]]+)\]\]/g,
-          (match, linkText) => {
-            if (linkText.match(/\.(png|jpg|jpeg|gif|webp)$/i)) {
-              const imagePath = `/images/${linkText}`;
-              return `<img src="${imagePath}" alt="${linkText}" className="max-w-full h-auto border border-gray-700 my-3 rounded" />`;
-            }
-            return match; // Return unchanged if not an image
+            return validLines.length > 1
+              ? `related:\n${validLines.join("\n")}`
+              : "";
           }
         );
+      } else {
+        // Add new frontmatter if none exists
+        frontmatterPart = `---
+title: "${title}"
+---`;
+        contentPart = modifiedContent;
+      }
 
-        // Process backlinks (only in content part)
-        contentPart = processBacklinks(contentPart, validSlugs);
+      // Copy attachments and update links (only in content part)
+      contentPart = copyAttachment(contentPart, sourceDir, destDir);
 
-        // Fix iframe properties for React compatibility
-        contentPart = contentPart
-          .replace(/allowfullscreen/g, "allowFullScreen")
-          .replace(/frameborder=/g, "frameBorder=");
+      // Replace c/entity with entity in content (only in content part)
+      contentPart = contentPart.replace(/c\/entity/g, "entity");
 
-        // Check if we need the Link import - only add if there are valid Link components
-        const hasLinks = contentPart.includes('<Link href="/c/');
-        const importStatement = hasLinks ? '\n\nimport Link from "next/link";\n' : '\n\n';
-
-        // Reassemble the content
-        modifiedContent = frontmatterPart + importStatement + contentPart;
-
-        fs.mkdirSync(path.dirname(destPath), { recursive: true });
-        fs.writeFileSync(destPath, modifiedContent);
-        console.log(`Copied and modified: ${fullPath} to ${destPath}`);
-
-        // Add the page to our list
-        generatedPages.push(`/c/${slugifiedFileName}`);
-
-        // Clean tags in the data
-        const cleanedTags = (data.tags || [])
-          .map((tag: string) =>
-            tag
-              .replace(/^sources\//, "")
-              .replace(/^c\/entity$/, "entity")
-              .replace(/^[^\w]*/, "")
-          )
-          .filter((tag: string) => tag);
-
-        // Create page metadata
-        const pageData: PageMetadata = {
-          slug: slugifiedFileName,
-          title: data.title || title,
-          created: data.created,
-          date: data.date,
-          tags: cleanedTags,
-          url: data.URL,
-          tagline: data.tagline,
-          year: data.year,
-          path: `/c/${slugifiedFileName}`,
-        };
-
-        pageMetadata.push(pageData);
-
-        // Add to tag map
-        if (pageData.tags && pageData.tags.length > 0) {
-          pageData.tags.forEach((tag: string) => {
-            if (tag) {
-              if (!tagMap.has(tag)) {
-                tagMap.set(tag, []);
-              }
-              tagMap.get(tag)!.push(pageData);
-            }
-          });
+      // Process image references first (![[ ]] syntax)
+      contentPart = contentPart.replace(/!\[\[([^\]]+)\]\]/g, (match, linkText) => {
+        if (linkText.match(/\.(png|jpg|jpeg|gif|webp)$/i)) {
+          const imagePath = `/images/${linkText}`;
+          return `<img src="${imagePath}" alt="${linkText}" className="max-w-full h-auto border border-gray-700 my-3 rounded" />`;
         }
+        return match; // Return unchanged if not an image
+      });
+
+      // Process backlinks (only in content part)
+      contentPart = processBacklinks(contentPart, validSlugs);
+
+      // Fix iframe properties for React compatibility
+      contentPart = contentPart
+        .replace(/allowfullscreen/g, "allowFullScreen")
+        .replace(/frameborder=/g, "frameBorder=");
+
+      // Check if we need the Link import - only add if there are valid Link components
+      const hasLinks = contentPart.includes('<Link href="/c/');
+      const importStatement = hasLinks
+        ? '\n\nimport Link from "next/link";\n'
+        : "\n\n";
+
+      // Reassemble the content
+      modifiedContent = frontmatterPart + importStatement + contentPart;
+
+      fs.mkdirSync(path.dirname(destPath), { recursive: true });
+      fs.writeFileSync(destPath, modifiedContent);
+      console.log(`Copied and modified: ${fullPath} to ${destPath}`);
+
+      // Add the page to our list
+      generatedPages.push(`/c/${slugifiedFileName}`);
+
+      const rawTags = data.tags ?? [];
+      const tagList = Array.isArray(rawTags) ? rawTags : [rawTags];
+
+      // Clean tags in the data
+      const cleanedTags = tagList
+        .map((tag: string) =>
+          (tag || "")
+            .replace(/^sources\//, "")
+            .replace(/^c\/entity$/, "entity")
+            .replace(/^[^\w]*/, "")
+        )
+        .filter((tag: string) => tag);
+
+      const toISODate = (value: unknown, fallback: Date) => {
+        if (typeof value === "string") return value;
+        if (value instanceof Date) return value.toISOString();
+        return fallback.toISOString();
+      };
+
+      const createdDate = toISODate(
+        data.created ?? data.date,
+        stat.birthtime
+      );
+      const modifiedDate = toISODate(data.date, stat.mtime);
+      const resolvedYearValue =
+        data.year ??
+        new Date(createdDate).getFullYear().toString();
+      const year =
+        typeof resolvedYearValue === "number"
+          ? resolvedYearValue.toString()
+          : resolvedYearValue ??
+            new Date(createdDate).getFullYear().toString();
+
+      const urlValue =
+        typeof data.URL === "string"
+          ? data.URL
+          : typeof data.url === "string"
+          ? data.url
+          : undefined;
+      const taglineValue =
+        typeof data.tagline === "string" ? data.tagline : undefined;
+      const artistValue =
+        typeof data.artist === "string" ? data.artist : undefined;
+
+      // Create page metadata
+      const pageData: PageMetadata = {
+        slug: slugifiedFileName,
+        title: data.title || title,
+        created: createdDate,
+        date: modifiedDate,
+        tags: cleanedTags,
+        url: urlValue,
+        tagline: taglineValue,
+        year,
+        path: `/c/${slugifiedFileName}`,
+        artist: artistValue,
+        category,
+      };
+
+      pageMetadata.push(pageData);
+
+      // Add to tag map
+      if (pageData.tags && pageData.tags.length > 0) {
+        pageData.tags.forEach((tag: string) => {
+          if (tag) {
+            if (!tagMap.has(tag)) {
+              tagMap.set(tag, []);
+            }
+            tagMap.get(tag)!.push(pageData);
+          }
+        });
       }
     }
   }
@@ -325,23 +365,17 @@ function collectValidSlugs(dir: string) {
 
     if (stat.isDirectory()) {
       collectValidSlugs(fullPath);
-    } else if (path.extname(file) === ".md") {
-      const content = fs.readFileSync(fullPath, "utf8");
-      if (
-        content.includes('publish: "true"') ||
-        content.includes("publish: true")
-      ) {
-        const destFileName = file.replace(
-          /^(\p{Emoji_Presentation}|\p{Emoji}\uFE0F|\s)+/gu,
-          ""
-        );
-        const baseFileName = path.basename(destFileName, ".md");
-        const slugifiedFileName = baseFileName
-          .toLowerCase()
-          .replace(/\s+/g, "-")
-          .replace(/[^a-z0-9-]/g, "");
-        validSlugs.add(slugifiedFileName);
-      }
+    } else if (path.extname(file).toLowerCase() === ".md") {
+      const destFileName = file.replace(
+        /^(\p{Emoji_Presentation}|\p{Emoji}\uFE0F|\s)+/gu,
+        ""
+      );
+      const baseFileName = path.basename(destFileName, ".md");
+      const slugifiedFileName = baseFileName
+        .toLowerCase()
+        .replace(/\s+/g, "-")
+        .replace(/[^a-z0-9-]/g, "");
+      validSlugs.add(slugifiedFileName);
     }
   }
 }
@@ -427,32 +461,56 @@ if (fs.existsSync(contentImagesDir)) {
   console.log("No content/Images directory found");
 }
 
-// Generate projects index from project-tagged content (exclude templates)
-const projectPages = pageMetadata.filter(page => 
-  page.tags?.some(tag => tag.startsWith('publish/project')) &&
-  !page.title.toLowerCase().includes('template') &&
-  !page.title.toLowerCase().includes('writeup') &&
-  !page.slug.includes('t-project')
-);
+// Generate projects index from project content (exclude templates)
+const projectPages = pageMetadata.filter((page) => {
+  const title = page.title?.toLowerCase() ?? "";
+  return (
+    !title.includes("template") &&
+    !title.includes("writeup") &&
+    !page.slug.includes("t-project")
+  );
+});
 
 const projects = projectPages.map((page) => {
-  const slug = page.slug.replace('.mdx', '');
+  const slug = page.slug.replace(".mdx", "");
   // Extract all project type tags from publish/project/type format
-  const projectTypes = page.tags?.filter(tag => tag.startsWith('publish/project/')) || [];
-  const projectTags = projectTypes.map(tag => tag.replace('publish/project/', '')).filter(tag => tag !== '');
-  const mainProjectType = projectTags[0] || 'digital';
-  
+  const projectTypes =
+    page.tags?.filter((tag) => tag.startsWith("publish/project/")) || [];
+  const projectTags = projectTypes
+    .map((tag) => tag.replace("publish/project/", ""))
+    .filter((tag) => tag !== "");
+
+  if (projectTags.length === 0 && page.category) {
+    projectTags.push(page.category);
+  }
+
+  const mainProjectType = projectTags[0] || "project";
+  const derivedArtist =
+    page.artist ||
+    page.tags
+      ?.find((tag) => tag.startsWith("artist/"))
+      ?.replace("artist/", "") ||
+    "jmill";
+
+  const derivedYearTag = page.tags?.find((tag) => /^\d{4}$/.test(tag));
+  const resolvedYear =
+    page.year ||
+    derivedYearTag ||
+    new Date(page.created || page.date || new Date().toISOString())
+      .getFullYear()
+      .toString();
+
   return {
     id: slug,
     title: page.title,
     cover: `/project-covers/${slug}.webp`,
     fallbackCover: `/project-covers/${slug}.png`,
-    artist: page.tags?.find(tag => tag.startsWith('artist/'))?.replace('artist/', '') || 'jmill',
-    year: page.year || page.tags?.find(tag => /^\d{4}$/.test(tag)) || new Date(page.created || page.date || '2024').getFullYear().toString(),
+    artist: derivedArtist,
+    year: resolvedYear,
     genre: mainProjectType.charAt(0).toUpperCase() + mainProjectType.slice(1),
     project_tags: projectTags,
-    tagline: page.tagline,
-    url: page.url
+    tagline: page.tagline ?? null,
+    url: page.url ?? null,
   };
 });
 

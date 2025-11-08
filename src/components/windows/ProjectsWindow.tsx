@@ -31,6 +31,7 @@ interface Project {
   genre?: string;
   tagline?: string | null;
   url?: string | null;
+  project_tags?: string[];
 }
 
 // Import generated projects data
@@ -52,8 +53,8 @@ const parseProjectDate = (yearStr: string | undefined): Date => {
 
 // Sort projects by date (newest first)
 const allProjects: Project[] = projectsData.sort((a, b) => {
-  const dateA = parseProjectDate(a.year);
-  const dateB = parseProjectDate(b.year);
+  const dateA = parseProjectDate((a as Project).year);
+  const dateB = parseProjectDate((b as Project).year);
   return dateB.getTime() - dateA.getTime();
 });
 
@@ -147,7 +148,7 @@ export const ProjectsWindow: React.FC<ProjectWindowProps> = ({
   const [activeFilter, setActiveFilter] = useState<string>("All Projects");
   const [viewMode, setViewMode] = useState<"grid" | "detail">("grid");
   const [projectContent, setProjectContent] = useState<{
-    source: unknown;
+    source: MDXRemoteSerializeResult | null;
     frontmatter: Record<string, unknown>;
   } | null>(null);
   const [isLoadingContent, setIsLoadingContent] = useState(false);
@@ -162,7 +163,13 @@ export const ProjectsWindow: React.FC<ProjectWindowProps> = ({
     try {
       const response = await fetch(`/api/wiki/${projectId}`);
       if (response.ok) {
-        const { serializedContent, frontmatter } = await response.json();
+        const {
+          serializedContent,
+          frontmatter,
+        }: {
+          serializedContent: MDXRemoteSerializeResult;
+          frontmatter: Record<string, unknown>;
+        } = await response.json();
         setProjectContent({
           source: serializedContent,
           frontmatter: frontmatter,

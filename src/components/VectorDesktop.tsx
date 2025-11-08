@@ -241,6 +241,7 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({
       const margin = 10;
       const iconColumnWidth = 120; // Leave space for desktop icons
       const rightMargin = 20;
+      const desktopWindowStartX = iconColumnWidth + margin;
 
       let windowWidth: number;
       let windowHeight: number;
@@ -267,50 +268,64 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({
 
         if (viewportWidth >= 1024) {
           // Desktop: position after icon column with right margin
-          windowX = iconColumnWidth;
-          const availableWidth =
-            viewportWidth - iconColumnWidth - rightMargin - margin;
+          windowX = desktopWindowStartX;
+          const availableWidth = Math.max(
+            360,
+            viewportWidth - desktopWindowStartX - rightMargin
+          );
+          const maxUsableHeight = Math.min(
+            viewportHeight - actionBarHeight - 2 * margin,
+            viewportHeight - margin
+          );
 
-          if (icon.id === "about") {
-            windowWidth = Math.min(1000, Math.max(600, availableWidth * 0.9));
+          if (icon.id === "projects" || icon.id === "wiki") {
+            windowWidth = availableWidth;
             windowHeight = Math.min(
-              800,
-              viewportHeight - actionBarHeight - 2 * margin
+              icon.id === "projects" ? 920 : 880,
+              maxUsableHeight
             );
-          } else if (icon.id === "projects") {
-            windowWidth = Math.min(1200, Math.max(800, availableWidth * 0.95));
-            windowHeight = Math.min(
-              900,
-              viewportHeight - actionBarHeight - 2 * margin
-            );
+          } else if (icon.id === "about") {
+            windowWidth = Math.min(1000, Math.max(600, availableWidth * 0.85));
+            windowHeight = maxUsableHeight;
           } else if (icon.id === "achievements") {
-            windowWidth = Math.min(1200, Math.max(600, availableWidth * 0.9));
-            windowHeight = Math.min(
-              900,
-              viewportHeight - actionBarHeight - 2 * margin
+            windowWidth = Math.min(1100, Math.max(650, availableWidth * 0.85));
+            windowHeight = Math.min(900, maxUsableHeight);
+          } else if (icon.id === "terminal") {
+            windowWidth = Math.max(
+              360,
+              Math.min(520, availableWidth * 0.45)
             );
-          } else if (icon.id === "wiki") {
-            windowWidth = Math.min(900, Math.max(600, availableWidth * 0.85));
             windowHeight = Math.min(
-              800,
-              viewportHeight - actionBarHeight - 2 * margin
+              520,
+              Math.max(320, maxUsableHeight * 0.7)
             );
           } else {
-            windowWidth = Math.min(800, Math.max(500, availableWidth * 0.8));
-            windowHeight = Math.min(
-              700,
-              viewportHeight - actionBarHeight - 2 * margin
-            );
+            windowWidth = Math.min(850, Math.max(520, availableWidth * 0.75));
+            windowHeight = Math.min(750, maxUsableHeight);
           }
         } else if (viewportWidth >= 768) {
           // Tablet: still leave some icon space
-          windowX = iconColumnWidth;
-          const availableWidth = viewportWidth - iconColumnWidth - margin;
-          windowWidth = Math.min(800, availableWidth * 0.95);
-          windowHeight = Math.min(
-            700,
-            viewportHeight - actionBarHeight - 2 * margin
+          windowX = desktopWindowStartX;
+          const availableWidth = Math.max(
+            320,
+            viewportWidth - desktopWindowStartX - rightMargin
           );
+          const maxUsableHeight = Math.min(
+            viewportHeight - actionBarHeight - 2 * margin,
+            viewportHeight - margin
+          );
+
+          if (icon.id === "projects" || icon.id === "wiki") {
+            windowWidth = availableWidth;
+          } else if (icon.id === "terminal") {
+            windowWidth = Math.max(
+              320,
+              Math.min(480, availableWidth * 0.6)
+            );
+          } else {
+            windowWidth = Math.min(800, availableWidth * 0.9);
+          }
+          windowHeight = Math.min(700, maxUsableHeight);
         } else {
           // Mobile: full width
           windowX = margin;

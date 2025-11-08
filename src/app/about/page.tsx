@@ -1,4 +1,3 @@
-import Link from "next/link";
 import AboutContent from "@/components/AboutContent";
 
 export default function AboutPage() {
@@ -9,45 +8,18 @@ export default function AboutPage() {
         <AboutContent />
       </div>
 
-      {/* Navigation */}
-      <div className="border border-[#00FFFF] p-6">
-        <h2 className="text-lg font-bold mb-4 border-b border-[#00FFFF] border-opacity-30 pb-2">
-          NAVIGATION
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Link
-            href="/c/index"
-            className="block p-4 border border-[#00FFFF] hover:bg-[#00FFFF] hover:bg-opacity-10 transition-colors"
-          >
-            <div className="text-[#ff4800] font-bold mb-1">Index</div>
-            <div className="text-sm opacity-75">Main site index</div>
-          </Link>
-          <Link
-            href="/c/projects"
-            className="block p-4 border border-[#00FFFF] hover:bg-[#00FFFF] hover:bg-opacity-10 transition-colors"
-          >
-            <div className="text-[#ff4800] font-bold mb-1">Projects</div>
-            <div className="text-sm opacity-75">My projects and work</div>
-          </Link>
-          <Link
-            href="/t/bookmark"
-            className="block p-4 border border-[#00FFFF] hover:bg-[#00FFFF] hover:bg-opacity-10 transition-colors"
-          >
-            <div className="text-[#ff4800] font-bold mb-1">Bookmarks</div>
-            <div className="text-sm opacity-75">
-              Cool things from around the web
-            </div>
-          </Link>
-          <Link
-            href="/t/entity"
-            className="block p-4 border border-[#00FFFF] hover:bg-[#00FFFF] hover:bg-opacity-10 transition-colors"
-          >
-            <div className="text-[#ff4800] font-bold mb-1">Entities</div>
-            <div className="text-sm opacity-75">
-              Interesting concepts and ideas
-            </div>
-          </Link>
-        </div>
+      {/* Vault CTA */}
+      <div className="border border-[#00FFFF] p-8 text-center bg-black/40">
+        <p className="mb-6 text-base md:text-lg text-[#d1fff7] tracking-wide">
+          jmill&apos;s vault has a full archive of notes, bookmarks, and
+          projects.
+        </p>
+        <a
+          href="https://vault.jmill.dev"
+          className="inline-flex items-center justify-center px-8 py-3 border border-[#ff4800] bg-[#ff4800]/15 text-[#ff855a] font-bold tracking-[0.2em] uppercase hover:bg-[#ff4800] hover:text-black transition-colors"
+        >
+          Explore the Vault
+        </a>
       </div>
     </div>
   );
