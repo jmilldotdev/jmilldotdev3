@@ -4,42 +4,42 @@
     "title": "Bella Coven",
     "cover": "/project-covers/bella-coven.webp",
     "fallbackCover": "/project-covers/bella-coven.png",
-    "artist": "jmill",
-    "year": "2025",
-    "genre": "Projects",
+    "artist": "BCAD",
+    "year": "2022",
+    "genre": "AI",
     "project_tags": [
-      "projects"
+      "project"
     ],
-    "tagline": null,
-    "url": null
+    "tagline": "a discord-based tarot reader chatbot",
+    "url": "https://www.bcad.one/project/3"
   },
   {
     "id": "bombay-beachy-yami-ichi",
     "title": "Bombay Beachy Yami Ichi",
     "cover": "/project-covers/bombay-beachy-yami-ichi.webp",
     "fallbackCover": "/project-covers/bombay-beachy-yami-ichi.png",
-    "artist": "jmill",
-    "year": "2024",
-    "genre": "Projects",
+    "artist": "BCAD (feat. Mars)",
+    "year": "2023",
+    "genre": "IRL",
     "project_tags": [
-      "projects"
+      "project"
     ],
-    "tagline": null,
-    "url": null
+    "tagline": "an IRL internet market event held in Bombay Beach, CA",
+    "url": "https://bbyi.fyi"
   },
   {
     "id": "coke-diffusion",
     "title": "Coke Diffusion",
     "cover": "/project-covers/coke-diffusion.webp",
     "fallbackCover": "/project-covers/coke-diffusion.png",
-    "artist": "jmill",
-    "year": "2024",
-    "genre": "Projects",
+    "artist": "BCAD",
+    "year": "2023",
+    "genre": "AI",
     "project_tags": [
-      "projects"
+      "project"
     ],
-    "tagline": null,
-    "url": null
+    "tagline": "native advertising in generative media: real magic",
+    "url": "https://www.bcad.one/project/4"
   },
   {
     "id": "doomer",
@@ -47,12 +47,12 @@
     "cover": "/project-covers/doomer.webp",
     "fallbackCover": "/project-covers/doomer.png",
     "artist": "jmill",
-    "year": "2024",
-    "genre": "Projects",
+    "year": "2021",
+    "genre": "AI",
     "project_tags": [
-      "projects"
+      "project"
     ],
-    "tagline": null,
+    "tagline": "an unhinged GPT-3 based chatbot",
     "url": null
   },
   {
@@ -60,154 +60,98 @@
     "title": "Introverse",
     "cover": "/project-covers/introverse.webp",
     "fallbackCover": "/project-covers/introverse.png",
-    "artist": "jmill",
+    "artist": "BCAD",
     "year": "2024",
-    "genre": "Projects",
+    "genre": "Game",
     "project_tags": [
-      "projects"
+      "project"
     ],
-    "tagline": null,
-    "url": null
+    "tagline": "get to know each other unforgettably",
+    "url": "https://introverse.one"
   },
   {
     "id": "mulabonding",
     "title": "Mulabonding",
     "cover": "/project-covers/mulabonding.webp",
     "fallbackCover": "/project-covers/mulabonding.png",
-    "artist": "jmill",
-    "year": "2024",
-    "genre": "Projects",
+    "artist": "Mars",
+    "year": "2022",
+    "genre": "AI",
     "project_tags": [
-      "projects"
+      "project"
     ],
-    "tagline": null,
-    "url": null
-  },
-  {
-    "id": "obsidian-canvas-randomnote",
-    "title": "Obsidian Canvas Randomnote",
-    "cover": "/project-covers/obsidian-canvas-randomnote.webp",
-    "fallbackCover": "/project-covers/obsidian-canvas-randomnote.png",
-    "artist": "jmill",
-    "year": "2024",
-    "genre": "Projects",
-    "project_tags": [
-      "projects"
-    ],
-    "tagline": null,
-    "url": null
-  },
-  {
-    "id": "obsidian-frontmatter-tag-suggest",
-    "title": "Obsidian Frontmatter Tag Suggest",
-    "cover": "/project-covers/obsidian-frontmatter-tag-suggest.webp",
-    "fallbackCover": "/project-covers/obsidian-frontmatter-tag-suggest.png",
-    "artist": "jmill",
-    "year": "2024",
-    "genre": "Projects",
-    "project_tags": [
-      "projects"
-    ],
-    "tagline": null,
-    "url": null
-  },
-  {
-    "id": "obsidian-gpt",
-    "title": "Obsidian GPT",
-    "cover": "/project-covers/obsidian-gpt.webp",
-    "fallbackCover": "/project-covers/obsidian-gpt.png",
-    "artist": "jmill",
-    "year": "2024",
-    "genre": "Projects",
-    "project_tags": [
-      "projects"
-    ],
-    "tagline": null,
-    "url": null
-  },
-  {
-    "id": "obsidian-wikipedia",
-    "title": "Obsidian Wikipedia",
-    "cover": "/project-covers/obsidian-wikipedia.webp",
-    "fallbackCover": "/project-covers/obsidian-wikipedia.png",
-    "artist": "jmill",
-    "year": "2024",
-    "genre": "Projects",
-    "project_tags": [
-      "projects"
-    ],
-    "tagline": null,
-    "url": null
+    "tagline": "30 people and 5 chatbots write a book together",
+    "url": "https://drive.google.com/file/d/1-cUBuPIWJx8XtJQGxdj65_E3y80yvb4o/view?usp=sharing"
   },
   {
     "id": "pepperstake",
     "title": "Pepperstake",
     "cover": "/project-covers/pepperstake.webp",
     "fallbackCover": "/project-covers/pepperstake.png",
-    "artist": "jmill",
-    "year": "2024",
-    "genre": "Projects",
+    "artist": "BCAD",
+    "year": "2022",
+    "genre": "Crypto",
     "project_tags": [
-      "projects"
+      "project"
     ],
-    "tagline": null,
-    "url": null
+    "tagline": "a social accountability protocol on Ethereum",
+    "url": "https://ethglobal.com/showcase/pepperstake-ksjxn"
   },
   {
     "id": "roadmaps-nft",
     "title": "Roadmaps NFT",
     "cover": "/project-covers/roadmaps-nft.webp",
     "fallbackCover": "/project-covers/roadmaps-nft.png",
-    "artist": "jmill",
-    "year": "2024",
-    "genre": "Projects",
+    "artist": "BCAD",
+    "year": "2022",
+    "genre": "Crypto",
     "project_tags": [
-      "projects"
+      "project"
     ],
-    "tagline": null,
-    "url": null
+    "tagline": "7,777 generative NFT project roadmaps, minted as NFTs",
+    "url": "https://ethglobal.com/showcase/roadmaps-38th7"
   },
   {
     "id": "spaghettify",
     "title": "Spaghettify",
     "cover": "/project-covers/spaghettify.webp",
     "fallbackCover": "/project-covers/spaghettify.png",
-    "artist": "jmill",
-    "year": "2024",
-    "genre": "Projects",
+    "artist": "BCAD",
+    "year": "2023",
+    "genre": "AI",
     "project_tags": [
-      "projects"
+      "project"
     ],
-    "tagline": null,
-    "url": null
+    "tagline": "what if you could use AI to make your code worse?",
+    "url": "https://spaghettify.dev"
   },
   {
     "id": "swappy",
     "title": "Swappy",
     "cover": "/project-covers/swappy.webp",
     "fallbackCover": "/project-covers/swappy.png",
-    "artist": "jmill",
-    "year": "2024",
-    "genre": "Projects",
+    "artist": "jmill (feat. Pilot)",
+    "year": "2023",
+    "genre": "Crypto",
     "project_tags": [
-      "projects"
+      "project"
     ],
-    "tagline": null,
-    "url": null
+    "tagline": "a natural language interface for the Squid protocol",
+    "url": "https://app.buidlbox.io/ethdenver/ethdenver-2023/winners?projectId=2b03bc06-6be5-4c8e-9695-8bdaf3623479"
   },
   {
     "id": "vibe-check",
     "title": "Vibe Check",
     "cover": "/project-covers/vibe-check.webp",
     "fallbackCover": "/project-covers/vibe-check.png",
-    "artist": "jmill",
-    "year": "2024",
-    "genre": "Projects",
+    "artist": "BCAD",
+    "year": "2023",
+    "genre": "Web",
     "project_tags": [
-      "projects"
+      "project"
     ],
-    "tagline": null,
-    "url": null
+    "tagline": "check the vibe of any group with ease with anonymous live Q&A",
+    "url": "https://vibecheck.lol"
   },
   {
     "id": "viperbot",
@@ -215,40 +159,40 @@
     "cover": "/project-covers/viperbot.webp",
     "fallbackCover": "/project-covers/viperbot.png",
     "artist": "jmill",
-    "year": "2024",
-    "genre": "Projects",
+    "year": "2021",
+    "genre": "AI",
     "project_tags": [
-      "projects"
+      "project"
     ],
-    "tagline": null,
-    "url": null
+    "tagline": "wisdom via Viper album covers",
+    "url": "https://github.com/jmilldotdev/viperbot"
   },
   {
     "id": "whalechess",
     "title": "Whalechess",
     "cover": "/project-covers/whalechess.webp",
     "fallbackCover": "/project-covers/whalechess.png",
-    "artist": "jmill",
-    "year": "2025",
-    "genre": "Projects",
+    "artist": "BCAD",
+    "year": "2024",
+    "genre": "Crypto",
     "project_tags": [
-      "projects"
+      "project"
     ],
-    "tagline": null,
-    "url": null
+    "tagline": "on-chain chess game with AI-generated custom pieces",
+    "url": "https://ethglobal.com/showcase/whalechess-0wfdf"
   },
   {
     "id": "whoup",
     "title": "WhoUp",
     "cover": "/project-covers/whoup.webp",
     "fallbackCover": "/project-covers/whoup.png",
-    "artist": "jmill",
-    "year": "2025",
-    "genre": "Projects",
+    "artist": "BCAD (feat. Youyang)",
+    "year": "2024",
+    "genre": "Web",
     "project_tags": [
-      "projects"
+      "project"
     ],
-    "tagline": null,
+    "tagline": "reprogram your doomscrolling",
     "url": null
   }
 ]

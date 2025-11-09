@@ -61,6 +61,7 @@ export default function WikiWindow({
           </div>
         )}
         <iframe
+          id={`${id}-iframe`}
           src="https://vault.jmill.dev"
           title="Vault"
           className="w-full h-full border-0 bg-black"

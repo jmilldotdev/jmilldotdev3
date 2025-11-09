@@ -18,6 +18,7 @@ interface PageMetadata {
   url?: string;
   tagline?: string;
   year?: string;
+  genre?: string;
   path: string;
   artist?: string;
   category?: string;
@@ -128,6 +129,9 @@ function copyPublishedFiles(
         validSlugs
       );
     } else if (path.extname(file).toLowerCase() === ".md") {
+      if (file.toLowerCase() === "index.md") {
+        continue;
+      }
       const content = fs.readFileSync(fullPath, "utf8");
 
       // Remove emoji and space from the start of the filename
@@ -241,13 +245,16 @@ title: "${title}"
       contentPart = contentPart.replace(/c\/entity/g, "entity");
 
       // Process image references first (![[ ]] syntax)
-      contentPart = contentPart.replace(/!\[\[([^\]]+)\]\]/g, (match, linkText) => {
-        if (linkText.match(/\.(png|jpg|jpeg|gif|webp)$/i)) {
-          const imagePath = `/images/${linkText}`;
-          return `<img src="${imagePath}" alt="${linkText}" className="max-w-full h-auto border border-gray-700 my-3 rounded" />`;
+      contentPart = contentPart.replace(
+        /!\[\[([^\]]+)\]\]/g,
+        (match, linkText) => {
+          if (linkText.match(/\.(png|jpg|jpeg|gif|webp)$/i)) {
+            const imagePath = `/images/${linkText}`;
+            return `<img src="${imagePath}" alt="${linkText}" className="max-w-full h-auto border border-gray-700 my-3 rounded" />`;
+          }
+          return match; // Return unchanged if not an image
         }
-        return match; // Return unchanged if not an image
-      });
+      );
 
       // Process backlinks (only in content part)
       contentPart = processBacklinks(contentPart, validSlugs);
@@ -292,19 +299,14 @@ title: "${title}"
         return fallback.toISOString();
       };
 
-      const createdDate = toISODate(
-        data.created ?? data.date,
-        stat.birthtime
-      );
+      const createdDate = toISODate(data.created ?? data.date, stat.birthtime);
       const modifiedDate = toISODate(data.date, stat.mtime);
       const resolvedYearValue =
-        data.year ??
-        new Date(createdDate).getFullYear().toString();
+        data.year ?? new Date(createdDate).getFullYear().toString();
       const year =
         typeof resolvedYearValue === "number"
           ? resolvedYearValue.toString()
-          : resolvedYearValue ??
-            new Date(createdDate).getFullYear().toString();
+          : resolvedYearValue ?? new Date(createdDate).getFullYear().toString();
 
       const urlValue =
         typeof data.URL === "string"
@@ -321,6 +323,7 @@ title: "${title}"
       const pageData: PageMetadata = {
         slug: slugifiedFileName,
         title: data.title || title,
+        genre: data.genre,
         created: createdDate,
         date: modifiedDate,
         tags: cleanedTags,
@@ -366,6 +369,9 @@ function collectValidSlugs(dir: string) {
     if (stat.isDirectory()) {
       collectValidSlugs(fullPath);
     } else if (path.extname(file).toLowerCase() === ".md") {
+      if (file.toLowerCase() === "index.md") {
+        continue;
+      }
       const destFileName = file.replace(
         /^(\p{Emoji_Presentation}|\p{Emoji}\uFE0F|\s)+/gu,
         ""
@@ -484,7 +490,6 @@ const projects = projectPages.map((page) => {
     projectTags.push(page.category);
   }
 
-  const mainProjectType = projectTags[0] || "project";
   const derivedArtist =
     page.artist ||
     page.tags
@@ -500,6 +505,10 @@ const projects = projectPages.map((page) => {
       .getFullYear()
       .toString();
 
+  const derivedGenre =
+    page.genre ||
+    page.tags?.find((tag) => tag.startsWith("genre/"))?.replace("genre/", "");
+
   return {
     id: slug,
     title: page.title,
@@ -507,7 +516,7 @@ const projects = projectPages.map((page) => {
     fallbackCover: `/project-covers/${slug}.png`,
     artist: derivedArtist,
     year: resolvedYear,
-    genre: mainProjectType.charAt(0).toUpperCase() + mainProjectType.slice(1),
+    genre: derivedGenre,
     project_tags: projectTags,
     tagline: page.tagline ?? null,
     url: page.url ?? null,

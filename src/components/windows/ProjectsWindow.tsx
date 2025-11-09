@@ -129,6 +129,16 @@ const ProjectImage: React.FC<{
   );
 };
 
+const DetailImage: React.FC<React.ImgHTMLAttributes<HTMLImageElement>> = ({
+  className = "",
+  ...props
+}) => (
+  <img
+    {...props}
+    className={`mx-auto my-4 w-full max-w-[220px] sm:max-w-[260px] lg:max-w-[320px] max-h-[220px] sm:max-h-[260px] rounded-lg shadow-lg border border-gray-700 object-contain ${className}`}
+  />
+);
+
 export const ProjectsWindow: React.FC<ProjectWindowProps> = ({
   id,
   title,
@@ -461,7 +471,7 @@ export const ProjectsWindow: React.FC<ProjectWindowProps> = ({
                         {project.title}
                       </div>
                       <div className="text-zinc-300 text-xs truncate">
-                        {project.genre} • {project.year}
+                        {project.artist} • {project.year}
                       </div>
                       {project.tagline && (
                         <div className="text-zinc-400 text-xs mt-1 line-clamp-2">
@@ -508,7 +518,7 @@ export const ProjectsWindow: React.FC<ProjectWindowProps> = ({
                 </div>
               ) : projectContent?.source ? (
                 <article className="w-full max-w-full overflow-visible">
-                  <div className="text-[#eef2ff] leading-relaxed tracking-[0.3px] font-mono prose prose-invert prose-headings:text-[#FF4800] prose-h1:text-2xl prose-h1:border-b prose-h1:border-[#FF4800]/30 prose-h1:pb-1 prose-h1:mt-4 prose-h1:mb-2 prose-h2:text-xl prose-h2:mt-4 prose-h2:mb-2 prose-h3:text-lg prose-h3:mt-4 prose-h3:mb-2 prose-p:text-sm prose-p:mb-3 prose-a:text-[#00FFFF] prose-a:no-underline prose-a:border-b prose-a:border-dotted prose-a:border-[#00FFFF] hover:prose-a:text-white hover:prose-a:border-white prose-ul:ml-4 prose-ul:mb-3 prose-ul:text-sm prose-ol:ml-4 prose-ol:mb-3 prose-ol:text-sm prose-li:mb-1 prose-code:bg-black/30 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:text-sm prose-pre:bg-black/50 prose-pre:p-4 prose-pre:rounded prose-pre:border-l-2 prose-pre:border-[#00FFFF] prose-pre:overflow-x-auto prose-blockquote:border-l-4 prose-blockquote:border-[#00FFFF] prose-blockquote:pl-4 prose-blockquote:py-1 prose-blockquote:my-3 prose-blockquote:italic prose-blockquote:text-gray-400 prose-blockquote:bg-black/20 prose-img:border prose-img:border-gray-700 prose-img:my-3 prose-img:max-w-full prose-img:h-auto prose-table:w-full prose-table:border-collapse prose-table:mb-3 prose-th:border prose-th:border-gray-700 prose-th:p-2 prose-th:text-left prose-th:bg-black/50 prose-th:text-[#FF4800] prose-td:border prose-td:border-gray-700 prose-td:p-2 prose-sm prose-img:object-contain">
+                  <div className="text-[#eef2ff] leading-relaxed tracking-[0.3px] font-mono prose prose-invert prose-headings:text-[#FF4800] prose-h1:text-2xl prose-h1:border-b prose-h1:border-[#FF4800]/30 prose-h1:pb-1 prose-h1:mt-4 prose-h1:mb-2 prose-h2:text-xl prose-h2:mt-4 prose-h2:mb-2 prose-h3:text-lg prose-h3:mt-4 prose-h3:mb-2 prose-p:text-sm prose-p:mb-3 prose-a:text-[#00FFFF] prose-a:no-underline prose-a:border-b prose-a:border-dotted prose-a:border-[#00FFFF] hover:prose-a:text-white hover:prose-a:border-white prose-ul:ml-4 prose-ul:mb-3 prose-ul:text-sm prose-ol:ml-4 prose-ol:mb-3 prose-ol:text-sm prose-li:mb-1 prose-code:bg-black/30 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:text-sm prose-pre:bg-black/50 prose-pre:p-4 prose-pre:rounded prose-pre:border-l-2 prose-pre:border-[#00FFFF] prose-pre:overflow-x-auto prose-blockquote:border-l-4 prose-blockquote:border-[#00FFFF] prose-blockquote:pl-4 prose-blockquote:py-1 prose-blockquote:my-3 prose-blockquote:italic prose-blockquote:text-gray-400 prose-blockquote:bg-black/20 prose-table:w-full prose-table:border-collapse prose-table:mb-3 prose-th:border prose-th:border-gray-700 prose-th:p-2 prose-th:text-left prose-th:bg-black/50 prose-th:text-[#FF4800] prose-td:border prose-td:border-gray-700 prose-td:p-2 prose-sm">
                     <MDXRemote
                       {...(projectContent.source as MDXRemoteSerializeResult)}
                       components={{
@@ -549,6 +559,15 @@ export const ProjectsWindow: React.FC<ProjectWindowProps> = ({
                             </a>
                           );
                         },
+                        img: ({
+                          className,
+                          ...imgProps
+                        }: React.ImgHTMLAttributes<HTMLImageElement>) => (
+                          <DetailImage
+                            {...imgProps}
+                            className={className ? className : ""}
+                          />
+                        ),
                       }}
                     />
                   </div>

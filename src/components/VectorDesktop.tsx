@@ -304,27 +304,37 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({
             320,
             viewportWidth - desktopWindowStartX - rightMargin
           );
-          const maxUsableHeight = Math.min(
-            viewportHeight - actionBarHeight - 2 * margin,
-            viewportHeight - margin
+          const maxUsableHeight = Math.max(
+            360,
+            viewportHeight - actionBarHeight - 2 * margin
           );
 
-          if (icon.id === "projects" || icon.id === "wiki") {
+          if (icon.id === "projects" || icon.id === "wiki" || icon.id === "about") {
             windowWidth = availableWidth;
+            windowHeight = maxUsableHeight;
           } else if (icon.id === "terminal") {
             windowWidth = Math.max(320, Math.min(480, availableWidth * 0.6));
+            windowHeight = Math.min(maxUsableHeight, 600);
           } else {
             windowWidth = Math.min(800, availableWidth * 0.9);
+            windowHeight = maxUsableHeight;
           }
-          windowHeight = Math.min(700, maxUsableHeight);
         } else {
           // Mobile: full width
           windowX = margin;
           windowWidth = viewportWidth - 2 * margin;
-          windowHeight = Math.min(
-            650,
+          const maxUsableHeight = Math.max(
+            360,
             viewportHeight - actionBarHeight - 2 * margin
           );
+
+          if (icon.id === "projects" || icon.id === "wiki" || icon.id === "about") {
+            windowHeight = maxUsableHeight;
+          } else if (icon.id === "terminal") {
+            windowHeight = Math.min(maxUsableHeight, 520);
+          } else {
+            windowHeight = Math.min(maxUsableHeight, 600);
+          }
         }
       }
 
@@ -1073,6 +1083,10 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape" && windows.length > 0) {
+        const activeEl = document.activeElement as HTMLElement | null;
+        if (activeEl?.tagName === "IFRAME") {
+          return;
+        }
         // Find the window with the highest z-index (active window)
         const activeWindow = windows.reduce((prev, current) =>
           current.zIndex > prev.zIndex ? current : prev

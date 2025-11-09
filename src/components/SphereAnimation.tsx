@@ -606,10 +606,10 @@ export const SphereAnimation = forwardRef<
       ref={containerRef}
       className={`relative w-full h-full flex items-center justify-center ${className}`}
     >
-      {/* Canvas container with higher z-index but no pointer events */}
+      {/* Canvas container sits behind desktop windows */}
       <div
         ref={canvasContainerRef}
-        className="absolute inset-0 z-[18] pointer-events-none"
+        className="absolute inset-0 z-0 pointer-events-none"
       />
     </div>
   );
