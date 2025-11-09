@@ -4,7 +4,7 @@ export default function AboutPage() {
   return (
     <div className="w-full px-4 md:px-8 lg:px-16 py-8 text-[#00FFFF] font-mono">
       {/* About Content */}
-      <div className="border border-[#00FFFF] p-6 mb-8">
+      <div className="border border-[#00FFFF] bg-black/40 p-6 mb-8">
         <AboutContent />
       </div>
 
