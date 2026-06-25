@@ -35,16 +35,16 @@ export default function Header() {
   };
 
   return (
-    <header className="w-full p-2.5 flex justify-between items-center h-20 border border-gray-700 bg-black/50">
+    <header className="w-full p-2.5 flex justify-between items-center h-20 border border-[color:var(--palette-border-soft)] bg-[color:var(--palette-surface-muted)] backdrop-blur">
       <div className="flex items-center">
         <Link href="/" onClick={handleClick}>
-          <div className="text-[#FF4800] font-bold text-2xl flex items-center before:content-[''] before:inline-block before:w-0 before:h-0 before:border-l-[10px] before:border-l-transparent before:border-r-[10px] before:border-r-transparent before:border-b-[20px] before:border-b-[#FF4800] before:mr-2.5 hover:text-[#ff6a33] transition-colors cursor-pointer">
+          <div className="text-warm font-bold text-2xl flex items-center before:content-[''] before:inline-block before:w-0 before:h-0 before:border-l-[10px] before:border-l-transparent before:border-r-[10px] before:border-r-transparent before:border-b-[20px] before:border-b-[color:var(--palette-warm)] before:mr-2.5 hover:text-foreground transition-colors cursor-pointer">
             JMILL
           </div>
         </Link>
       </div>
       <div className="flex items-center gap-4">
-        <div className="text-white">{time}</div>
+        <div className="text-foreground">{time}</div>
       </div>
     </header>
   );

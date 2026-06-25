@@ -69,6 +69,10 @@ export default function Home() {
 
   return (
     <div className="w-full h-full relative">
+      <div className="login-atmosphere" aria-hidden="true">
+        <div className="login-atmosphere__vignette" />
+        <div className="login-atmosphere__grid" />
+      </div>
       <div className="absolute inset-0">
         <SphereAnimation
           key={sphereResetKey}
@@ -86,7 +90,7 @@ export default function Home() {
         <Button
           variant="secondary"
           onClick={handleLoginClick}
-          className={`!border-[#00FFFF] !text-[#00FFFF] transition-opacity duration-500 ${
+          className={`!border-[color:var(--palette-border)] !text-[color:var(--palette-accent)] transition-opacity duration-500 ${
             buttonClicked ? "opacity-0 pointer-events-none" : "opacity-100"
           }`}
         >

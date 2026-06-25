@@ -147,8 +147,8 @@ export default function CommandLine({ onInvalidCommand, onOpenWikiWindow }: Comm
       <div ref={historyRef} className="flex-1 overflow-auto mb-4 space-y-2">
         {history.map((entry, index) => (
           <div key={index} className="text-sm">
-            <div className="text-[#FF4800]">CMD&gt; <span className="text-[#00FFFF]">{entry.command}</span></div>
-            <div className="text-[#00FFFF] whitespace-pre-wrap pl-6">{entry.response}</div>
+            <div className="text-warm">CMD&gt; <span className="text-accent">{entry.command}</span></div>
+            <div className="text-accent whitespace-pre-wrap pl-6">{entry.response}</div>
           </div>
         ))}
       </div>
@@ -165,11 +165,11 @@ export default function CommandLine({ onInvalidCommand, onOpenWikiWindow }: Comm
             }
           }}
         >
-          <span className="text-[#FF4800] mr-2.5">CMD&gt;</span>
+          <span className="text-warm mr-2.5">CMD&gt;</span>
           <input
             ref={inputRef}
             type="text"
-            className="flex-1 bg-transparent text-[#00FFFF] font-mono text-base outline-none border border-transparent transition-colors duration-200 placeholder-[#00FFFF]/50"
+            className="flex-1 bg-transparent text-accent font-mono text-base outline-none border border-transparent transition-colors duration-200 placeholder-[color:var(--palette-accent-muted)]"
             placeholder=""
             value={input}
             onChange={(e) => setInput(e.target.value)}

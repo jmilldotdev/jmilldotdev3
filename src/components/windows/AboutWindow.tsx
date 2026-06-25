@@ -14,9 +14,9 @@ interface AboutWindowProps {
   isMaximized: boolean;
   zIndex: number;
   onClose: () => void;
-  onToggleMaximize: () => void;
   onMouseDown: (e: React.MouseEvent) => void;
   onResizeStart: (e: React.MouseEvent, windowId: string) => void;
+  isClosing?: boolean;
 }
 
 export const AboutWindow: React.FC<AboutWindowProps> = ({
@@ -28,10 +28,9 @@ export const AboutWindow: React.FC<AboutWindowProps> = ({
   height,
   isMaximized,
   zIndex,
-  onClose,
-  onToggleMaximize,
-  onMouseDown,
+  onClose,  onMouseDown,
   onResizeStart,
+  isClosing = false,
 }) => {
   return (
     <BaseWindow
@@ -48,16 +47,16 @@ export const AboutWindow: React.FC<AboutWindowProps> = ({
       isMaximized={isMaximized}
       zIndex={zIndex}
       onClose={onClose}
-      onToggleMaximize={onToggleMaximize}
       onMouseDown={onMouseDown}
       onResizeStart={onResizeStart}
+      isClosing={isClosing}
       data-window="true"
     >
-      <div className="p-6 text-[#00FFFF] font-mono">
+      <div className="p-6 text-accent font-mono">
         <AboutContent />
 
         {/* System Specs */}
-        <div className="space-y-3 border-t border-[#00FFFF] border-opacity-30 pt-4 mt-6">
+        <div className="space-y-3 border-t border-[color:var(--palette-border-soft)] pt-4 mt-6">
           <h2 className="text-md font-semibold">SYSTEM SPECIFICATIONS:</h2>
           <ul className="space-y-1 text-sm pl-2">
             <li>
@@ -77,7 +76,7 @@ export const AboutWindow: React.FC<AboutWindowProps> = ({
               Entanglement Enabled
             </li>
           </ul>
-          <div className="mt-4 pt-2 border-t border-[#00FFFF] border-opacity-20">
+          <div className="mt-4 pt-2 border-t border-[color:var(--palette-border-soft)]">
             <p className="text-sm font-semibold">
               STATUS: <span className="text-green-400">OPERATIONAL</span>
             </p>

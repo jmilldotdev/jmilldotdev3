@@ -5,8 +5,8 @@ import * as THREE from "three";
 export interface SphereShatterOptions {
   position?: THREE.Vector3;
   scale?: number;
-  wireframeColor?: number;
-  innerColor?: number;
+  wireframeColor?: THREE.ColorRepresentation;
+  innerColor?: THREE.ColorRepresentation;
   wireframeOpacity?: number;
   innerOpacity?: number;
   fragmentCount?: number;
@@ -24,6 +24,25 @@ export interface SphereShatterEmitter {
   trigger: (options?: SphereShatterOptions) => void;
   cleanup: () => void;
 }
+
+const getCurrentPaletteColors = () => {
+  if (typeof window === "undefined") {
+    return {
+      accent: new THREE.Color("#00ffff"),
+      warm: new THREE.Color("#ff4800"),
+    };
+  }
+
+  const styles = getComputedStyle(document.documentElement);
+  return {
+    accent: new THREE.Color().setStyle(
+      styles.getPropertyValue("--palette-accent").trim() || "#00ffff"
+    ),
+    warm: new THREE.Color().setStyle(
+      styles.getPropertyValue("--palette-warm").trim() || "#ff4800"
+    ),
+  };
+};
 
 // Hook version for use in React components
 export const useSphereShatter = (scene: THREE.Scene | null): SphereShatterEmitter => {
@@ -45,8 +64,8 @@ export const createSphereShatterEmitter = (scene: THREE.Scene): SphereShatterEmi
     const {
       position = new THREE.Vector3(0, 0, 0),
       scale = 1,
-      wireframeColor = 0x00ffff,
-      innerColor = 0xff4800,
+      wireframeColor,
+      innerColor,
       wireframeOpacity = 0.7,
       innerOpacity = 0.4,
       fragmentCount = 16,
@@ -59,6 +78,9 @@ export const createSphereShatterEmitter = (scene: THREE.Scene): SphereShatterEmi
       pulseIntensity = 0.005,
       shakeDuration = 400,
     } = options;
+    const paletteColors = getCurrentPaletteColors();
+    const resolvedWireframeColor = wireframeColor ?? paletteColors.accent;
+    const resolvedInnerColor = innerColor ?? paletteColors.warm;
 
     // Create temporary sphere group for the effect
     const sphereGroup = new THREE.Group();
@@ -69,7 +91,7 @@ export const createSphereShatterEmitter = (scene: THREE.Scene): SphereShatterEmi
     const outerGeometry = new THREE.SphereGeometry(2, 32, 32);
     const outerWireframe = new THREE.WireframeGeometry(outerGeometry);
     const outerMaterial = new THREE.LineBasicMaterial({
-      color: wireframeColor,
+      color: resolvedWireframeColor,
       transparent: true,
       opacity: wireframeOpacity,
     });
@@ -79,7 +101,7 @@ export const createSphereShatterEmitter = (scene: THREE.Scene): SphereShatterEmi
     const innerGeometry = new THREE.SphereGeometry(1.2, 32, 32);
     const innerWireframe = new THREE.WireframeGeometry(innerGeometry);
     const innerMaterial = new THREE.LineBasicMaterial({
-      color: innerColor,
+      color: resolvedInnerColor,
       transparent: true,
       opacity: innerOpacity,
     });
@@ -125,7 +147,7 @@ export const createSphereShatterEmitter = (scene: THREE.Scene): SphereShatterEmi
       // Create outer wireframe fragments
       const outerFragments = createWireframeFragments(
         outerWireframe,
-        wireframeColor,
+        resolvedWireframeColor,
         wireframeOpacity,
         fragmentCount,
         velocity,
@@ -137,7 +159,7 @@ export const createSphereShatterEmitter = (scene: THREE.Scene): SphereShatterEmi
       // Create inner wireframe fragments
       const innerFragments = createWireframeFragments(
         innerWireframe,
-        innerColor,
+        resolvedInnerColor,
         innerOpacity,
         innerFragmentCount,
         innerVelocity,
@@ -208,7 +230,7 @@ export const createSphereShatterEmitter = (scene: THREE.Scene): SphereShatterEmi
 
 function createWireframeFragments(
   wireframeGeometry: THREE.WireframeGeometry,
-  color: number,
+  color: THREE.ColorRepresentation,
   opacity: number,
   fragmentCount: number,
   velocityScale: number,

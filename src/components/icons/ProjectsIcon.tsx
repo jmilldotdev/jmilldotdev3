@@ -11,7 +11,7 @@ export const ProjectsIcon: React.FC<ProjectsIconProps> = ({
   className = "",
   width = 48,
   height = 48,
-  color = "#00FFFF",
+  color = "var(--palette-accent)",
 }) => {
   return (
     <svg

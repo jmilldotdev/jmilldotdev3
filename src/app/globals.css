@@ -1,10 +1,30 @@
 @import "tailwindcss";
 
 :root {
-  --background: #000000;
-  --foreground: #FFFFFF;
-  --color-primary: #FF4800;
-  --color-secondary: #00FFFF;
+  /* Palette defaults - overwritten by PaletteManager */
+  --palette-accent: #00FFFF;
+  --palette-accent-muted: rgba(0, 255, 255, 0.72);
+  --palette-accent-soft: rgba(0, 255, 255, 0.18);
+  --palette-background: #01050D;
+  --palette-surface: rgba(0, 6, 16, 0.92);
+  --palette-surface-muted: rgba(0, 12, 24, 0.78);
+  --palette-border: #00FFFF;
+  --palette-border-soft: var(--palette-accent-soft);
+  --palette-text: #E6FFFF;
+  --palette-muted-text: rgba(230, 255, 255, 0.72);
+  --palette-warm: #FF4800;
+  --palette-warm-soft: rgba(255, 72, 0, 0.18);
+  --palette-glow: 0 0 16px rgba(0, 255, 255, 0.28);
+  --palette-preview: linear-gradient(
+    135deg,
+    rgba(0, 255, 255, 0.18) 0%,
+    rgba(0, 255, 255, 0.05) 100%
+  );
+
+  --background: var(--palette-background);
+  --foreground: var(--palette-text);
+  --color-primary: var(--palette-warm);
+  --color-secondary: var(--palette-accent);
 }
 
 @theme inline {
@@ -16,8 +36,8 @@
 
 /* Core body styles and CRT effects that can't be easily replicated with Tailwind */
 body {
-  background-color: #000000;
-  color: #FFFFFF;
+  background-color: var(--palette-background);
+  color: var(--palette-text);
   font-family: 'Courier New', monospace;
   position: relative;
 }
@@ -57,4 +77,261 @@ body::after {
 /* Custom animation for reverse spinning */
 .animate-reverse {
   animation-direction: reverse;
+}
+
+/* Palette helpers */
+.text-accent {
+  color: var(--palette-accent);
+}
+
+.text-accent-muted {
+  color: var(--palette-accent-muted);
+}
+
+.text-foreground {
+  color: var(--palette-text);
+}
+
+.text-muted {
+  color: var(--palette-muted-text);
+}
+
+.text-warm {
+  color: var(--palette-warm);
+}
+
+.border-accent {
+  border-color: var(--palette-border);
+}
+
+.bg-surface {
+  background-color: var(--palette-surface);
+}
+
+.bg-surface-muted {
+  background-color: var(--palette-surface-muted);
+}
+
+.bg-accent-soft {
+  background: var(--palette-accent-soft);
+}
+
+.shadow-accent-glow {
+  box-shadow: var(--palette-glow);
+}
+
+.login-atmosphere,
+.desktop-atmosphere {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.login-atmosphere {
+  z-index: 2;
+}
+
+.login-atmosphere__vignette {
+  position: absolute;
+  inset: -18%;
+  background:
+    radial-gradient(circle at 50% 46%, transparent 0 18%, rgba(1, 5, 13, 0.38) 46%, rgba(1, 5, 13, 0.84) 78%),
+    radial-gradient(circle at 30% 24%, color-mix(in srgb, var(--palette-accent) 8%, transparent), transparent 24%),
+    radial-gradient(circle at 72% 64%, color-mix(in srgb, var(--palette-warm) 8%, transparent), transparent 26%);
+}
+
+.login-atmosphere__grid,
+.desktop-atmosphere__field {
+  position: absolute;
+  inset: 0;
+  opacity: 0.42;
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--palette-accent) 9%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--palette-accent) 8%, transparent) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(circle at 50% 46%, transparent 0 13rem, rgba(0, 0, 0, 0.88) 23rem, transparent 45rem);
+  animation: atmosphere-grid-drift 28s linear infinite;
+}
+
+.desktop-atmosphere {
+  z-index: 4;
+  background: transparent;
+}
+
+.desktop-atmosphere__field {
+  z-index: 1;
+  opacity: 0.24;
+  background-size: 42px 42px;
+  mask-image: linear-gradient(90deg, transparent 0, rgba(0, 0, 0, 0.9) 18%, rgba(0, 0, 0, 0.8) 72%, transparent 100%);
+}
+
+.desktop-lava-lamp {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  contain: strict;
+}
+
+.desktop-lava-lamp__canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  opacity: 0;
+  mix-blend-mode: screen;
+  animation: desktop-lava-canvas-fade-in 1800ms ease-out 480ms forwards;
+}
+
+.desktop-lava-lamp__stars {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  opacity: 0;
+  animation: desktop-lava-stars-fade-in 1400ms ease-out 620ms forwards;
+}
+
+.desktop-lava-lamp__star {
+  position: absolute;
+  color: var(--palette-accent);
+  border: 1px solid currentColor;
+  background: color-mix(in srgb, currentColor 18%, transparent);
+  opacity: var(--star-opacity);
+  transform: translate3d(0, 0, 0) scale(0.88);
+  animation: desktop-lava-star-pulse var(--star-duration) ease-in-out var(--star-delay) infinite;
+  box-shadow: 0 0 8px color-mix(in srgb, currentColor 32%, transparent);
+}
+
+.desktop-lava-lamp__star::before,
+.desktop-lava-lamp__star::after {
+  content: "";
+  position: absolute;
+  inset: 50%;
+  width: 14px;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.22;
+  transform: translate(-50%, -50%);
+}
+
+.desktop-lava-lamp__star::after {
+  width: 1px;
+  height: 14px;
+}
+
+.desktop-lava-lamp__star--accent {
+  color: var(--palette-accent);
+}
+
+.desktop-lava-lamp__star--muted {
+  color: var(--palette-muted-text);
+}
+
+.desktop-lava-lamp__star--warm {
+  color: var(--palette-warm);
+}
+
+.desktop-lava-lamp__perf {
+  position: absolute;
+  z-index: 3;
+  right: 8px;
+  bottom: 8px;
+  padding: 3px 6px;
+  border: 1px solid color-mix(in srgb, var(--palette-accent) 30%, transparent);
+  background: color-mix(in srgb, var(--palette-background) 82%, transparent);
+  color: var(--palette-muted-text);
+  font-family: var(--font-mono), "Courier New", monospace;
+  font-size: 10px;
+  line-height: 1.2;
+  letter-spacing: 0;
+  opacity: 0.72;
+}
+
+.window-container {
+  animation: window-open 260ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  transform-origin: 28px 18px;
+}
+
+.window-container-closing {
+  animation: window-close 260ms cubic-bezier(0.4, 0, 1, 1) both;
+  pointer-events: none;
+}
+
+@keyframes window-open {
+  from {
+    opacity: 0;
+    transform: translate3d(-8px, -8px, 0) scale(0.985);
+    filter: brightness(1.35);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+    filter: brightness(1);
+  }
+}
+
+@keyframes window-close {
+  from {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+    filter: brightness(1);
+  }
+  to {
+    opacity: 0;
+    transform: translate3d(-8px, -8px, 0) scale(0.985);
+    filter: brightness(1.35);
+  }
+}
+
+@keyframes atmosphere-grid-drift {
+  from {
+    background-position: 0 0, 0 0;
+  }
+  to {
+    background-position: 48px 96px, 48px 96px;
+  }
+}
+
+@keyframes desktop-lava-canvas-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 0.46;
+  }
+}
+
+@keyframes desktop-lava-stars-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes desktop-lava-star-pulse {
+  0%,
+  100% {
+    opacity: calc(var(--star-opacity) * 0.42);
+    transform: translate3d(0, 0, 0) scale(0.78);
+  }
+  50% {
+    opacity: var(--star-opacity);
+    transform: translate3d(0, 0, 0) scale(1.08);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .window-container,
+  .window-container-closing {
+    animation-duration: 1ms;
+  }
+
+  .login-atmosphere *,
+  .desktop-atmosphere * {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+  }
 }

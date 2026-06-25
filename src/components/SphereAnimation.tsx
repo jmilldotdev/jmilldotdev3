@@ -1,7 +1,14 @@
 "use client";
 
-import { useEffect, useRef, forwardRef, useImperativeHandle } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  forwardRef,
+  useImperativeHandle,
+} from "react";
 import * as THREE from "three";
+import { usePalette } from "@/contexts/PaletteContext";
 
 interface SphereAnimationProps {
   className?: string;
@@ -16,6 +23,7 @@ export const SphereAnimation = forwardRef<
   SphereAnimationRef,
   SphereAnimationProps
 >(({ className = "", onShatter }, ref) => {
+  const { palette } = usePalette();
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasContainerRef = useRef<HTMLDivElement>(null);
   const sceneRef = useRef<THREE.Scene | null>(null);
@@ -26,6 +34,49 @@ export const SphereAnimation = forwardRef<
   const wireframeFragmentsRef = useRef<THREE.LineSegments[]>([]);
   const redFragmentsRef = useRef<THREE.LineSegments[]>([]);
   const isShatteredRef = useRef(false);
+  const targetSphereScaleRef = useRef(1);
+  const paletteColorsRef = useRef({
+    accent: new THREE.Color(palette.accent),
+    warm: new THREE.Color(palette.warm),
+  });
+  const lineMaterialRef = useRef<THREE.LineBasicMaterial | null>(null);
+  const redLineMaterialRef = useRef<THREE.LineBasicMaterial | null>(null);
+  const blueLightRef = useRef<THREE.PointLight | null>(null);
+
+  useEffect(() => {
+    paletteColorsRef.current.accent.set(palette.accent);
+    paletteColorsRef.current.warm.set(palette.warm);
+    lineMaterialRef.current?.color.copy(paletteColorsRef.current.accent);
+    redLineMaterialRef.current?.color.copy(paletteColorsRef.current.warm);
+    blueLightRef.current?.color.copy(paletteColorsRef.current.accent);
+  }, [palette.accent, palette.warm]);
+
+  const getResponsiveSphereScale = useCallback(
+    (width: number, height: number, camera: THREE.PerspectiveCamera) => {
+      const visibleHeight =
+        2 *
+        Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) *
+        camera.position.z;
+      const visibleWidth = visibleHeight * (width / height);
+      const outerSphereDiameter = 4;
+      const widthFitScale = (visibleWidth * 0.86) / outerSphereDiameter;
+
+      return Math.min(1, widthFitScale);
+    },
+    []
+  );
+
+  const applyResponsiveSphereScale = useCallback(
+    (width: number, height: number, camera: THREE.PerspectiveCamera) => {
+      const scale = getResponsiveSphereScale(width, height, camera);
+      targetSphereScaleRef.current = scale;
+
+      if (sphereGroupRef.current && !isShatteredRef.current) {
+        sphereGroupRef.current.scale.setScalar(scale);
+      }
+    },
+    [getResponsiveSphereScale]
+  );
 
   const triggerShatter = () => {
     if (!isShatteredRef.current && sphereGroupRef.current && sceneRef.current) {
@@ -69,7 +120,9 @@ export const SphereAnimation = forwardRef<
         const pulseSpeed = 10 + progress * 15; // Slower pulse acceleration
         const pulse =
           1 + Math.sin(elapsed * pulseSpeed * 0.01) * pulseIntensity * progress;
-        sphereGroupRef.current.scale.set(pulse, pulse, pulse);
+        sphereGroupRef.current.scale.setScalar(
+          targetSphereScaleRef.current * pulse
+        );
 
         // Speed up rotation as it gets more unstable
         const rotationMultiplier = 1 + progress * 2;
@@ -80,7 +133,7 @@ export const SphereAnimation = forwardRef<
       } else {
         // Reset position and hide sphere
         sphereGroupRef.current.position.set(0, 0, 0);
-        sphereGroupRef.current.scale.set(1, 1, 1);
+        sphereGroupRef.current.scale.setScalar(targetSphereScaleRef.current);
         sphereGroupRef.current.visible = false;
       }
     };
@@ -216,12 +269,13 @@ export const SphereAnimation = forwardRef<
           );
 
           const material = new THREE.LineBasicMaterial({
-            color: 0x00ffff,
+            color: paletteColorsRef.current.accent,
             transparent: true,
             opacity: 0.7,
           });
 
           const fragment = new THREE.LineSegments(fragmentGeometry, material);
+          fragment.scale.setScalar(targetSphereScaleRef.current);
 
           // Position fragments with slight offset from center
           const theta = Math.random() * Math.PI * 2;
@@ -332,12 +386,13 @@ export const SphereAnimation = forwardRef<
           );
 
           const material = new THREE.LineBasicMaterial({
-            color: 0xff4800,
+            color: paletteColorsRef.current.warm,
             transparent: true,
             opacity: 0.4,
           });
 
           const fragment = new THREE.LineSegments(fragmentGeometry, material);
+          fragment.scale.setScalar(targetSphereScaleRef.current);
 
           // Position fragments with slight offset from center
           const theta = Math.random() * Math.PI * 2;
@@ -446,10 +501,14 @@ export const SphereAnimation = forwardRef<
     directionalLight.position.set(1, 1, 1);
     scene.add(directionalLight);
 
-    // Add blue point light for that A.T. field glow
-    const blueLight = new THREE.PointLight(0x00ffff, 0.5);
+    // Add point light for that A.T. field glow
+    const blueLight = new THREE.PointLight(
+      paletteColorsRef.current.accent,
+      0.5
+    );
     blueLight.position.set(-2, 1, 3);
     scene.add(blueLight);
+    blueLightRef.current = blueLight;
 
     // Create sphere geometry
     const geometry = new THREE.SphereGeometry(2, 32, 32);
@@ -457,20 +516,22 @@ export const SphereAnimation = forwardRef<
     // Create wireframe geometry
     const wireframe = new THREE.WireframeGeometry(geometry);
     const lineMaterial = new THREE.LineBasicMaterial({
-      color: 0x00ffff,
+      color: paletteColorsRef.current.accent,
       transparent: true,
       opacity: 0.4,
     });
+    lineMaterialRef.current = lineMaterial;
     const wireframeMesh = new THREE.LineSegments(wireframe, lineMaterial);
 
     // Create red inner wireframe sphere
     const redSphereGeometry = new THREE.SphereGeometry(1.2, 32, 32);
     const redWireframe = new THREE.WireframeGeometry(redSphereGeometry);
     const redLineMaterial = new THREE.LineBasicMaterial({
-      color: 0xff4800,
+      color: paletteColorsRef.current.warm,
       transparent: true,
       opacity: 0.3,
     });
+    redLineMaterialRef.current = redLineMaterial;
     const redSphere = new THREE.LineSegments(redWireframe, redLineMaterial);
     redSphereRef.current = redSphere;
 
@@ -480,6 +541,7 @@ export const SphereAnimation = forwardRef<
     sphereGroup.add(redSphere);
     scene.add(sphereGroup);
     sphereGroupRef.current = sphereGroup;
+    applyResponsiveSphereScale(width, height, camera);
 
     // Animation loop
     function animate() {
@@ -582,6 +644,7 @@ export const SphereAnimation = forwardRef<
 
       cameraRef.current.aspect = newWidth / newHeight;
       cameraRef.current.updateProjectionMatrix();
+      applyResponsiveSphereScale(newWidth, newHeight, cameraRef.current);
       rendererRef.current.setSize(newWidth, newHeight);
     };
 
@@ -598,7 +661,7 @@ export const SphereAnimation = forwardRef<
       }
       scene.clear();
     };
-  }, []);
+  }, [applyResponsiveSphereScale]);
 
   return (
     <div

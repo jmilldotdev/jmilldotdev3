@@ -20,9 +20,12 @@ import { AchievementPopup } from "./AchievementPopup";
 import { AboutWindow } from "./windows/AboutWindow";
 import { TerminalWindow } from "./windows/TerminalWindow";
 import { ProjectsWindow } from "./windows/ProjectsWindow";
+import { SettingsWindow } from "./windows/SettingsWindow";
 import { DesktopIcon, DESKTOP_ICON_DIMENSIONS } from "./DesktopIcon";
 import { Achievement, unlockAchievement } from "@/lib/achievements";
 import { ACHIEVEMENTS_ENABLED } from "@/config";
+import { SettingsIcon } from "./icons/SettingsIcon";
+import DesktopLavaLamp from "./DesktopLavaLamp";
 
 interface Window {
   id: string;
@@ -35,6 +38,7 @@ interface Window {
   isMaximized: boolean;
   zIndex: number;
   type?: string;
+  isClosing?: boolean;
 }
 
 interface DesktopIcon {
@@ -53,6 +57,8 @@ interface VectorDesktopProps {
   currentAchievement?: Achievement | null;
   onAchievementClose?: () => void;
 }
+
+const WINDOW_ANIMATION_MS = 260;
 
 export const VectorDesktop: React.FC<VectorDesktopProps> = ({
   isVisible,
@@ -219,6 +225,14 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({
         content: "PROJECTS_WINDOW",
         icon: <ProjectsIcon />,
       },
+      {
+        id: "settings",
+        name: "CONFIG.INI",
+        gridX: 0,
+        gridY: 6,
+        content: "SETTINGS_WINDOW",
+        icon: <SettingsIcon />,
+      },
     ];
 
     // Filter out achievements icon if achievements are disabled
@@ -227,8 +241,23 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({
     );
   }, []);
 
+  const starExclusionRects = useMemo(
+    () =>
+      desktopIcons.map((icon) => {
+        const position = getIconPosition(icon);
+
+        return {
+          x: position.x,
+          y: position.y,
+          width: DESKTOP_ICON_DIMENSIONS.width,
+          height: DESKTOP_ICON_DIMENSIONS.height,
+        };
+      }),
+    [desktopIcons, getIconPosition]
+  );
+
   const createWindow = useCallback(
-    (icon: DesktopIcon) => {
+    (icon: DesktopIcon, options?: { singleInstance?: boolean }) => {
       const container = document.querySelector("main");
       const viewportWidth = container
         ? container.clientWidth
@@ -237,8 +266,7 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({
         ? container.clientHeight
         : window.innerHeight;
 
-      const actionBarHeight = 60;
-      const margin = 10;
+      const margin = viewportWidth < 768 ? 8 : 10;
       const iconColumnWidth = 120; // Leave space for desktop icons
       const rightMargin = 20;
       const desktopWindowStartX = iconColumnWidth + margin;
@@ -250,21 +278,33 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({
 
       // Jazz window gets random positioning and fixed size
       if (icon.id === "jazz") {
-        windowWidth = 450;
-        windowHeight = 380;
+        windowWidth =
+          viewportWidth < 768 ? viewportWidth - 2 * margin : 450;
+        windowHeight =
+          viewportWidth < 768
+            ? Math.min(Math.max(280, viewportHeight - 2 * margin), 380)
+            : 380;
 
-        // Random position within viewport
-        const maxX = Math.max(margin, viewportWidth - windowWidth - margin);
-        const maxY = Math.max(
-          margin,
-          viewportHeight - windowHeight - actionBarHeight - margin
-        );
+        if (viewportWidth < 768) {
+          windowX = margin;
+          windowY = margin;
+        } else {
+          // Random position within viewport
+          const maxX = Math.max(margin, viewportWidth - windowWidth - margin);
+          const maxY = Math.max(
+            margin,
+            viewportHeight - windowHeight - margin
+          );
 
-        windowX = margin + Math.random() * Math.max(0, maxX - margin);
-        windowY = margin + Math.random() * Math.max(0, maxY - margin);
+          windowX = margin + Math.random() * Math.max(0, maxX - margin);
+          windowY = margin + Math.random() * Math.max(0, maxY - margin);
+        }
       } else {
-        // Smart positioning and sizing for other windows
+        // Deterministic positioning and sizing for other windows.
+        // The desktop viewport is the app's <main>, so no page chrome is
+        // subtracted here.
         windowY = margin;
+        const maxUsableHeight = Math.max(260, viewportHeight - 2 * margin);
 
         if (viewportWidth >= 1024) {
           // Desktop: position after icon column with right margin
@@ -273,23 +313,19 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({
             360,
             viewportWidth - desktopWindowStartX - rightMargin
           );
-          const maxUsableHeight = Math.min(
-            viewportHeight - actionBarHeight - 2 * margin,
-            viewportHeight - margin
-          );
 
           if (icon.id === "projects" || icon.id === "wiki") {
             windowWidth = availableWidth;
-            windowHeight = Math.min(
-              icon.id === "projects" ? 920 : 880,
-              maxUsableHeight
-            );
+            windowHeight = maxUsableHeight;
           } else if (icon.id === "about") {
-            windowWidth = Math.min(1000, Math.max(600, availableWidth * 0.85));
+            windowWidth = availableWidth;
             windowHeight = maxUsableHeight;
           } else if (icon.id === "achievements") {
             windowWidth = Math.min(1100, Math.max(650, availableWidth * 0.85));
             windowHeight = Math.min(900, maxUsableHeight);
+          } else if (icon.id === "settings") {
+            windowWidth = Math.min(900, Math.max(560, availableWidth * 0.75));
+            windowHeight = Math.min(780, maxUsableHeight);
           } else if (icon.id === "terminal") {
             windowWidth = Math.max(360, Math.min(520, availableWidth * 0.45));
             windowHeight = Math.min(520, Math.max(320, maxUsableHeight * 0.7));
@@ -303,10 +339,6 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({
           const availableWidth = Math.max(
             320,
             viewportWidth - desktopWindowStartX - rightMargin
-          );
-          const maxUsableHeight = Math.max(
-            360,
-            viewportHeight - actionBarHeight - 2 * margin
           );
 
           if (icon.id === "projects" || icon.id === "wiki" || icon.id === "about") {
@@ -323,10 +355,6 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({
           // Mobile: full width
           windowX = margin;
           windowWidth = viewportWidth - 2 * margin;
-          const maxUsableHeight = Math.max(
-            360,
-            viewportHeight - actionBarHeight - 2 * margin
-          );
 
           if (icon.id === "projects" || icon.id === "wiki" || icon.id === "about") {
             windowHeight = maxUsableHeight;
@@ -348,6 +376,7 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({
         height: windowHeight,
         isMaximized: false,
         zIndex: nextZIndex,
+        isClosing: false,
         type:
           icon.id === "about"
             ? "about"
@@ -357,6 +386,8 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({
             ? "jazz"
             : icon.id === "achievements"
             ? "achievements"
+            : icon.id === "settings"
+            ? "settings"
             : icon.id === "terminal"
             ? "terminal"
             : icon.id === "projects"
@@ -364,7 +395,16 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({
             : "default",
       };
 
-      setWindows((prev) => [...prev, newWindow]);
+      setWindows((prev) => {
+        if (
+          options?.singleInstance &&
+          prev.some((w) => w.type === newWindow.type && !w.isClosing)
+        ) {
+          return prev;
+        }
+
+        return [...prev, newWindow];
+      });
       setNextZIndex((prev) => prev + 1);
 
       // Start animation for the corresponding icon
@@ -428,7 +468,14 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({
   const closeWindow = useCallback(
     (windowId: string) => {
       const windowToClose = windows.find((w) => w.id === windowId);
-      setWindows((prev) => prev.filter((w) => w.id !== windowId));
+      setWindows((prev) =>
+        prev.map((w) =>
+          w.id === windowId ? { ...w, isClosing: true } : w
+        )
+      );
+      setTimeout(() => {
+        setWindows((prev) => prev.filter((w) => w.id !== windowId));
+      }, WINDOW_ANIMATION_MS);
 
       // Stop animation for the corresponding icon if no more windows of this type are open
       if (windowToClose) {
@@ -480,14 +527,6 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({
     },
     [windows, desktopIcons]
   );
-
-  const toggleMaximize = (windowId: string) => {
-    setWindows((prev) =>
-      prev.map((w) =>
-        w.id === windowId ? { ...w, isMaximized: !w.isMaximized } : w
-      )
-    );
-  };
 
   const bringToFront = (windowId: string) => {
     setWindows((prev) =>
@@ -1114,6 +1153,11 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({
       onMouseUp={handleDesktopMouseUp}
       data-desktop-container
     >
+      <div className="desktop-atmosphere" aria-hidden="true">
+        <div className="desktop-atmosphere__field" />
+        <DesktopLavaLamp starExclusionRects={starExclusionRects} />
+      </div>
+
       {/* Desktop Icons */}
       {desktopIcons.map((icon) => {
         const position = getIconPosition(icon);
@@ -1151,9 +1195,9 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({
             isMaximized={window.isMaximized}
             zIndex={window.zIndex}
             onClose={() => closeWindow(window.id)}
-            onToggleMaximize={() => toggleMaximize(window.id)}
             onMouseDown={(e) => handleMouseDown(e, window.id)}
             onResizeStart={handleResizeStart}
+            isClosing={window.isClosing}
           />
         ) : window.type === "jazz" ? (
           <JazzWindow
@@ -1166,9 +1210,9 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({
             isMaximized={window.isMaximized}
             zIndex={window.zIndex}
             onClose={() => closeWindow(window.id)}
-            onToggleMaximize={() => toggleMaximize(window.id)}
             onMouseDown={(e) => handleMouseDown(e, window.id)}
             onResizeStart={handleResizeStart}
+            isClosing={window.isClosing}
           />
         ) : window.type === "wiki" ? (
           <WikiWindow
@@ -1176,7 +1220,6 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({
             id={window.id}
             onClose={() => closeWindow(window.id)}
             isMaximized={window.isMaximized}
-            onToggleMaximize={() => toggleMaximize(window.id)}
             x={window.x}
             y={window.y}
             width={window.width}
@@ -1184,6 +1227,7 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({
             zIndex={window.zIndex}
             onMouseDown={(e) => handleMouseDown(e, window.id)}
             onResizeStart={handleResizeStart}
+            isClosing={window.isClosing}
             initialSlug={
               window.content !==
               "WIKI SYSTEM ACCESS\n\nBrowse random pages from the knowledge base:\n\n• Projects & Creative Works\n• Concepts & Theories\n• Tools & Resources\n• Bookmarks & References\n\nClick 'RND' to load a random page\nContent rendered with MDX\nInteractive links enabled"
@@ -1198,7 +1242,6 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({
             title={window.title}
             onClose={() => closeWindow(window.id)}
             isMaximized={window.isMaximized}
-            onToggleMaximize={() => toggleMaximize(window.id)}
             x={window.x}
             y={window.y}
             width={window.width}
@@ -1206,6 +1249,23 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({
             zIndex={window.zIndex}
             onMouseDown={(e) => handleMouseDown(e, window.id)}
             onResizeStart={handleResizeStart}
+            isClosing={window.isClosing}
+          />
+        ) : window.type === "settings" ? (
+          <SettingsWindow
+            key={window.id}
+            id={window.id}
+            title={window.title}
+            onClose={() => closeWindow(window.id)}
+            isMaximized={window.isMaximized}
+            x={window.x}
+            y={window.y}
+            width={window.width}
+            height={window.height}
+            zIndex={window.zIndex}
+            onMouseDown={(e) => handleMouseDown(e, window.id)}
+            onResizeStart={handleResizeStart}
+            isClosing={window.isClosing}
           />
         ) : window.type === "terminal" ? (
           <TerminalWindow
@@ -1214,7 +1274,6 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({
             title={window.title}
             onClose={() => closeWindow(window.id)}
             isMaximized={window.isMaximized}
-            onToggleMaximize={() => toggleMaximize(window.id)}
             x={window.x}
             y={window.y}
             width={window.width}
@@ -1223,6 +1282,7 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({
             onMouseDown={(e) => handleMouseDown(e, window.id)}
             onResizeStart={handleResizeStart}
             onOpenWikiWindow={openWikiWindow}
+            isClosing={window.isClosing}
           />
         ) : window.type === "projects" ? (
           <ProjectsWindow
@@ -1231,7 +1291,6 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({
             title={window.title}
             onClose={() => closeWindow(window.id)}
             isMaximized={window.isMaximized}
-            onToggleMaximize={() => toggleMaximize(window.id)}
             x={window.x}
             y={window.y}
             width={window.width}
@@ -1239,6 +1298,7 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({
             zIndex={window.zIndex}
             onMouseDown={(e) => handleMouseDown(e, window.id)}
             onResizeStart={handleResizeStart}
+            isClosing={window.isClosing}
           />
         ) : (
           <BaseWindow
@@ -1252,13 +1312,13 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({
             isMaximized={window.isMaximized}
             zIndex={window.zIndex}
             onClose={() => closeWindow(window.id)}
-            onToggleMaximize={() => toggleMaximize(window.id)}
             onMouseDown={(e) => handleMouseDown(e, window.id)}
             onResizeStart={handleResizeStart}
+            isClosing={window.isClosing}
             data-window="true"
           >
             <div className="p-4 overflow-auto h-full">
-              <pre className="text-[#00FFFF] font-mono text-sm whitespace-pre-wrap leading-relaxed">
+              <pre className="text-accent font-mono text-sm whitespace-pre-wrap leading-relaxed">
                 {window.content}
               </pre>
             </div>

@@ -12,7 +12,6 @@ interface BaseWindowProps {
   isMaximized: boolean;
   zIndex: number;
   onClose: () => void;
-  onToggleMaximize: () => void;
   onMouseDown: (e: React.MouseEvent) => void;
   onResizeStart?: (e: React.MouseEvent, windowId: string) => void;
   children: React.ReactNode;
@@ -23,6 +22,7 @@ interface BaseWindowProps {
   maxWidth?: number;
   minHeight?: number;
   maxHeight?: number;
+  isClosing?: boolean;
 }
 
 export const BaseWindow: React.FC<BaseWindowProps> = ({
@@ -35,7 +35,6 @@ export const BaseWindow: React.FC<BaseWindowProps> = ({
   isMaximized,
   zIndex,
   onClose,
-  onToggleMaximize,
   onMouseDown,
   onResizeStart,
   children,
@@ -49,6 +48,7 @@ export const BaseWindow: React.FC<BaseWindowProps> = ({
   minHeight: _minHeight,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   maxHeight: _maxHeight,
+  isClosing = false,
   ...props
 }) => {
   const windowRef = useRef<HTMLDivElement>(null);
@@ -70,7 +70,9 @@ export const BaseWindow: React.FC<BaseWindowProps> = ({
   return (
     <div
       ref={windowRef}
-      className={`window-container absolute border-2 border-[#00FFFF] bg-black/95 backdrop-blur-sm ${
+      className={`window-container ${
+        isClosing ? "window-container-closing" : ""
+      } absolute border-2 border-accent bg-[color:var(--palette-surface)] backdrop-blur-sm ${
         isMaximized ? "inset-4" : ""
       } ${className}`}
       key={id}
@@ -79,21 +81,17 @@ export const BaseWindow: React.FC<BaseWindowProps> = ({
     >
       {/* Title Bar */}
       <div
-        className="flex items-center justify-between bg-[#00FFFF] bg-opacity-20 px-3 py-2 cursor-move"
+        className="flex items-center justify-between bg-accent-soft px-3 py-2 cursor-move border-b border-[color:var(--palette-border-soft)]"
         onMouseDown={!isMaximized ? onMouseDown : undefined}
       >
-        <span className="text-black font-mono text-sm font-bold">{title}</span>
+        <span className="text-foreground font-mono text-sm font-bold">
+          {title}
+        </span>
         <div className="flex gap-2 items-center">
           {titleBarButtons}
           <button
-            onClick={onToggleMaximize}
-            className="text-black hover:bg-black hover:text-[#00FFFF] w-6 h-6 border border-black text-xs font-mono transition-colors"
-          >
-            {isMaximized ? "□" : "■"}
-          </button>
-          <button
             onClick={onClose}
-            className="text-black hover:bg-black hover:text-[#00FFFF] w-6 h-6 border border-black text-xs font-mono transition-colors"
+            className="text-foreground hover:bg-[color:var(--palette-background)] hover:text-accent w-6 h-6 border border-[color:var(--palette-border-soft)] text-xs font-mono transition-colors bg-[color:var(--palette-accent-soft)]"
           >
             ×
           </button>
@@ -112,7 +110,7 @@ export const BaseWindow: React.FC<BaseWindowProps> = ({
           onMouseDown={(e) => onResizeStart(e, id)}
           style={{
             background:
-              "linear-gradient(-45deg, transparent 30%, #00FFFF 30%, #00FFFF 35%, transparent 35%, transparent 65%, #00FFFF 65%, #00FFFF 70%, transparent 70%)",
+              "linear-gradient(-45deg, transparent 30%, var(--palette-accent) 30%, var(--palette-accent) 35%, transparent 35%, transparent 65%, var(--palette-accent) 65%, var(--palette-accent) 70%, transparent 70%)",
           }}
         />
       )}

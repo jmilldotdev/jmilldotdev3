@@ -7,7 +7,6 @@ interface WikiWindowProps {
   id: string;
   onClose: () => void;
   isMaximized: boolean;
-  onToggleMaximize: () => void;
   x: number;
   y: number;
   width: number;
@@ -16,20 +15,20 @@ interface WikiWindowProps {
   onMouseDown: (e: React.MouseEvent) => void;
   onResizeStart?: (e: React.MouseEvent, windowId: string) => void;
   initialSlug?: string;
+  isClosing?: boolean;
 }
 
 export default function WikiWindow({
   id,
   onClose,
-  isMaximized,
-  onToggleMaximize,
-  x,
+  isMaximized,  x,
   y,
   width,
   height,
   zIndex,
   onMouseDown,
   onResizeStart,
+  isClosing = false,
 }: WikiWindowProps) {
   const [isLoaded, setIsLoaded] = useState(false);
 
@@ -48,15 +47,15 @@ export default function WikiWindow({
       isMaximized={isMaximized}
       zIndex={zIndex}
       onClose={onClose}
-      onToggleMaximize={onToggleMaximize}
       onMouseDown={onMouseDown}
       onResizeStart={onResizeStart}
+      isClosing={isClosing}
       data-window="true"
     >
       <div className="relative w-full h-full">
         {!isLoaded && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/60 text-[#00FFFF] z-10 text-sm font-mono">
-            <div className="w-10 h-10 border-2 border-[#00FFFF] border-t-transparent rounded-full animate-spin"></div>
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/60 text-accent z-10 text-sm font-mono">
+            <div className="w-10 h-10 border-2 border-[color:var(--palette-border)] border-t-transparent rounded-full animate-spin"></div>
             <span>Dialing vault.jmill.dev…</span>
           </div>
         )}

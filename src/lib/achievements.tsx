@@ -416,14 +416,14 @@ export class AchievementsManager {
   // Reset all achievements
   resetAll(): void {
     // Reset all achievements to unlocked: false
-    this.achievements = ACHIEVEMENT_DEFINITIONS.map(def => ({
+    this.achievements = ACHIEVEMENT_DEFINITIONS.map((def) => ({
       ...def,
       unlocked: false,
       unlockedAt: undefined,
     }));
 
     // Clear localStorage
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       localStorage.removeItem(ACHIEVEMENTS_STORAGE_KEY);
     }
 
@@ -456,9 +456,9 @@ export class AchievementsManager {
     const neighbors: Achievement[] = [];
     const directions = [
       { x: 0, y: -1 }, // up
-      { x: 0, y: 1 },  // down
+      { x: 0, y: 1 }, // down
       { x: -1, y: 0 }, // left
-      { x: 1, y: 0 },  // right
+      { x: 1, y: 0 }, // right
     ];
 
     directions.forEach(({ x: dx, y: dy }) => {

@@ -49,17 +49,17 @@ export const DesktopIcon: React.FC<DesktopIconProps> = ({
     >
       {/* Icon Container */}
       <div
-        className={`text-[#00FFFF] p-3 border border-[#00FFFF] transition-all flex items-center justify-center w-16 h-16 ${
+        className={`text-accent p-3 border border-[color:var(--palette-border)] transition-all flex items-center justify-center w-16 h-16 ${
           isWindowOpen
-            ? "border-opacity-100 shadow-[0_0_10px_#00FFFF]"
-            : "border-opacity-50 group-hover:border-opacity-100 group-hover:shadow-[0_0_10px_#00FFFF]"
+            ? "border-opacity-100 shadow-[0_0_10px_var(--palette-accent)]"
+            : "border-opacity-50 group-hover:border-opacity-100 group-hover:shadow-[0_0_10px_var(--palette-accent)]"
         }`}
       >
         {icon}
       </div>
       
       {/* Label */}
-      <span className="text-[#00FFFF] text-xs mt-1 text-center font-mono leading-tight max-w-full break-words">
+      <span className="text-accent text-xs mt-1 text-center font-mono leading-tight max-w-full break-words">
         {name}
       </span>
     </div>

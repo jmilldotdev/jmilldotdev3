@@ -13,10 +13,10 @@ interface TerminalWindowProps {
   isMaximized: boolean;
   zIndex: number;
   onClose: () => void;
-  onToggleMaximize: () => void;
   onMouseDown: (e: React.MouseEvent) => void;
   onResizeStart?: (e: React.MouseEvent, windowId: string) => void;
   onOpenWikiWindow?: (slug?: string) => void;
+  isClosing?: boolean;
 }
 
 export const TerminalWindow: React.FC<TerminalWindowProps> = ({
@@ -28,11 +28,10 @@ export const TerminalWindow: React.FC<TerminalWindowProps> = ({
   height,
   isMaximized,
   zIndex,
-  onClose,
-  onToggleMaximize,
-  onMouseDown,
+  onClose,  onMouseDown,
   onResizeStart,
   onOpenWikiWindow,
+  isClosing = false,
 }) => {
   return (
     <BaseWindow
@@ -49,9 +48,9 @@ export const TerminalWindow: React.FC<TerminalWindowProps> = ({
       isMaximized={isMaximized}
       zIndex={zIndex}
       onClose={onClose}
-      onToggleMaximize={onToggleMaximize}
       onMouseDown={onMouseDown}
       onResizeStart={onResizeStart}
+      isClosing={isClosing}
       className="terminal-window"
     >
       <div className="h-full bg-black p-4 font-mono">

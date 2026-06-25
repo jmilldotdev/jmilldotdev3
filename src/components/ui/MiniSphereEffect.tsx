@@ -12,6 +12,18 @@ export interface MiniSphereEffectEmitter {
   cleanup: () => void;
 }
 
+const getCurrentAccentColor = () => {
+  if (typeof window === "undefined") {
+    return new THREE.Color("#00ffff");
+  }
+
+  const accent = getComputedStyle(document.documentElement)
+    .getPropertyValue("--palette-accent")
+    .trim();
+
+  return new THREE.Color().setStyle(accent || "#00ffff");
+};
+
 export const createMiniSphereEffect = (scene: THREE.Scene): MiniSphereEffectEmitter => {
   const activeFragments: THREE.LineSegments[] = [];
 
@@ -20,6 +32,7 @@ export const createMiniSphereEffect = (scene: THREE.Scene): MiniSphereEffectEmit
       position = new THREE.Vector3(0, 0, 0),
       scale = 0.2,
     } = options;
+    const accentColor = getCurrentAccentColor();
 
     // Create fragments using same logic as original sphere
     const fragments: THREE.LineSegments[] = [];
@@ -76,7 +89,7 @@ export const createMiniSphereEffect = (scene: THREE.Scene): MiniSphereEffectEmit
         );
 
         const material = new THREE.LineBasicMaterial({
-          color: 0x00ffff,
+          color: accentColor,
           transparent: true,
           opacity: 0, // Start invisible for fade-in
         });

@@ -16,9 +16,9 @@ interface ProjectWindowProps {
   isMaximized: boolean;
   zIndex: number;
   onClose: () => void;
-  onToggleMaximize: () => void;
   onMouseDown: (e: React.MouseEvent) => void;
   onResizeStart: (e: React.MouseEvent, windowId: string) => void;
+  isClosing?: boolean;
 }
 
 interface Project {
@@ -148,10 +148,9 @@ export const ProjectsWindow: React.FC<ProjectWindowProps> = ({
   height,
   isMaximized,
   zIndex,
-  onClose,
-  onToggleMaximize,
-  onMouseDown,
+  onClose,  onMouseDown,
   onResizeStart,
+  isClosing = false,
 }) => {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -299,25 +298,26 @@ export const ProjectsWindow: React.FC<ProjectWindowProps> = ({
       isMaximized={isMaximized}
       zIndex={zIndex}
       onClose={onClose}
-      onToggleMaximize={onToggleMaximize}
       onMouseDown={onMouseDown}
       onResizeStart={onResizeStart}
+      isClosing={isClosing}
       data-window="true"
     >
-      <div className="flex h-full bg-black">
-        {/* Sidebar - hidden on small screens */}
-        <div className="md:block w-48 bg-zinc-900 border-r border-zinc-800 flex flex-col">
-          <div className="p-4 border-b border-zinc-800">
-            <h2 className="text-[#00FFFF] font-bold text-sm mb-3">LIBRARY</h2>
-            <ul className="space-y-2 text-xs">
+      <div className="flex h-full min-w-0 flex-col bg-[color:var(--palette-surface)] text-foreground md:flex-row">
+        <div className="flex max-h-28 shrink-0 overflow-x-auto border-b border-[color:var(--palette-border-soft)] bg-[color:var(--palette-surface-muted)] md:max-h-none md:w-48 md:flex-col md:overflow-x-visible md:border-b-0 md:border-r">
+          <div className="min-w-max border-r border-[color:var(--palette-border-soft)] p-3 md:min-w-0 md:border-r-0 md:border-b md:p-4">
+            <h2 className="mb-2 text-xs font-bold text-accent md:mb-3 md:text-sm">
+              LIBRARY
+            </h2>
+            <ul className="flex gap-2 text-xs md:block md:space-y-2">
               {libraryFilters.map((filter) => (
                 <li
                   key={filter}
                   onClick={() => setActiveFilter(filter)}
-                  className={`cursor-pointer transition-colors ${
+                  className={`cursor-pointer whitespace-nowrap border border-transparent px-2 py-1 transition-colors md:border-0 md:px-0 md:py-0 ${
                     activeFilter === filter
-                      ? "text-[#00FFFF]"
-                      : "text-zinc-500 hover:text-[#ff4800]"
+                      ? "border-[color:var(--palette-border-soft)] text-accent md:border-transparent"
+                      : "text-accent-muted hover:text-warm"
                   }`}
                 >
                   {filter}
@@ -326,17 +326,19 @@ export const ProjectsWindow: React.FC<ProjectWindowProps> = ({
             </ul>
           </div>
 
-          <div className="p-4 flex-grow">
-            <h3 className="text-[#00FFFF] font-bold text-sm mb-3">PLAYLISTS</h3>
-            <ul className="space-y-2 text-xs">
+          <div className="min-w-max p-3 md:min-w-0 md:flex-grow md:p-4">
+            <h3 className="mb-2 text-xs font-bold text-accent md:mb-3 md:text-sm">
+              PLAYLISTS
+            </h3>
+            <ul className="flex gap-2 text-xs md:block md:space-y-2">
               {playlistFilters.map((playlist) => (
                 <li
                   key={playlist}
                   onClick={() => setActiveFilter(playlist)}
-                  className={`cursor-pointer transition-colors ${
+                  className={`cursor-pointer whitespace-nowrap border border-transparent px-2 py-1 transition-colors md:border-0 md:px-0 md:py-0 ${
                     activeFilter === playlist
-                      ? "text-[#00FFFF]"
-                      : "text-zinc-500 hover:text-[#ff4800]"
+                      ? "border-[color:var(--palette-border-soft)] text-accent md:border-transparent"
+                      : "text-accent-muted hover:text-warm"
                   }`}
                 >
                   {playlist}
@@ -347,10 +349,9 @@ export const ProjectsWindow: React.FC<ProjectWindowProps> = ({
         </div>
 
         {/* Main Content */}
-        <div className="flex-1 flex flex-col">
-          {/* Now Playing Bar - Fixed Height */}
-          <div className="bg-zinc-900 border-b border-zinc-800 p-4 flex items-center gap-4 h-24 min-h-24">
-            <div className="w-12 h-12 relative bg-zinc-800 rounded flex-shrink-0">
+        <div className="flex min-h-0 flex-1 flex-col">
+          <div className="flex min-h-20 items-center gap-3 border-b border-[color:var(--palette-border-soft)] bg-[color:var(--palette-surface-muted)] p-3 md:h-24 md:min-h-24 md:gap-4 md:p-4">
+            <div className="relative h-10 w-10 flex-shrink-0 rounded bg-[color:var(--palette-surface)] md:h-12 md:w-12">
               {selectedProject && (
                 <ProjectImage
                   project={selectedProject}
@@ -361,10 +362,10 @@ export const ProjectsWindow: React.FC<ProjectWindowProps> = ({
                 />
               )}
             </div>
-            <div className="flex-1 min-w-0 flex flex-col justify-center h-full">
+            <div className="flex h-full min-w-0 flex-1 flex-col justify-center">
               {selectedProject ? (
                 <>
-                  <div className="text-[#00FFFF] font-semibold text-sm truncate">
+                  <div className="text-accent font-semibold text-sm truncate">
                     {selectedProject.title}
                   </div>
                   <div className="text-zinc-500 text-xs truncate">
@@ -375,13 +376,13 @@ export const ProjectsWindow: React.FC<ProjectWindowProps> = ({
                   </div>
                 </>
               ) : (
-                <div className="text-zinc-500 text-sm">
+                <div className="text-sm leading-snug text-zinc-500">
                   Nothing currently playing
                 </div>
               )}
             </div>
-            <div className="flex items-center gap-2 flex-shrink-0">
-              <button className="text-zinc-500 hover:text-[#00FFFF] transition-colors">
+            <div className="flex flex-shrink-0 items-center gap-1 md:gap-2">
+              <button className="text-zinc-500 hover:text-accent transition-colors">
                 <svg
                   className="w-5 h-5"
                   fill="currentColor"
@@ -392,7 +393,7 @@ export const ProjectsWindow: React.FC<ProjectWindowProps> = ({
               </button>
               <button
                 onClick={() => setIsPlaying(!isPlaying)}
-                className="bg-[#00FFFF] text-black rounded-full p-2 hover:bg-[#ff4800] transition-colors"
+                className="rounded-full bg-[color:var(--palette-accent)] p-2 text-[color:var(--palette-background)] transition-colors hover:bg-[color:var(--palette-warm)] disabled:opacity-50"
                 disabled={!selectedProject}
               >
                 {isPlaying ? (
@@ -449,15 +450,15 @@ export const ProjectsWindow: React.FC<ProjectWindowProps> = ({
           {/* Content Area */}
           {viewMode === "grid" ? (
             /* Project Grid */
-            <div className="flex-1 overflow-y-auto p-6">
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div className="flex-1 overflow-y-auto p-3 md:p-6">
+              <div className="grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-4 lg:grid-cols-4">
                 {getFilteredProjects(activeFilter).map((project) => (
                   <div
                     key={project.id}
                     onClick={() => handleProjectClick(project)}
                     className="group cursor-pointer"
                   >
-                    <div className="relative w-full aspect-square bg-zinc-900 rounded-lg overflow-hidden mb-2">
+                    <div className="relative mb-2 aspect-square w-full overflow-hidden rounded-md bg-zinc-900 md:rounded-lg">
                       <ProjectImage
                         project={project}
                         fill
@@ -466,15 +467,15 @@ export const ProjectsWindow: React.FC<ProjectWindowProps> = ({
                         priority
                       />
                     </div>
-                    <div className="bg-black bg-opacity-75 p-2 rounded">
-                      <div className="text-[#00FFFF] text-sm font-medium group-hover:text-[#ff4800] transition-colors truncate">
+                    <div className="rounded bg-[color:var(--palette-surface)] p-1.5 md:p-2">
+                      <div className="truncate text-xs font-medium text-accent transition-colors group-hover:text-warm md:text-sm">
                         {project.title}
                       </div>
-                      <div className="text-zinc-300 text-xs truncate">
+                      <div className="truncate text-[11px] text-zinc-300 md:text-xs">
                         {project.artist} • {project.year}
                       </div>
                       {project.tagline && (
-                        <div className="text-zinc-400 text-xs mt-1 line-clamp-2">
+                        <div className="mt-1 line-clamp-2 text-[11px] text-zinc-400 md:text-xs">
                           {project.tagline}
                         </div>
                       )}
@@ -485,11 +486,11 @@ export const ProjectsWindow: React.FC<ProjectWindowProps> = ({
             </div>
           ) : (
             /* Project Detail View */
-            <div className="flex-1 overflow-y-auto p-4">
+            <div className="flex-1 overflow-y-auto p-3 md:p-4">
               {/* Back Button */}
               <button
                 onClick={handleBackToGrid}
-                className="mb-4 flex items-center gap-2 text-[#00FFFF] hover:text-[#ff4800] transition-colors text-sm"
+                className="mb-4 flex items-center gap-2 text-accent hover:text-warm transition-colors text-sm"
               >
                 <svg
                   className="w-4 h-4"
@@ -510,15 +511,15 @@ export const ProjectsWindow: React.FC<ProjectWindowProps> = ({
               {isLoadingContent ? (
                 <div className="flex flex-col items-center justify-center h-64 space-y-4">
                   <div className="relative">
-                    <div className="w-8 h-8 border-2 border-[#00FFFF] border-t-transparent rounded-full animate-spin"></div>
+                    <div className="w-8 h-8 border-2 border-[color:var(--palette-border)] border-t-transparent rounded-full animate-spin"></div>
                   </div>
-                  <div className="text-[#00FFFF] text-sm font-mono animate-pulse">
+                  <div className="text-accent text-sm font-mono animate-pulse">
                     LOADING PROJECT...
                   </div>
                 </div>
               ) : projectContent?.source ? (
                 <article className="w-full max-w-full overflow-visible">
-                  <div className="text-[#eef2ff] leading-relaxed tracking-[0.3px] font-mono prose prose-invert prose-headings:text-[#FF4800] prose-h1:text-2xl prose-h1:border-b prose-h1:border-[#FF4800]/30 prose-h1:pb-1 prose-h1:mt-4 prose-h1:mb-2 prose-h2:text-xl prose-h2:mt-4 prose-h2:mb-2 prose-h3:text-lg prose-h3:mt-4 prose-h3:mb-2 prose-p:text-sm prose-p:mb-3 prose-a:text-[#00FFFF] prose-a:no-underline prose-a:border-b prose-a:border-dotted prose-a:border-[#00FFFF] hover:prose-a:text-white hover:prose-a:border-white prose-ul:ml-4 prose-ul:mb-3 prose-ul:text-sm prose-ol:ml-4 prose-ol:mb-3 prose-ol:text-sm prose-li:mb-1 prose-code:bg-black/30 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:text-sm prose-pre:bg-black/50 prose-pre:p-4 prose-pre:rounded prose-pre:border-l-2 prose-pre:border-[#00FFFF] prose-pre:overflow-x-auto prose-blockquote:border-l-4 prose-blockquote:border-[#00FFFF] prose-blockquote:pl-4 prose-blockquote:py-1 prose-blockquote:my-3 prose-blockquote:italic prose-blockquote:text-gray-400 prose-blockquote:bg-black/20 prose-table:w-full prose-table:border-collapse prose-table:mb-3 prose-th:border prose-th:border-gray-700 prose-th:p-2 prose-th:text-left prose-th:bg-black/50 prose-th:text-[#FF4800] prose-td:border prose-td:border-gray-700 prose-td:p-2 prose-sm">
+                  <div className="text-foreground leading-relaxed tracking-[0.3px] font-mono prose prose-invert prose-headings:text-[color:var(--palette-warm)] prose-h1:text-2xl prose-h1:border-b prose-h1:border-[color:var(--palette-warm-soft)] prose-h1:pb-1 prose-h1:mt-4 prose-h1:mb-2 prose-h2:text-xl prose-h2:mt-4 prose-h2:mb-2 prose-h3:text-lg prose-h3:mt-4 prose-h3:mb-2 prose-p:text-sm prose-p:mb-3 prose-a:text-[color:var(--palette-accent)] prose-a:no-underline prose-a:border-b prose-a:border-dotted prose-a:border-[color:var(--palette-border)] hover:prose-a:text-foreground hover:prose-a:border-[color:var(--palette-text)] prose-ul:ml-4 prose-ul:mb-3 prose-ul:text-sm prose-ol:ml-4 prose-ol:mb-3 prose-ol:text-sm prose-li:mb-1 prose-code:bg-[color:var(--palette-surface-muted)] prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:text-sm prose-pre:bg-[color:var(--palette-surface-muted)] prose-pre:p-4 prose-pre:rounded prose-pre:border-l-2 prose-pre:border-[color:var(--palette-border)] prose-pre:overflow-x-auto prose-blockquote:border-l-4 prose-blockquote:border-[color:var(--palette-border)] prose-blockquote:pl-4 prose-blockquote:py-1 prose-blockquote:my-3 prose-blockquote:italic prose-blockquote:text-muted prose-blockquote:bg-[color:var(--palette-surface-muted)] prose-table:w-full prose-table:border-collapse prose-table:mb-3 prose-th:border prose-th:border-[color:var(--palette-border-soft)] prose-th:p-2 prose-th:text-left prose-th:bg-[color:var(--palette-surface-muted)] prose-th:text-[color:var(--palette-warm)] prose-td:border prose-td:border-[color:var(--palette-border-soft)] prose-td:p-2 prose-sm">
                     <MDXRemote
                       {...(projectContent.source as MDXRemoteSerializeResult)}
                       components={{
@@ -534,14 +535,14 @@ export const ProjectsWindow: React.FC<ProjectWindowProps> = ({
                           if (
                             href &&
                             (href.startsWith("http://") ||
-                              href.startsWith("https://"))
+                            href.startsWith("https://"))
                           ) {
                             return (
                               <a
                                 href={href}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="text-[#FF4800] no-underline border-b border-solid border-[#FF4800] hover:text-[#FF6600] hover:border-[#FF6600] inline-flex items-center gap-1"
+                                className="text-warm no-underline border-b border-solid border-[color:var(--palette-warm)] hover:text-accent hover:border-[color:var(--palette-border)] inline-flex items-center gap-1"
                                 {...props}
                               >
                                 {children}
@@ -552,7 +553,7 @@ export const ProjectsWindow: React.FC<ProjectWindowProps> = ({
                           return (
                             <a
                               href={href || "#"}
-                              className="text-[#00FFFF] no-underline border-b border-dotted border-[#00FFFF] hover:text-white hover:border-white"
+                              className="text-accent no-underline border-b border-dotted border-[color:var(--palette-border)] hover:text-foreground hover:border-[color:var(--palette-text)]"
                               {...props}
                             >
                               {children}
@@ -573,7 +574,7 @@ export const ProjectsWindow: React.FC<ProjectWindowProps> = ({
                   </div>
                 </article>
               ) : (
-                <div className="text-[#00FFFF] opacity-60 italic text-sm">
+                <div className="text-accent opacity-60 italic text-sm">
                   No content available for this project.
                 </div>
               )}
@@ -581,15 +582,15 @@ export const ProjectsWindow: React.FC<ProjectWindowProps> = ({
           )}
 
           {/* Player Controls */}
-          <div className="bg-zinc-900 border-t border-zinc-800 p-3">
-            <div className="flex items-center gap-4">
+          <div className="border-t border-[color:var(--palette-border-soft)] bg-[color:var(--palette-surface-muted)] p-2 md:p-3">
+            <div className="flex items-center gap-2 md:gap-4">
               <div className="flex items-center gap-2">
                 <button
                   onClick={handlePreviousProject}
                   disabled={!canGoPrevious()}
                   className={`transition-colors ${
                     canGoPrevious()
-                      ? "text-zinc-400 hover:text-[#00FFFF]"
+                      ? "text-accent-muted hover:text-accent"
                       : "text-zinc-700 cursor-not-allowed"
                   }`}
                   title="Previous project"
@@ -607,7 +608,7 @@ export const ProjectsWindow: React.FC<ProjectWindowProps> = ({
                   disabled={!canGoNext()}
                   className={`transition-colors ${
                     canGoNext()
-                      ? "text-zinc-400 hover:text-[#00FFFF]"
+                      ? "text-accent-muted hover:text-accent"
                       : "text-zinc-700 cursor-not-allowed"
                   }`}
                   title="Next project"
@@ -622,13 +623,13 @@ export const ProjectsWindow: React.FC<ProjectWindowProps> = ({
                 </button>
               </div>
 
-              <div className="flex-1 flex items-center gap-2">
+              <div className="flex min-w-0 flex-1 items-center gap-2">
                 <span className="text-zinc-500 text-xs">
                   {selectedProject ? formatTime(elapsedSeconds) : "0:00"}
                 </span>
                 <div className="flex-1 h-1 bg-zinc-800 rounded-full relative">
                   <div
-                    className={`absolute inset-y-0 left-0 bg-[#00FFFF] rounded-full ${
+                    className={`absolute inset-y-0 left-0 bg-[color:var(--palette-accent)] rounded-full ${
                       shouldAnimate
                         ? "transition-all duration-1000 ease-linear"
                         : ""
@@ -642,7 +643,7 @@ export const ProjectsWindow: React.FC<ProjectWindowProps> = ({
               </div>
 
               <div className="flex items-center gap-2">
-                <button className="text-zinc-500 hover:text-[#00FFFF] transition-colors">
+                <button className="text-zinc-500 hover:text-accent transition-colors">
                   <svg
                     className="w-4 h-4"
                     fill="currentColor"

@@ -13,9 +13,9 @@ interface JazzWindowProps {
   isMaximized: boolean;
   zIndex: number;
   onClose: () => void;
-  onToggleMaximize: () => void;
   onMouseDown: (e: React.MouseEvent) => void;
   onResizeStart: (e: React.MouseEvent, windowId: string) => void;
+  isClosing?: boolean;
 }
 
 export const JazzWindow: React.FC<JazzWindowProps> = ({
@@ -26,10 +26,9 @@ export const JazzWindow: React.FC<JazzWindowProps> = ({
   height,
   isMaximized,
   zIndex,
-  onClose,
-  onToggleMaximize,
-  onMouseDown,
+  onClose,  onMouseDown,
   onResizeStart,
+  isClosing = false,
 }) => {
   return (
     <BaseWindow
@@ -42,9 +41,9 @@ export const JazzWindow: React.FC<JazzWindowProps> = ({
       isMaximized={isMaximized}
       zIndex={zIndex}
       onClose={onClose}
-      onToggleMaximize={onToggleMaximize}
       onMouseDown={onMouseDown}
       onResizeStart={onResizeStart}
+      isClosing={isClosing}
     >
       <div
         className="p-4 overflow-auto h-full flex items-center justify-center cursor-pointer"
