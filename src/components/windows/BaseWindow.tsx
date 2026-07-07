@@ -72,7 +72,7 @@ export const BaseWindow: React.FC<BaseWindowProps> = ({
       ref={windowRef}
       className={`window-container ${
         isClosing ? "window-container-closing" : ""
-      } absolute border-2 border-accent bg-[color:var(--palette-surface)] backdrop-blur-sm ${
+      } absolute border-2 border-accent bg-[color:var(--window-surface-opaque)] ${
         isMaximized ? "inset-4" : ""
       } ${className}`}
       key={id}

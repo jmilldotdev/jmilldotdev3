@@ -16,6 +16,8 @@ interface AboutWindowProps {
   onClose: () => void;
   onMouseDown: (e: React.MouseEvent) => void;
   onResizeStart: (e: React.MouseEvent, windowId: string) => void;
+  onOpenProjects?: () => void;
+  onOpenWiki?: () => void;
   isClosing?: boolean;
 }
 
@@ -28,8 +30,11 @@ export const AboutWindow: React.FC<AboutWindowProps> = ({
   height,
   isMaximized,
   zIndex,
-  onClose,  onMouseDown,
+  onClose,
+  onMouseDown,
   onResizeStart,
+  onOpenProjects,
+  onOpenWiki,
   isClosing = false,
 }) => {
   return (
@@ -53,7 +58,10 @@ export const AboutWindow: React.FC<AboutWindowProps> = ({
       data-window="true"
     >
       <div className="p-6 text-accent font-mono">
-        <AboutContent />
+        <AboutContent
+          onOpenProjects={onOpenProjects}
+          onOpenWiki={onOpenWiki}
+        />
 
         {/* System Specs */}
         <div className="space-y-3 border-t border-[color:var(--palette-border-soft)] pt-4 mt-6">

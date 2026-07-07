@@ -148,7 +148,8 @@ export const ProjectsWindow: React.FC<ProjectWindowProps> = ({
   height,
   isMaximized,
   zIndex,
-  onClose,  onMouseDown,
+  onClose,
+  onMouseDown,
   onResizeStart,
   isClosing = false,
 }) => {
@@ -350,100 +351,129 @@ export const ProjectsWindow: React.FC<ProjectWindowProps> = ({
 
         {/* Main Content */}
         <div className="flex min-h-0 flex-1 flex-col">
-          <div className="flex min-h-20 items-center gap-3 border-b border-[color:var(--palette-border-soft)] bg-[color:var(--palette-surface-muted)] p-3 md:h-24 md:min-h-24 md:gap-4 md:p-4">
-            <div className="relative h-10 w-10 flex-shrink-0 rounded bg-[color:var(--palette-surface)] md:h-12 md:w-12">
-              {selectedProject && (
-                <ProjectImage
-                  project={selectedProject}
-                  fill
-                  sizes="48px"
-                  className="object-cover rounded"
-                  priority
-                />
-              )}
-            </div>
-            <div className="flex h-full min-w-0 flex-1 flex-col justify-center">
-              {selectedProject ? (
-                <>
-                  <div className="text-accent font-semibold text-sm truncate">
-                    {selectedProject.title}
-                  </div>
-                  <div className="text-zinc-500 text-xs truncate">
-                    {selectedProject.artist} • {selectedProject.year}
-                  </div>
-                  <div className="text-zinc-600 text-xs mt-1 truncate">
-                    {selectedProject.tagline || "\u00A0"}
-                  </div>
-                </>
-              ) : (
-                <div className="text-sm leading-snug text-zinc-500">
-                  Nothing currently playing
-                </div>
-              )}
-            </div>
-            <div className="flex flex-shrink-0 items-center gap-1 md:gap-2">
-              <button className="text-zinc-500 hover:text-accent transition-colors">
-                <svg
-                  className="w-5 h-5"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" />
-                </svg>
-              </button>
-              <button
-                onClick={() => setIsPlaying(!isPlaying)}
-                className="rounded-full bg-[color:var(--palette-accent)] p-2 text-[color:var(--palette-background)] transition-colors hover:bg-[color:var(--palette-warm)] disabled:opacity-50"
-                disabled={!selectedProject}
-              >
-                {isPlaying ? (
-                  <svg
-                    className="w-5 h-5"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM7 8a1 1 0 012 0v4a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1z"
-                    />
-                  </svg>
-                ) : (
-                  <svg
-                    className="w-5 h-5"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"
-                    />
-                  </svg>
+          <div className="shrink-0 border-b border-[color:var(--palette-border-soft)] bg-[color:var(--palette-surface-muted)]">
+            <div className="flex min-h-20 items-center gap-3 p-3 md:h-20 md:min-h-20 md:gap-4 md:px-4 md:py-3">
+              <div className="relative h-10 w-10 flex-shrink-0 rounded bg-[color:var(--palette-surface)] md:h-12 md:w-12">
+                {selectedProject && (
+                  <ProjectImage
+                    project={selectedProject}
+                    fill
+                    sizes="48px"
+                    className="object-cover rounded"
+                    priority
+                  />
                 )}
-              </button>
-              {selectedProject?.url && (
-                <button
-                  onClick={() =>
-                    selectedProject.url &&
-                    window.open(selectedProject.url, "_blank")
-                  }
-                  className="text-zinc-500 hover:text-[#ff4800] transition-colors"
-                  title="Open project"
-                >
+              </div>
+              <div className="flex h-full min-w-0 flex-1 flex-col justify-center">
+                {selectedProject ? (
+                  <>
+                    <div className="text-accent font-semibold text-sm truncate">
+                      {selectedProject.title}
+                    </div>
+                    <div className="text-zinc-500 text-xs truncate">
+                      {selectedProject.artist} • {selectedProject.year}
+                    </div>
+                    <div className="text-zinc-600 text-xs mt-1 truncate">
+                      {selectedProject.tagline || "\u00A0"}
+                    </div>
+                  </>
+                ) : (
+                  <div className="text-sm leading-snug text-zinc-500">
+                    Nothing currently playing
+                  </div>
+                )}
+              </div>
+              <div className="flex flex-shrink-0 items-center gap-1 md:gap-2">
+                <button className="text-zinc-500 hover:text-accent transition-colors">
                   <svg
                     className="w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                    />
+                    <path d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" />
                   </svg>
                 </button>
-              )}
+                <button
+                  onClick={() => setIsPlaying(!isPlaying)}
+                  className="rounded-full bg-[color:var(--palette-accent)] p-2 text-[color:var(--palette-background)] transition-colors hover:bg-[color:var(--palette-warm)] disabled:opacity-50"
+                  disabled={!selectedProject}
+                >
+                  {isPlaying ? (
+                    <svg
+                      className="w-5 h-5"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM7 8a1 1 0 012 0v4a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1z"
+                      />
+                    </svg>
+                  ) : (
+                    <svg
+                      className="w-5 h-5"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"
+                      />
+                    </svg>
+                  )}
+                </button>
+                {selectedProject?.url && (
+                  <button
+                    onClick={() =>
+                      selectedProject.url &&
+                      window.open(selectedProject.url, "_blank")
+                    }
+                    className="text-zinc-500 hover:text-warm transition-colors"
+                    title="Open project"
+                  >
+                    <svg
+                      className="w-5 h-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                      />
+                    </svg>
+                  </button>
+                )}
+              </div>
+            </div>
+            <div className="flex h-7 items-center px-3 md:px-4">
+              <button
+                onClick={handleBackToGrid}
+                tabIndex={viewMode === "detail" ? 0 : -1}
+                aria-hidden={viewMode !== "detail"}
+                className={`flex items-center gap-2 text-sm text-accent transition-colors hover:text-warm ${
+                  viewMode === "detail"
+                    ? "visible pointer-events-auto"
+                    : "invisible pointer-events-none"
+                }`}
+              >
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M10 19l-7-7m0 0l7-7m-7 7h18"
+                  />
+                </svg>
+                Back to Projects
+              </button>
             </div>
           </div>
 
@@ -487,27 +517,6 @@ export const ProjectsWindow: React.FC<ProjectWindowProps> = ({
           ) : (
             /* Project Detail View */
             <div className="flex-1 overflow-y-auto p-3 md:p-4">
-              {/* Back Button */}
-              <button
-                onClick={handleBackToGrid}
-                className="mb-4 flex items-center gap-2 text-accent hover:text-warm transition-colors text-sm"
-              >
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M10 19l-7-7m0 0l7-7m-7 7h18"
-                  />
-                </svg>
-                Back to Projects
-              </button>
-
               {isLoadingContent ? (
                 <div className="flex flex-col items-center justify-center h-64 space-y-4">
                   <div className="relative">

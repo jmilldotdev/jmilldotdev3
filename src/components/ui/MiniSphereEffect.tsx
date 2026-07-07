@@ -9,6 +9,7 @@ export interface MiniSphereEffectOptions {
 
 export interface MiniSphereEffectEmitter {
   trigger: (options?: MiniSphereEffectOptions) => void;
+  update: () => boolean;
   cleanup: () => void;
 }
 
@@ -26,6 +27,15 @@ const getCurrentAccentColor = () => {
 
 export const createMiniSphereEffect = (scene: THREE.Scene): MiniSphereEffectEmitter => {
   const activeFragments: THREE.LineSegments[] = [];
+
+  const disposeFragment = (fragment: THREE.LineSegments) => {
+    fragment.geometry.dispose();
+    if (Array.isArray(fragment.material)) {
+      fragment.material.forEach((material) => material.dispose());
+    } else {
+      fragment.material.dispose();
+    }
+  };
 
   const trigger = (options: MiniSphereEffectOptions = {}) => {
     const {
@@ -121,60 +131,57 @@ export const createMiniSphereEffect = (scene: THREE.Scene): MiniSphereEffectEmit
         activeFragments.push(fragment);
       }
     }
-    
-    // Animate fragments
-    const animate = () => {
-      const remainingFragments = fragments.filter(fragment => {
-        if (!fragment.parent) return false;
-        
-        const velocity = (fragment as unknown as { velocity: THREE.Vector3; rotationVelocity: THREE.Vector3; age: number }).velocity;
-        const rotationVelocity = (fragment as unknown as { velocity: THREE.Vector3; rotationVelocity: THREE.Vector3; age: number }).rotationVelocity;
-        const material = fragment.material as THREE.LineBasicMaterial;
-        
-        (fragment as unknown as { velocity: THREE.Vector3; rotationVelocity: THREE.Vector3; age: number }).age += 1;
-        const age = (fragment as unknown as { velocity: THREE.Vector3; rotationVelocity: THREE.Vector3; age: number }).age;
-        
-        // Fade in during first 10 frames
-        if (age < 10) {
-          material.opacity = age / 10 * 0.8;
-        } else if (age > 40) {
-          // Fade out after 40 frames
-          material.opacity *= 0.98;
-        }
-        
-        // Apply constant velocity (no gravity)
-        fragment.position.add(velocity);
-        fragment.rotation.x += rotationVelocity.x;
-        fragment.rotation.y += rotationVelocity.y;
-        fragment.rotation.z += rotationVelocity.z;
-        
-        // Remove when faded out
-        if (material.opacity < 0.01) {
-          scene.remove(fragment);
-          const index = activeFragments.indexOf(fragment);
-          if (index > -1) {
-            activeFragments.splice(index, 1);
-          }
-          return false;
-        }
-        
-        return true;
-      });
-      
-      if (remainingFragments.length > 0) {
-        requestAnimationFrame(animate);
+  };
+
+  const update = () => {
+    for (let index = activeFragments.length - 1; index >= 0; index--) {
+      const fragment = activeFragments[index];
+      if (!fragment.parent) {
+        activeFragments.splice(index, 1);
+        disposeFragment(fragment);
+        continue;
       }
-    };
-    
-    animate();
+
+      const fragmentState = fragment as unknown as {
+        velocity: THREE.Vector3;
+        rotationVelocity: THREE.Vector3;
+        age: number;
+      };
+      const material = fragment.material as THREE.LineBasicMaterial;
+
+      fragmentState.age += 1;
+
+      // Fade in during first 10 frames
+      if (fragmentState.age < 10) {
+        material.opacity = (fragmentState.age / 10) * 0.8;
+      } else if (fragmentState.age > 40) {
+        // Fade out after 40 frames
+        material.opacity *= 0.98;
+      }
+
+      // Apply constant velocity (no gravity)
+      fragment.position.add(fragmentState.velocity);
+      fragment.rotation.x += fragmentState.rotationVelocity.x;
+      fragment.rotation.y += fragmentState.rotationVelocity.y;
+      fragment.rotation.z += fragmentState.rotationVelocity.z;
+
+      if (material.opacity < 0.01) {
+        scene.remove(fragment);
+        activeFragments.splice(index, 1);
+        disposeFragment(fragment);
+      }
+    }
+
+    return activeFragments.length > 0;
   };
 
   const cleanup = () => {
     activeFragments.forEach(fragment => {
       scene.remove(fragment);
+      disposeFragment(fragment);
     });
     activeFragments.length = 0;
   };
 
-  return { trigger, cleanup };
+  return { trigger, update, cleanup };
 };

@@ -1,5 +1,4 @@
 import React from "react";
-import { ACHIEVEMENTS_ENABLED } from "@/config";
 
 export interface Achievement {
   id: string;
@@ -479,17 +478,13 @@ export class AchievementsManager {
 }
 
 /**
- * Unlock an achievement if achievements are enabled.
+ * Unlock an achievement.
  * This is the recommended way to unlock achievements throughout the app.
  *
  * @param achievementId - The ID of the achievement to unlock
  * @returns true if the achievement was unlocked, false otherwise
  */
 export function unlockAchievement(achievementId: string): boolean {
-  if (!ACHIEVEMENTS_ENABLED) {
-    return false;
-  }
-
   const manager = AchievementsManager.getInstance();
   const result = manager.unlock(achievementId);
   return result;

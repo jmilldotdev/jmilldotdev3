@@ -17,6 +17,7 @@ export default function Home() {
     useState<Achievement | null>(null);
   const [sphereResetKey, setSphereResetKey] = useState(0);
   const [isShortViewport, setIsShortViewport] = useState(false);
+  const [showLoginAnimation, setShowLoginAnimation] = useState(true);
   const sphereRef = useRef<SphereAnimationRef>(null);
   const achievementsManager = useRef<AchievementsManager | null>(null);
 
@@ -49,40 +50,53 @@ export default function Home() {
   useEffect(() => {
     if (!showDesktop) {
       setButtonClicked(false);
+      setShowLoginAnimation(true);
       setSphereResetKey((prev) => prev + 1);
     }
   }, [showDesktop]);
 
   const handleLoginClick = () => {
     setButtonClicked(true);
+    setShowLoginAnimation(true);
     sphereRef.current?.triggerShatter();
-
-    // Show desktop during shatter animation, then unlock achievement
-    setTimeout(() => {
-      setShowDesktop(true);
-      // Unlock first login achievement after desktop is shown
-      setTimeout(() => {
-        unlockAchievement("first-login");
-      }, 100);
-    }, 1500);
   };
 
   return (
     <div className="w-full h-full relative">
-      <div className="login-atmosphere" aria-hidden="true">
-        <div className="login-atmosphere__vignette" />
-        <div className="login-atmosphere__grid" />
-      </div>
-      <div className="absolute inset-0">
-        <SphereAnimation
-          key={sphereResetKey}
-          ref={sphereRef}
-          className="w-full h-full"
-          onShatter={() => {
-            // Optional: do something after shatter starts
-          }}
-        />
-      </div>
+      {showLoginAnimation && (
+        <div
+          className={`login-atmosphere ${
+            showDesktop ? "login-atmosphere--handoff" : ""
+          }`}
+          aria-hidden="true"
+        >
+          <div className="login-atmosphere__vignette" />
+          <div className="login-atmosphere__grid" />
+        </div>
+      )}
+      {showLoginAnimation && (
+        <div
+          className={`absolute inset-0 ${
+            showDesktop ? "z-10 pointer-events-none" : "z-0"
+          }`}
+        >
+          <SphereAnimation
+            key={sphereResetKey}
+            ref={sphereRef}
+            className="w-full h-full"
+            onShatter={() => {
+              // Optional: do something after shatter starts
+            }}
+            onShatterReveal={() => {
+              setShowDesktop(true);
+              unlockAchievement("first-login");
+            }}
+            onShatterComplete={() => {
+              setShowLoginAnimation(false);
+            }}
+          />
+        </div>
+      )}
 
       <div className={`absolute bottom-8 left-0 right-0 flex ${isShortViewport ? 'flex-row' : 'flex-col'} items-center justify-center gap-4 z-30 transition-opacity duration-500 ${
         showDesktop ? "opacity-0 pointer-events-none" : "opacity-100"

@@ -23,7 +23,6 @@ import { ProjectsWindow } from "./windows/ProjectsWindow";
 import { SettingsWindow } from "./windows/SettingsWindow";
 import { DesktopIcon, DESKTOP_ICON_DIMENSIONS } from "./DesktopIcon";
 import { Achievement, unlockAchievement } from "@/lib/achievements";
-import { ACHIEVEMENTS_ENABLED } from "@/config";
 import { SettingsIcon } from "./icons/SettingsIcon";
 import DesktopLavaLamp from "./DesktopLavaLamp";
 
@@ -107,7 +106,36 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const miniSphereEffectRef = useRef<MiniSphereEffectEmitter | null>(null);
+  const miniSphereRenderFrameRef = useRef<number | null>(null);
   const wikiAnimationTimersRef = useRef<NodeJS.Timeout[]>([]);
+
+  const startMiniSphereRenderLoop = useCallback(() => {
+    if (miniSphereRenderFrameRef.current !== null) return;
+
+    const renderFrame = () => {
+      const renderer = rendererRef.current;
+      const scene = sceneRef.current;
+      const camera = cameraRef.current;
+      const emitter = miniSphereEffectRef.current;
+
+      if (!renderer || !scene || !camera || !emitter) {
+        miniSphereRenderFrameRef.current = null;
+        return;
+      }
+
+      const hasActiveFragments = emitter.update();
+      renderer.render(scene, camera);
+
+      if (hasActiveFragments) {
+        miniSphereRenderFrameRef.current =
+          window.requestAnimationFrame(renderFrame);
+      } else {
+        miniSphereRenderFrameRef.current = null;
+      }
+    };
+
+    miniSphereRenderFrameRef.current = window.requestAnimationFrame(renderFrame);
+  }, []);
 
   // Dynamic grid configuration based on container size
   const getResponsiveIconGrid = useMemo(() => {
@@ -235,10 +263,7 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({
       },
     ];
 
-    // Filter out achievements icon if achievements are disabled
-    return allIcons.filter(
-      (icon) => icon.id !== "achievements" || ACHIEVEMENTS_ENABLED
-    );
+    return allIcons;
   }, []);
 
   const starExclusionRects = useMemo(
@@ -558,6 +583,32 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({
       }
     },
     [desktopIcons, createWindow]
+  );
+
+  const openDesktopWindow = useCallback(
+    (iconId: "projects" | "wiki") => {
+      const existingWindow = windows.find(
+        (window) => window.type === iconId && !window.isClosing
+      );
+
+      if (existingWindow) {
+        setWindows((prev) =>
+          prev.map((window) =>
+            window.id === existingWindow.id
+              ? { ...window, zIndex: nextZIndex }
+              : window
+          )
+        );
+        setNextZIndex((prev) => prev + 1);
+        return;
+      }
+
+      const icon = desktopIcons.find((desktopIcon) => desktopIcon.id === iconId);
+      if (icon) {
+        createWindow(icon);
+      }
+    },
+    [windows, nextZIndex, desktopIcons, createWindow]
   );
 
   const handleMouseDown = (e: React.MouseEvent, windowId: string) => {
@@ -980,6 +1031,8 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({
   useEffect(() => {
     if (!isVisible) return;
 
+    let handleResize: (() => void) | null = null;
+
     // Small delay to ensure DOM is ready
     const timer = setTimeout(() => {
       const scene = new THREE.Scene();
@@ -1024,13 +1077,7 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({
       rendererRef.current = renderer;
       canvasRef.current = renderer.domElement;
 
-      const animate = () => {
-        requestAnimationFrame(animate);
-        renderer.render(scene, camera);
-      };
-      animate();
-
-      const handleResize = () => {
+      handleResize = () => {
         if (cameraRef.current && rendererRef.current) {
           const container = document.querySelector(
             "[data-desktop-container]"
@@ -1041,6 +1088,7 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({
           cameraRef.current.aspect = width / height;
           cameraRef.current.updateProjectionMatrix();
           rendererRef.current.setSize(width, height);
+          rendererRef.current.render(scene, cameraRef.current);
         }
       };
 
@@ -1049,20 +1097,33 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({
       // Create mini sphere effect emitter here, after scene is ready
       const emitter = createMiniSphereEffect(scene);
       miniSphereEffectRef.current = emitter;
+      renderer.render(scene, camera);
     }, 100); // 100ms delay
 
     return () => {
       clearTimeout(timer);
-      window.removeEventListener("resize", () => {});
+      if (miniSphereRenderFrameRef.current !== null) {
+        window.cancelAnimationFrame(miniSphereRenderFrameRef.current);
+        miniSphereRenderFrameRef.current = null;
+      }
+      if (handleResize) {
+        window.removeEventListener("resize", handleResize);
+      }
       if (canvasRef.current && canvasRef.current.parentNode) {
         canvasRef.current.parentNode.removeChild(canvasRef.current);
       }
       if (miniSphereEffectRef.current) {
         miniSphereEffectRef.current.cleanup();
+        miniSphereEffectRef.current = null;
       }
+      rendererRef.current?.dispose();
       if (sceneRef.current) {
         sceneRef.current.clear();
+        sceneRef.current = null;
       }
+      rendererRef.current = null;
+      cameraRef.current = null;
+      canvasRef.current = null;
     };
   }, [isVisible]);
 
@@ -1114,8 +1175,14 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({
         position: intersectPoint,
         scale: 0.15,
       });
+      startMiniSphereRenderLoop();
     },
-    [dragState.windowId, resizeState.windowId, iconDragState.iconId]
+    [
+      dragState.windowId,
+      resizeState.windowId,
+      iconDragState.iconId,
+      startMiniSphereRenderLoop,
+    ]
   );
 
   // Handle escape key to close active window
@@ -1146,7 +1213,7 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({
 
   return (
     <div
-      className={`absolute inset-0 transition-opacity duration-2000 ${
+      className={`desktop-shell absolute inset-0 transition-opacity duration-2000 ${
         isVisible ? "opacity-100" : "opacity-0"
       }`}
       style={{ zIndex: 15 }}
@@ -1197,6 +1264,8 @@ export const VectorDesktop: React.FC<VectorDesktopProps> = ({
             onClose={() => closeWindow(window.id)}
             onMouseDown={(e) => handleMouseDown(e, window.id)}
             onResizeStart={handleResizeStart}
+            onOpenProjects={() => openDesktopWindow("projects")}
+            onOpenWiki={() => openDesktopWindow("wiki")}
             isClosing={window.isClosing}
           />
         ) : window.type === "jazz" ? (

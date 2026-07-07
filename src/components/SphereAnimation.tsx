@@ -13,27 +13,63 @@ import { usePalette } from "@/contexts/PaletteContext";
 interface SphereAnimationProps {
   className?: string;
   onShatter?: () => void;
+  onShatterReveal?: () => void;
+  onShatterComplete?: () => void;
 }
 
 export interface SphereAnimationRef {
   triggerShatter: () => void;
 }
 
+const disposeObject = (object: THREE.Object3D) => {
+  const disposable = object as THREE.Object3D & {
+    geometry?: THREE.BufferGeometry;
+    material?: THREE.Material | THREE.Material[];
+  };
+
+  disposable.geometry?.dispose();
+
+  if (Array.isArray(disposable.material)) {
+    disposable.material.forEach((material) => material.dispose());
+  } else {
+    disposable.material?.dispose();
+  }
+};
+
+const FRAGMENT_VISIBLE_OPACITY = 0.01;
+const SHATTER_SHAKE_DURATION_MS = 500;
+
 export const SphereAnimation = forwardRef<
   SphereAnimationRef,
   SphereAnimationProps
->(({ className = "", onShatter }, ref) => {
+>(
+  (
+    {
+      className = "",
+      onShatter,
+      onShatterReveal,
+      onShatterComplete,
+    },
+    ref
+  ) => {
   const { palette } = usePalette();
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasContainerRef = useRef<HTMLDivElement>(null);
   const sceneRef = useRef<THREE.Scene | null>(null);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
+  const animationFrameRef = useRef<number | null>(null);
+  const shakeFrameRef = useRef<number | null>(null);
   const sphereGroupRef = useRef<THREE.Group | null>(null);
   const redSphereRef = useRef<THREE.LineSegments | null>(null);
   const wireframeFragmentsRef = useRef<THREE.LineSegments[]>([]);
   const redFragmentsRef = useRef<THREE.LineSegments[]>([]);
   const isShatteredRef = useRef(false);
+  const pendingFragmentGroupsRef = useRef(0);
+  const shatterRevealSentRef = useRef(false);
+  const shatterCompleteSentRef = useRef(false);
+  const onShatterRevealRef = useRef(onShatterReveal);
+  const onShatterCompleteRef = useRef(onShatterComplete);
   const targetSphereScaleRef = useRef(1);
   const paletteColorsRef = useRef({
     accent: new THREE.Color(palette.accent),
@@ -42,6 +78,11 @@ export const SphereAnimation = forwardRef<
   const lineMaterialRef = useRef<THREE.LineBasicMaterial | null>(null);
   const redLineMaterialRef = useRef<THREE.LineBasicMaterial | null>(null);
   const blueLightRef = useRef<THREE.PointLight | null>(null);
+
+  useEffect(() => {
+    onShatterRevealRef.current = onShatterReveal;
+    onShatterCompleteRef.current = onShatterComplete;
+  }, [onShatterReveal, onShatterComplete]);
 
   useEffect(() => {
     paletteColorsRef.current.accent.set(palette.accent);
@@ -81,8 +122,10 @@ export const SphereAnimation = forwardRef<
   const triggerShatter = () => {
     if (!isShatteredRef.current && sphereGroupRef.current && sceneRef.current) {
       isShatteredRef.current = true;
-      createWireframeFragments();
-      createRedFragments();
+      pendingFragmentGroupsRef.current = 2;
+      shatterRevealSentRef.current = false;
+      shatterCompleteSentRef.current = false;
+      startShatterSequence();
       if (onShatter) onShatter();
     }
   };
@@ -91,19 +134,43 @@ export const SphereAnimation = forwardRef<
     triggerShatter,
   }));
 
-  const createWireframeFragments = () => {
+  const markFragmentGroupReady = () => {
+    pendingFragmentGroupsRef.current = Math.max(
+      0,
+      pendingFragmentGroupsRef.current - 1
+    );
+
+    if (
+      pendingFragmentGroupsRef.current === 0 &&
+      !shatterRevealSentRef.current
+    ) {
+      shatterRevealSentRef.current = true;
+      onShatterRevealRef.current?.();
+    }
+  };
+
+  const removeFinishedFragments = (fragments: THREE.LineSegments[]) =>
+    fragments.filter((fragment) => {
+      const material = fragment.material as THREE.LineBasicMaterial;
+      if (material.opacity > FRAGMENT_VISIBLE_OPACITY) return true;
+
+      sceneRef.current?.remove(fragment);
+      disposeObject(fragment);
+      return false;
+    });
+
+  const startShatterSequence = () => {
     if (!sceneRef.current || !sphereGroupRef.current) return;
 
-    // Create dramatic pulse/shake effect before shattering
-    const startTime = Date.now();
+    const startTime = performance.now();
     const shakeIntensity = 0.005;
     const pulseIntensity = 0.005;
 
-    const shakeEffect = () => {
+    const shakeEffect = (now: number) => {
       if (!sphereGroupRef.current) return;
 
-      const elapsed = Date.now() - startTime;
-      const progress = Math.min(elapsed / 500, 1); // 400ms shake duration
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / SHATTER_SHAKE_DURATION_MS, 1);
 
       if (progress < 1) {
         // Gentle, slow shake using sine waves instead of random
@@ -129,20 +196,22 @@ export const SphereAnimation = forwardRef<
         sphereGroupRef.current.rotation.x += 0.002 * rotationMultiplier;
         sphereGroupRef.current.rotation.y += 0.004 * rotationMultiplier;
 
-        requestAnimationFrame(shakeEffect);
+        shakeFrameRef.current = window.requestAnimationFrame(shakeEffect);
       } else {
-        // Reset position and hide sphere
         sphereGroupRef.current.position.set(0, 0, 0);
         sphereGroupRef.current.scale.setScalar(targetSphereScaleRef.current);
         sphereGroupRef.current.visible = false;
+        createWireframeFragments();
+        createRedFragments();
       }
     };
 
-    shakeEffect();
+    shakeFrameRef.current = window.requestAnimationFrame(shakeEffect);
+  };
 
-    // Start creating fragments after shake completes
-    setTimeout(() => {
-      // Break the original sphere wireframe into varied fragments
+  const createWireframeFragments = () => {
+    if (!sceneRef.current || !sphereGroupRef.current) return;
+
       const fragments: THREE.LineSegments[] = [];
       const originalGeometry = new THREE.SphereGeometry(2, 32, 32);
       const originalWireframe = new THREE.WireframeGeometry(originalGeometry);
@@ -322,16 +391,15 @@ export const SphereAnimation = forwardRef<
         }
       }
 
+      originalWireframe.dispose();
+      originalGeometry.dispose();
       wireframeFragmentsRef.current = fragments;
-    }, 400); // 400ms delay to match shake duration
+      markFragmentGroupReady();
   };
 
   const createRedFragments = () => {
     if (!sceneRef.current || !redSphereRef.current) return;
 
-    // Start creating red fragments after the same delay as blue fragments
-    setTimeout(() => {
-      // Break the red sphere wireframe into fragments
       const fragments: THREE.LineSegments[] = [];
       const redGeometry = new THREE.SphereGeometry(1.2, 32, 32);
       const redWireframe = new THREE.WireframeGeometry(redGeometry);
@@ -439,8 +507,10 @@ export const SphereAnimation = forwardRef<
         }
       }
 
+      redWireframe.dispose();
+      redGeometry.dispose();
       redFragmentsRef.current = fragments;
-    }, 400); // 400ms delay to match shake duration
+      markFragmentGroupReady();
   };
 
   useEffect(() => {
@@ -545,7 +615,13 @@ export const SphereAnimation = forwardRef<
 
     // Animation loop
     function animate() {
-      requestAnimationFrame(animate);
+      const scene = sceneRef.current;
+      const camera = cameraRef.current;
+      const renderer = rendererRef.current;
+      if (!scene || !camera || !renderer) {
+        animationFrameRef.current = null;
+        return;
+      }
 
       if (!isShatteredRef.current && sphereGroupRef.current) {
         // Rotate sphere
@@ -596,6 +672,9 @@ export const SphereAnimation = forwardRef<
           const material = fragment.material as THREE.LineBasicMaterial;
           material.opacity *= 0.998;
         });
+        wireframeFragmentsRef.current = removeFinishedFragments(
+          wireframeFragmentsRef.current
+        );
       }
 
       // Animate red fragments slowly
@@ -626,9 +705,24 @@ export const SphereAnimation = forwardRef<
           const material = fragment.material as THREE.LineBasicMaterial;
           material.opacity *= 0.999; // Fade slightly slower than blue fragments
         });
+        redFragmentsRef.current = removeFinishedFragments(
+          redFragmentsRef.current
+        );
+      }
+
+      if (
+        isShatteredRef.current &&
+        shatterRevealSentRef.current &&
+        !shatterCompleteSentRef.current &&
+        wireframeFragmentsRef.current.length === 0 &&
+        redFragmentsRef.current.length === 0
+      ) {
+        shatterCompleteSentRef.current = true;
+        onShatterCompleteRef.current?.();
       }
 
       renderer.render(scene, camera);
+      animationFrameRef.current = window.requestAnimationFrame(animate);
     }
 
     // Initial render to make sure something shows up
@@ -651,15 +745,33 @@ export const SphereAnimation = forwardRef<
     window.addEventListener("resize", handleResize);
 
     // Start animation
-    animate();
+    animationFrameRef.current = window.requestAnimationFrame(animate);
 
     // Cleanup
     return () => {
       window.removeEventListener("resize", handleResize);
+      if (animationFrameRef.current !== null) {
+        window.cancelAnimationFrame(animationFrameRef.current);
+        animationFrameRef.current = null;
+      }
+      if (shakeFrameRef.current !== null) {
+        window.cancelAnimationFrame(shakeFrameRef.current);
+        shakeFrameRef.current = null;
+      }
       if (canvasContainer && rendererRef.current) {
         canvasContainer.removeChild(rendererRef.current.domElement);
       }
+      scene.traverse(disposeObject);
       scene.clear();
+      rendererRef.current?.dispose();
+      sceneRef.current = null;
+      rendererRef.current = null;
+      cameraRef.current = null;
+      sphereGroupRef.current = null;
+      redSphereRef.current = null;
+      wireframeFragmentsRef.current = [];
+      redFragmentsRef.current = [];
+      pendingFragmentGroupsRef.current = 0;
     };
   }, [applyResponsiveSphereScale]);
 
@@ -676,7 +788,8 @@ export const SphereAnimation = forwardRef<
       />
     </div>
   );
-});
+  }
+);
 
 SphereAnimation.displayName = "SphereAnimation";
 

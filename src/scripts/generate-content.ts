@@ -3,8 +3,8 @@ import path from "path";
 import matter from "gray-matter";
 import { CONTENT_DIR } from "../config";
 
-const vaultRoot = "/Users/jmill/Documents/obsidian/nhx4b";
-const sourceDir = path.join(vaultRoot, "me", "publish");
+const vaultRoot = "/Users/jmill/sdj/nhx4b";
+const sourceDir = path.join(vaultRoot, "nobody", "publish");
 const attachmentsDir = path.join(vaultRoot, "nobody/attachments");
 const destDir = CONTENT_DIR;
 

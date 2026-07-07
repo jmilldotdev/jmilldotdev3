@@ -1,4 +1,14 @@
-export default function AboutContent() {
+"use client";
+
+interface AboutContentProps {
+  onOpenProjects?: () => void;
+  onOpenWiki?: () => void;
+}
+
+export default function AboutContent({
+  onOpenProjects,
+  onOpenWiki,
+}: AboutContentProps) {
   return (
     <div className="space-y-6">
       {/* Bio */}
@@ -9,6 +19,33 @@ export default function AboutContent() {
         </p>
         <p className="leading-relaxed">
           he lives at the intersection of art and technology.
+        </p>
+        <p className="leading-relaxed">
+          check out his{" "}
+          <a
+            href={onOpenProjects ? "#projects" : "/"}
+            onClick={(event) => {
+              if (!onOpenProjects) return;
+              event.preventDefault();
+              onOpenProjects();
+            }}
+            className="text-warm underline hover:text-foreground transition-colors"
+          >
+            projects
+          </a>{" "}
+          or his knowledge{" "}
+          <a
+            href={onOpenWiki ? "#wiki" : "/"}
+            onClick={(event) => {
+              if (!onOpenWiki) return;
+              event.preventDefault();
+              onOpenWiki();
+            }}
+            className="text-warm underline hover:text-foreground transition-colors"
+          >
+            wiki
+          </a>
+          .
         </p>
       </div>
 

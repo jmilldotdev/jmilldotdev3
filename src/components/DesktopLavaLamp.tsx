@@ -53,6 +53,7 @@ const STAR_COUNT = 34;
 const BLOB_COUNT = 7;
 const DEPOSIT_COUNT = 4;
 const RENDER_QUALITY = 0.48;
+const TARGET_FRAME_INTERVAL_MS = 1000 / 30;
 
 const VERTEX_SHADER = `
 attribute vec2 a_position;
@@ -470,6 +471,7 @@ export function DesktopLavaLamp({
   const containerRef = useRef<HTMLDivElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const rafRef = useRef<number | null>(null);
+  const frameTimerRef = useRef<number | null>(null);
   const pointerRef = useRef({
     x: 0.5,
     y: 0.5,
@@ -490,6 +492,12 @@ export function DesktopLavaLamp({
   const renderStateRef = useRef({
     aspect: 1,
     time: 0,
+  });
+  const boundsRef = useRef({
+    left: 0,
+    top: 0,
+    width: 1,
+    height: 1,
   });
   const seedsRef = useRef(createBlobSeeds());
   const motionsRef = useRef(createBlobMotions());
@@ -591,6 +599,12 @@ export function DesktopLavaLamp({
 
     const resize = () => {
       const rect = container.getBoundingClientRect();
+      boundsRef.current = {
+        left: rect.left,
+        top: rect.top,
+        width: Math.max(1, rect.width),
+        height: Math.max(1, rect.height),
+      };
       containerWidth = rect.width;
       const width = Math.max(2, Math.floor(rect.width * RENDER_QUALITY));
       const height = Math.max(2, Math.floor(rect.height * RENDER_QUALITY));
@@ -614,7 +628,7 @@ export function DesktopLavaLamp({
     resize();
 
     const handlePointerMove = (event: PointerEvent) => {
-      const rect = container.getBoundingClientRect();
+      const rect = boundsRef.current;
       const x = (event.clientX - rect.left) / rect.width;
       const y = 1 - (event.clientY - rect.top) / rect.height;
       const pointer = pointerRef.current;
@@ -641,7 +655,7 @@ export function DesktopLavaLamp({
     };
 
     const handlePointerDown = (event: PointerEvent) => {
-      const rect = container.getBoundingClientRect();
+      const rect = boundsRef.current;
       const x = Math.max(
         0,
         Math.min(1, (event.clientX - rect.left) / rect.width)
@@ -703,7 +717,44 @@ export function DesktopLavaLamp({
     window.addEventListener("pointermove", handlePointerMove, { passive: true });
     window.addEventListener("pointerdown", handlePointerDown, { passive: true });
 
-    const draw = (now: number) => {
+    const clearScheduledFrame = () => {
+      if (rafRef.current !== null) {
+        window.cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
+      }
+      if (frameTimerRef.current !== null) {
+        window.clearTimeout(frameTimerRef.current);
+        frameTimerRef.current = null;
+      }
+    };
+
+    const scheduleDraw = (delay = TARGET_FRAME_INTERVAL_MS) => {
+      if (document.hidden || frameTimerRef.current !== null) return;
+
+      frameTimerRef.current = window.setTimeout(() => {
+        frameTimerRef.current = null;
+        if (!document.hidden) {
+          rafRef.current = window.requestAnimationFrame(draw);
+        }
+      }, delay);
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        clearScheduledFrame();
+        return;
+      }
+
+      lastPerfUpdate = performance.now();
+      frameCount = 0;
+      frameTimeSum = 0;
+      scheduleDraw(0);
+    };
+
+    const draw: FrameRequestCallback = (now) => {
+      rafRef.current = null;
+      if (document.hidden) return;
+
       const frameStart = performance.now();
       const pointer = pointerRef.current;
       const palette = paletteRef.current;
@@ -850,17 +901,17 @@ export function DesktopLavaLamp({
         lastPerfUpdate = now;
       }
 
-      rafRef.current = window.requestAnimationFrame(draw);
+      scheduleDraw();
     };
 
-    rafRef.current = window.requestAnimationFrame(draw);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    scheduleDraw(0);
 
     return () => {
-      if (rafRef.current !== null) {
-        window.cancelAnimationFrame(rafRef.current);
-      }
+      clearScheduledFrame();
       window.removeEventListener("pointermove", handlePointerMove);
       window.removeEventListener("pointerdown", handlePointerDown);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
       window.clearInterval(paletteTimer);
       resizeObserver.disconnect();
       gl.deleteBuffer(buffer);
