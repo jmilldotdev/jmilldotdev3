@@ -206,7 +206,7 @@
     "project_tags": [
       "project"
     ],
-    "tagline": null,
+    "tagline": "Visual media for humans and agents.",
     "url": "https://vamp.sh"
   },
   {
@@ -220,7 +220,7 @@
     "project_tags": [
       "project"
     ],
-    "tagline": null,
+    "tagline": "The history of AI from 2040 to 2053. An ever-evolving hyperfiction.",
     "url": "https://ai-2053.com"
   },
   {
@@ -234,7 +234,7 @@
     "project_tags": [
       "project"
     ],
-    "tagline": null,
+    "tagline": "A proposed system for using intelligence for pro-social coordination.",
     "url": "https://selfdrivingjazz.substack.com/p/ambient-communal-intelligence"
   },
   {
@@ -248,7 +248,7 @@
     "project_tags": [
       "project"
     ],
-    "tagline": null,
+    "tagline": "An art fair for basil: high-art 3D-printed pots and living basil plants at Bombay Beach.",
     "url": "https://artbasil.fyi"
   },
   {
@@ -262,7 +262,7 @@
     "project_tags": [
       "project"
     ],
-    "tagline": null,
+    "tagline": "An open-source control plane for sending media to physical screens.",
     "url": "https://cuelight.sh"
   },
   {
@@ -276,7 +276,7 @@
     "project_tags": [
       "project"
     ],
-    "tagline": null,
+    "tagline": "Fable 5.5 helps to get jmill a job at Anthropic, while making no mistakes",
     "url": "https://ciaude.ai"
   }
 ]

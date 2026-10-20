@@ -356,8 +356,13 @@ title: "${title}"
           : typeof data.url === "string"
           ? data.url
           : undefined;
+      // Recent write-ups author only `summary`; it stands in when no tagline is set.
       const taglineValue =
-        typeof data.tagline === "string" ? data.tagline : undefined;
+        typeof data.tagline === "string"
+          ? data.tagline
+          : typeof data.summary === "string"
+          ? data.summary
+          : undefined;
       const artistValue =
         typeof data.artist === "string" ? data.artist : undefined;
 

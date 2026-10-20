@@ -139,6 +139,26 @@ const DetailImage: React.FC<React.ImgHTMLAttributes<HTMLImageElement>> = ({
   />
 );
 
+// Filter control: a touch-sized chip on phones, the plain sidebar entry from md up.
+const FilterButton: React.FC<{
+  label: string;
+  active: boolean;
+  onSelect: () => void;
+}> = ({ label, active, onSelect }) => (
+  <button
+    type="button"
+    onClick={onSelect}
+    aria-pressed={active}
+    className={`flex min-h-11 min-w-11 cursor-pointer items-center justify-center whitespace-nowrap border px-3 transition-colors md:block md:min-h-0 md:min-w-0 md:w-full md:border-0 md:bg-transparent md:px-0 md:text-left ${
+      active
+        ? "border-[color:var(--palette-border)] bg-[color:var(--palette-accent-soft)] text-accent"
+        : "border-[color:var(--palette-border-soft)] text-accent-muted hover:text-warm"
+    }`}
+  >
+    {label}
+  </button>
+);
+
 export const ProjectsWindow: React.FC<ProjectWindowProps> = ({
   id,
   title,
@@ -305,44 +325,40 @@ export const ProjectsWindow: React.FC<ProjectWindowProps> = ({
       data-window="true"
     >
       <div className="flex h-full min-w-0 flex-col bg-[color:var(--palette-surface)] text-foreground md:flex-row">
-        <div className="flex max-h-28 shrink-0 overflow-x-auto border-b border-[color:var(--palette-border-soft)] bg-[color:var(--palette-surface-muted)] md:max-h-none md:w-48 md:flex-col md:overflow-x-visible md:border-b-0 md:border-r">
-          <div className="min-w-max border-r border-[color:var(--palette-border-soft)] p-3 md:min-w-0 md:border-r-0 md:border-b md:p-4">
-            <h2 className="mb-2 text-xs font-bold text-accent md:mb-3 md:text-sm">
+        <div
+          className={`${
+            viewMode === "detail" ? "hidden md:flex" : "flex"
+          } max-h-28 shrink-0 overflow-x-auto border-b border-[color:var(--palette-border-soft)] bg-[color:var(--palette-surface-muted)] md:max-h-none md:w-48 md:flex-col md:overflow-x-visible md:border-b-0 md:border-r`}
+        >
+          <div className="flex min-w-max items-center gap-2 border-r border-[color:var(--palette-border-soft)] px-3 py-2 md:block md:min-w-0 md:border-r-0 md:border-b md:p-4">
+            <h2 className="shrink-0 text-xs font-bold text-accent md:mb-3 md:text-sm">
               LIBRARY
             </h2>
             <ul className="flex gap-2 text-xs md:block md:space-y-2">
               {libraryFilters.map((filter) => (
-                <li
-                  key={filter}
-                  onClick={() => setActiveFilter(filter)}
-                  className={`cursor-pointer whitespace-nowrap border border-transparent px-2 py-1 transition-colors md:border-0 md:px-0 md:py-0 ${
-                    activeFilter === filter
-                      ? "border-[color:var(--palette-border-soft)] text-accent md:border-transparent"
-                      : "text-accent-muted hover:text-warm"
-                  }`}
-                >
-                  {filter}
+                <li key={filter}>
+                  <FilterButton
+                    label={filter}
+                    active={activeFilter === filter}
+                    onSelect={() => setActiveFilter(filter)}
+                  />
                 </li>
               ))}
             </ul>
           </div>
 
-          <div className="min-w-max p-3 md:min-w-0 md:flex-grow md:p-4">
-            <h3 className="mb-2 text-xs font-bold text-accent md:mb-3 md:text-sm">
+          <div className="flex min-w-max items-center gap-2 px-3 py-2 md:block md:min-w-0 md:flex-grow md:p-4">
+            <h3 className="shrink-0 text-xs font-bold text-accent md:mb-3 md:text-sm">
               PLAYLISTS
             </h3>
             <ul className="flex gap-2 text-xs md:block md:space-y-2">
               {playlistFilters.map((playlist) => (
-                <li
-                  key={playlist}
-                  onClick={() => setActiveFilter(playlist)}
-                  className={`cursor-pointer whitespace-nowrap border border-transparent px-2 py-1 transition-colors md:border-0 md:px-0 md:py-0 ${
-                    activeFilter === playlist
-                      ? "border-[color:var(--palette-border-soft)] text-accent md:border-transparent"
-                      : "text-accent-muted hover:text-warm"
-                  }`}
-                >
-                  {playlist}
+                <li key={playlist}>
+                  <FilterButton
+                    label={playlist}
+                    active={activeFilter === playlist}
+                    onSelect={() => setActiveFilter(playlist)}
+                  />
                 </li>
               ))}
             </ul>
@@ -350,8 +366,13 @@ export const ProjectsWindow: React.FC<ProjectWindowProps> = ({
         </div>
 
         {/* Main Content */}
-        <div className="flex min-h-0 flex-1 flex-col">
-          <div className="shrink-0 border-b border-[color:var(--palette-border-soft)] bg-[color:var(--palette-surface-muted)]">
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col">
+          {/* Phones show the player only for an open project; desktop keeps it. */}
+          <div
+            className={`${
+              viewMode === "detail" ? "" : "hidden md:block"
+            } shrink-0 border-b border-[color:var(--palette-border-soft)] bg-[color:var(--palette-surface-muted)]`}
+          >
             <div className="flex min-h-20 items-center gap-3 p-3 md:h-20 md:min-h-20 md:gap-4 md:px-4 md:py-3">
               <div className="relative h-10 w-10 flex-shrink-0 rounded bg-[color:var(--palette-surface)] md:h-12 md:w-12">
                 {selectedProject && (
@@ -367,13 +388,13 @@ export const ProjectsWindow: React.FC<ProjectWindowProps> = ({
               <div className="flex h-full min-w-0 flex-1 flex-col justify-center">
                 {selectedProject ? (
                   <>
-                    <div className="text-accent font-semibold text-sm truncate">
+                    <div className="text-accent font-semibold text-sm break-words md:truncate">
                       {selectedProject.title}
                     </div>
-                    <div className="text-zinc-500 text-xs truncate">
+                    <div className="text-zinc-500 text-xs break-words md:truncate">
                       {selectedProject.artist} • {selectedProject.year}
                     </div>
-                    <div className="text-zinc-600 text-xs mt-1 truncate">
+                    <div className="text-zinc-600 text-xs mt-1 hidden md:block md:truncate">
                       {selectedProject.tagline || "\u00A0"}
                     </div>
                   </>
@@ -384,7 +405,7 @@ export const ProjectsWindow: React.FC<ProjectWindowProps> = ({
                 )}
               </div>
               <div className="flex flex-shrink-0 items-center gap-1 md:gap-2">
-                <button className="text-zinc-500 hover:text-accent transition-colors">
+                <button className="hidden text-zinc-500 hover:text-accent transition-colors md:block">
                   <svg
                     className="w-5 h-5"
                     fill="currentColor"
@@ -395,7 +416,7 @@ export const ProjectsWindow: React.FC<ProjectWindowProps> = ({
                 </button>
                 <button
                   onClick={() => setIsPlaying(!isPlaying)}
-                  className="rounded-full bg-[color:var(--palette-accent)] p-2 text-[color:var(--palette-background)] transition-colors hover:bg-[color:var(--palette-warm)] disabled:opacity-50"
+                  className="rounded-full bg-[color:var(--palette-accent)] p-3 text-[color:var(--palette-background)] transition-colors hover:bg-[color:var(--palette-warm)] disabled:opacity-50 md:p-2"
                   disabled={!selectedProject}
                 >
                   {isPlaying ? (
@@ -428,7 +449,7 @@ export const ProjectsWindow: React.FC<ProjectWindowProps> = ({
                       selectedProject.url &&
                       window.open(selectedProject.url, "_blank")
                     }
-                    className="text-zinc-500 hover:text-warm transition-colors"
+                    className="p-3 text-zinc-500 hover:text-warm transition-colors md:p-0"
                     title="Open project"
                   >
                     <svg
@@ -448,12 +469,12 @@ export const ProjectsWindow: React.FC<ProjectWindowProps> = ({
                 )}
               </div>
             </div>
-            <div className="flex h-7 items-center px-3 md:px-4">
+            <div className="flex h-11 items-center px-3 md:h-7 md:px-4">
               <button
                 onClick={handleBackToGrid}
                 tabIndex={viewMode === "detail" ? 0 : -1}
                 aria-hidden={viewMode !== "detail"}
-                className={`flex items-center gap-2 text-sm text-accent transition-colors hover:text-warm ${
+                className={`flex h-full items-center gap-2 text-sm text-accent transition-colors hover:text-warm ${
                   viewMode === "detail"
                     ? "visible pointer-events-auto"
                     : "invisible pointer-events-none"
@@ -481,7 +502,7 @@ export const ProjectsWindow: React.FC<ProjectWindowProps> = ({
           {viewMode === "grid" ? (
             /* Project Grid */
             <div className="flex-1 overflow-y-auto p-3 md:p-6">
-              <div className="grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-4 lg:grid-cols-4">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
                 {getFilteredProjects(activeFilter).map((project) => (
                   <div
                     key={project.id}
@@ -492,20 +513,20 @@ export const ProjectsWindow: React.FC<ProjectWindowProps> = ({
                       <ProjectImage
                         project={project}
                         fill
-                        sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                        sizes="(max-width: 639px) 100vw, (max-width: 767px) 50vw, (max-width: 1023px) 33vw, 25vw"
                         className="object-cover group-hover:scale-105 transition-transform duration-300"
                         priority
                       />
                     </div>
-                    <div className="rounded bg-[color:var(--palette-surface)] p-1.5 md:p-2">
-                      <div className="truncate text-xs font-medium text-accent transition-colors group-hover:text-warm md:text-sm">
+                    <div className="rounded bg-[color:var(--palette-surface)] p-2">
+                      <div className="break-words text-sm font-medium text-accent transition-colors group-hover:text-warm md:truncate">
                         {project.title}
                       </div>
-                      <div className="truncate text-[11px] text-zinc-300 md:text-xs">
+                      <div className="break-words text-xs text-zinc-300 md:truncate">
                         {project.artist} • {project.year}
                       </div>
                       {project.tagline && (
-                        <div className="mt-1 line-clamp-2 text-[11px] text-zinc-400 md:text-xs">
+                        <div className="mt-1 text-xs text-zinc-400 md:line-clamp-3">
                           {project.tagline}
                         </div>
                       )}
@@ -517,6 +538,12 @@ export const ProjectsWindow: React.FC<ProjectWindowProps> = ({
           ) : (
             /* Project Detail View */
             <div className="flex-1 overflow-y-auto p-3 md:p-4">
+              {/* On phones the full tagline leads the write-up instead of crowding the player. */}
+              {selectedProject?.tagline && (
+                <p className="mb-3 text-xs text-zinc-400 md:hidden">
+                  {selectedProject.tagline}
+                </p>
+              )}
               {isLoadingContent ? (
                 <div className="flex flex-col items-center justify-center h-64 space-y-4">
                   <div className="relative">
@@ -591,13 +618,17 @@ export const ProjectsWindow: React.FC<ProjectWindowProps> = ({
           )}
 
           {/* Player Controls */}
-          <div className="border-t border-[color:var(--palette-border-soft)] bg-[color:var(--palette-surface-muted)] p-2 md:p-3">
+          <div
+            className={`${
+              viewMode === "detail" ? "" : "hidden md:block"
+            } border-t border-[color:var(--palette-border-soft)] bg-[color:var(--palette-surface-muted)] px-2 md:p-3`}
+          >
             <div className="flex items-center gap-2 md:gap-4">
               <div className="flex items-center gap-2">
                 <button
                   onClick={handlePreviousProject}
                   disabled={!canGoPrevious()}
-                  className={`transition-colors ${
+                  className={`p-3 transition-colors md:p-0 ${
                     canGoPrevious()
                       ? "text-accent-muted hover:text-accent"
                       : "text-zinc-700 cursor-not-allowed"
@@ -615,7 +646,7 @@ export const ProjectsWindow: React.FC<ProjectWindowProps> = ({
                 <button
                   onClick={handleNextProject}
                   disabled={!canGoNext()}
-                  className={`transition-colors ${
+                  className={`p-3 transition-colors md:p-0 ${
                     canGoNext()
                       ? "text-accent-muted hover:text-accent"
                       : "text-zinc-700 cursor-not-allowed"
@@ -651,7 +682,7 @@ export const ProjectsWindow: React.FC<ProjectWindowProps> = ({
                 </span>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="hidden items-center gap-2 md:flex">
                 <button className="text-zinc-500 hover:text-accent transition-colors">
                   <svg
                     className="w-4 h-4"
