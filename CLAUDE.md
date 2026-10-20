@@ -32,9 +32,9 @@ pnpm lint         # Run Next.js linter
 ### Content Pipeline
 The site uses a unique content generation system that processes files from an Obsidian vault:
 
-1. **Source**: Obsidian vault at `/Users/jmill/Documents/obsidian/nhx3b`
+1. **Source**: Obsidian vault at `VAULT_ROOT`, defaulting to `/Users/jmill/sdj/nhx4b`; notes are read from `nobody/publish`.
 2. **Processing**: `src/scripts/generate-content.ts` script that:
-   - Filters for markdown files with `publish: true` in frontmatter
+   - By default recursively imports Markdown notes under that directory (except `index.md`); the full import does not check `publish`.
    - Converts Obsidian-style `[[wikilinks]]` to Next.js Link components
    - Processes image attachments and copies them to public directory
    - Generates metadata files for navigation and search
@@ -68,11 +68,14 @@ The site uses a unique content generation system that processes files from an Ob
 
 ## Working with Content
 
-When modifying content generation:
-1. The source Obsidian vault is hardcoded in `generate-content.ts`
-2. Only files with `publish: true` in frontmatter are processed
-3. Wikilinks are validated against existing content to prevent broken links
-4. Images are copied to both `/content/Images/` and `/public/images/`
+1. Set `VAULT_ROOT` to use a different vault location (for desktop, `/home/jmill/sdj/nhx4b`).
+2. To import only specific published write-ups without rewriting the rest of the catalogue:
+   ```sh
+   VAULT_ROOT=/home/jmill/sdj/nhx4b pnpm generate:content --notes "project/😤 AI 2053.md" "project/vamp.md"
+   ```
+   Paths are relative to `nobody/publish`. Selected notes must have `publish: true`; template/writeup notes are rejected. Only their MDX and embedded attachments are copied, and their entries are merged into the existing configuration indexes. Unselected MDX, images, covers, and index entries are retained. Omitting `--notes` keeps the original full-import behavior.
+3. Wikilinks are validated against imported content (and existing MDX for selected imports).
+4. `![[image.png]]` embeds are converted to image elements; attachments are copied to both `/content/Images/` and `/public/images/`.
 
 ## Important Notes
 

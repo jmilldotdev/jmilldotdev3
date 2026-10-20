@@ -3,10 +3,47 @@ import path from "path";
 import matter from "gray-matter";
 import { CONTENT_DIR } from "../config";
 
-const vaultRoot = "/Users/jmill/sdj/nhx4b";
+const vaultRoot = process.env.VAULT_ROOT || "/Users/jmill/sdj/nhx4b";
 const sourceDir = path.join(vaultRoot, "nobody", "publish");
 const attachmentsDir = path.join(vaultRoot, "nobody/attachments");
 const destDir = CONTENT_DIR;
+
+// A selected import updates only the named notes and merges their catalogue entries.
+const args = process.argv.slice(2);
+if (args.length && (args[0] !== "--notes" || args.length === 1)) {
+  throw new Error("Usage: generate:content [--notes project/note.md ...]");
+}
+const selectedNotes = args.length
+  ? new Set(args.slice(1).map((note) => path.resolve(sourceDir, note)))
+  : null;
+for (const note of selectedNotes || []) {
+  const relative = path.relative(sourceDir, note);
+  if (relative.startsWith("..") || path.isAbsolute(relative) || !note.endsWith(".md")) {
+    throw new Error(`Note must be a Markdown file inside ${sourceDir}: ${note}`);
+  }
+  const { data } = matter(fs.readFileSync(note, "utf8"));
+  if (data.publish !== true || /template|writeup|t-project/i.test(path.basename(note))) {
+    throw new Error(`Selected note is not a published write-up: ${note}`);
+  }
+}
+
+const configDir = path.join(process.cwd(), "src", "config");
+function readConfig<T>(name: string, fallback: T): T {
+  const file = path.join(configDir, `${name}.json`);
+  return fs.existsSync(file) ? JSON.parse(fs.readFileSync(file, "utf8")) : fallback;
+}
+
+function mergeEntries<T>(name: string, incoming: T[], key: (entry: T) => string): T[] {
+  if (!selectedNotes) return incoming;
+  const updates = new Map(incoming.map((entry) => [key(entry), entry]));
+  const merged = readConfig<T[]>(name, []).map((entry) => {
+    const id = key(entry);
+    const replacement = updates.get(id);
+    updates.delete(id);
+    return replacement ?? entry;
+  });
+  return [...merged, ...updates.values()];
+}
 
 // Add interface for page metadata
 interface PageMetadata {
@@ -132,6 +169,7 @@ function copyPublishedFiles(
       if (file.toLowerCase() === "index.md") {
         continue;
       }
+      if (selectedNotes && !selectedNotes.has(fullPath)) continue;
       const content = fs.readFileSync(fullPath, "utf8");
 
       // Remove emoji and space from the start of the filename
@@ -144,10 +182,14 @@ function copyPublishedFiles(
       const baseFileName = path.basename(destFileName, ".md");
 
       // Extract title from baseFileName (capitalize first letter of each word)
-      const title = baseFileName
+      let title = baseFileName
         .split(/[-_]/)
         .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
         .join(" ");
+      if (selectedNotes) {
+        const source = matter(content);
+        title = source.data.title || source.content.match(/^#\s+(.+)$/m)?.[1] || title;
+      }
 
       // Slugify the base file name
       const slugifiedFileName = baseFileName
@@ -372,6 +414,7 @@ function collectValidSlugs(dir: string) {
       if (file.toLowerCase() === "index.md") {
         continue;
       }
+      if (selectedNotes && !selectedNotes.has(fullPath)) continue;
       const destFileName = file.replace(
         /^(\p{Emoji_Presentation}|\p{Emoji}\uFE0F|\s)+/gu,
         ""
@@ -383,6 +426,12 @@ function collectValidSlugs(dir: string) {
         .replace(/[^a-z0-9-]/g, "");
       validSlugs.add(slugifiedFileName);
     }
+  }
+}
+
+if (selectedNotes) {
+  for (const file of fs.readdirSync(destDir)) {
+    if (file.endsWith(".mdx")) validSlugs.add(file.slice(0, -4));
   }
 }
 
@@ -403,21 +452,21 @@ const { generatedPages, pageMetadata, tagMap } = result;
 generatedPages.push("/");
 
 // Ensure config directory exists
-const configDir = path.join(process.cwd(), "src", "config");
+// Reuse configDir for both full and selected imports.
 fs.mkdirSync(configDir, { recursive: true });
 
 // Write the pages list to a JSON file
 const pagesPath = path.join(configDir, "pages.json");
-fs.writeFileSync(pagesPath, JSON.stringify(generatedPages, null, 2));
+fs.writeFileSync(pagesPath, JSON.stringify(mergeEntries("pages", generatedPages, (page) => page), null, 2));
 console.log(`Generated pages list at: ${pagesPath}`);
 
 // Write page metadata to a JSON file
 const metadataPath = path.join(configDir, "metadata.json");
-fs.writeFileSync(metadataPath, JSON.stringify(pageMetadata, null, 2));
+fs.writeFileSync(metadataPath, JSON.stringify(mergeEntries("metadata", pageMetadata, (page) => page.slug), null, 2));
 console.log(`Generated metadata at: ${metadataPath}`);
 
 // Write tag mappings to a JSON file
-const tagData = Object.fromEntries(
+const tagData: Record<string, PageMetadata[]> = Object.fromEntries(
   Array.from(tagMap.entries()).map(([tag, pages]) => [
     tag,
     pages.sort((a, b) => {
@@ -428,6 +477,16 @@ const tagData = Object.fromEntries(
     }),
   ])
 );
+if (selectedNotes) {
+  const updatedSlugs = new Set(pageMetadata.map((page) => page.slug));
+  const existingTags = readConfig<Record<string, PageMetadata[]>>("tags", {});
+  for (const [tag, pages] of Object.entries(existingTags)) {
+    tagData[tag] = [
+      ...pages.filter((page) => !updatedSlugs.has(page.slug)),
+      ...(tagData[tag] || []),
+    ];
+  }
+}
 
 const tagMapPath = path.join(configDir, "tags.json");
 fs.writeFileSync(tagMapPath, JSON.stringify(tagData, null, 2));
@@ -436,14 +495,18 @@ console.log(`Generated tag mappings at: ${tagMapPath}`);
 // Generate entities index (for entity tagged content)
 const entityPages = tagMap.get("entity") || [];
 const entitiesIndexPath = path.join(configDir, "entities.json");
-fs.writeFileSync(entitiesIndexPath, JSON.stringify(entityPages, null, 2));
+const selectedSlugs = new Set(pageMetadata.map((page) => page.slug));
+const retainedEntities = selectedNotes
+  ? readConfig<PageMetadata[]>("entities", []).filter((page) => !selectedSlugs.has(page.slug))
+  : [];
+fs.writeFileSync(entitiesIndexPath, JSON.stringify([...retainedEntities, ...entityPages], null, 2));
 console.log(`Generated entities index at: ${entitiesIndexPath}`);
 
 // Copy all existing images from content/Images to public/images for web serving
 const contentImagesDir = path.join(destDir, "Images");
 const publicImagesDir = path.join(process.cwd(), "public", "images");
 
-if (fs.existsSync(contentImagesDir)) {
+if (!selectedNotes && fs.existsSync(contentImagesDir)) {
   // Ensure public images directory exists
   fs.mkdirSync(publicImagesDir, { recursive: true });
 
@@ -463,7 +526,7 @@ if (fs.existsSync(contentImagesDir)) {
   console.log(
     `Copied ${imageFiles.length} images to public directory for web serving`
   );
-} else {
+} else if (!selectedNotes) {
   console.log("No content/Images directory found");
 }
 
@@ -524,7 +587,7 @@ const projects = projectPages.map((page) => {
 });
 
 const projectsIndexPath = path.join(configDir, "projects.json");
-fs.writeFileSync(projectsIndexPath, JSON.stringify(projects, null, 2));
+fs.writeFileSync(projectsIndexPath, JSON.stringify(mergeEntries("projects", projects, (project) => project.id), null, 2));
 console.log(`Generated projects index at: ${projectsIndexPath}`);
 
 console.log("Finished copying and modifying published files.");
