@@ -69,14 +69,20 @@ function textToSlug(text: string): string {
     .replace(/[^a-z0-9-]/g, ""); // Remove non-alphanumeric characters except hyphens
 }
 
+function imageElement(reference: string): string | null {
+  const [fileName, caption] = reference.split("|").map((part) => part.trim());
+  if (!/\.(png|jpg|jpeg|gif|webp)$/i.test(fileName)) return null;
+  const [src, alt] = [`/images/${fileName}`, caption || fileName].map((value) =>
+    value.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;")
+  );
+  return `<img src="${src}" alt="${alt}" className="max-w-full h-auto border border-gray-700 my-3 rounded" />`;
+}
+
 // Convert [[backlinks]] to MDX Link components and handle images
 function processBacklinks(content: string, validSlugs: Set<string>): string {
   return content.replace(/\[\[([^\]]+)\]\]/g, (match, linkText) => {
-    // Check if this is an image reference
-    if (linkText.match(/\.(png|jpg|jpeg|gif|webp)$/i)) {
-      const imagePath = `/images/${linkText}`;
-      return `<img src="${imagePath}" alt="${linkText}" className="max-w-full h-auto border border-gray-700 my-3 rounded" />`;
-    }
+    const image = imageElement(linkText);
+    if (image) return image;
 
     // Handle pipe syntax [[link|display text]]
     let actualLinkText = linkText;
@@ -114,7 +120,7 @@ function copyAttachment(
   const publicImagesDir = path.join(process.cwd(), "public", "images");
 
   while ((match = regex.exec(content)) !== null) {
-    const fileName = match[1];
+    const fileName = match[1].split("|")[0].trim();
     const sourcePath = path.join(attachmentsDir, fileName);
     // Copy to both content/Images and public/images for web serving
     const contentDestPath = path.join(destDir, "Images", fileName);
@@ -289,13 +295,7 @@ title: "${title}"
       // Process image references first (![[ ]] syntax)
       contentPart = contentPart.replace(
         /!\[\[([^\]]+)\]\]/g,
-        (match, linkText) => {
-          if (linkText.match(/\.(png|jpg|jpeg|gif|webp)$/i)) {
-            const imagePath = `/images/${linkText}`;
-            return `<img src="${imagePath}" alt="${linkText}" className="max-w-full h-auto border border-gray-700 my-3 rounded" />`;
-          }
-          return match; // Return unchanged if not an image
-        }
+        (match, linkText) => imageElement(linkText) || match
       );
 
       // Process backlinks (only in content part)

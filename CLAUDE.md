@@ -75,7 +75,7 @@ The site uses a unique content generation system that processes files from an Ob
    ```
    Paths are relative to `nobody/publish`. Selected notes must have `publish: true`; template/writeup notes are rejected. Only their MDX and embedded attachments are copied, and their entries are merged into the existing configuration indexes. Unselected MDX, images, covers, and index entries are retained. Omitting `--notes` keeps the original full-import behavior.
 3. Wikilinks are validated against imported content (and existing MDX for selected imports).
-4. `![[image.png]]` embeds are converted to image elements; attachments are copied to both `/content/Images/` and `/public/images/`.
+4. `![[image.png]]` and `![[image.png|Description]]` embeds are converted to image elements (descriptions become alt text); attachments are copied to both `/content/Images/` and `/public/images/`.
 
 ## Important Notes
 

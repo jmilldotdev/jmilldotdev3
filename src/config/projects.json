@@ -194,5 +194,89 @@
     ],
     "tagline": "reprogram your doomscrolling",
     "url": null
+  },
+  {
+    "id": "vamp",
+    "title": "vamp",
+    "cover": "/project-covers/vamp.webp",
+    "fallbackCover": "/project-covers/vamp.png",
+    "artist": "jmill",
+    "year": "2026",
+    "genre": "Protocol / Software",
+    "project_tags": [
+      "project"
+    ],
+    "tagline": null,
+    "url": "https://vamp.sh"
+  },
+  {
+    "id": "ai-2053",
+    "title": "AI 2053",
+    "cover": "/project-covers/ai-2053.webp",
+    "fallbackCover": "/project-covers/ai-2053.png",
+    "artist": "jmill",
+    "year": "2026",
+    "genre": "Interactive fiction",
+    "project_tags": [
+      "project"
+    ],
+    "tagline": null,
+    "url": "https://ai-2053.com"
+  },
+  {
+    "id": "ambient-communal-intelligence",
+    "title": "Ambient Communal Intelligence",
+    "cover": "/project-covers/ambient-communal-intelligence.webp",
+    "fallbackCover": "/project-covers/ambient-communal-intelligence.png",
+    "artist": "jmill",
+    "year": "2026",
+    "genre": "Essay",
+    "project_tags": [
+      "project"
+    ],
+    "tagline": null,
+    "url": "https://selfdrivingjazz.substack.com/p/ambient-communal-intelligence"
+  },
+  {
+    "id": "art-basil",
+    "title": "Art Basil",
+    "cover": "/project-covers/art-basil.webp",
+    "fallbackCover": "/project-covers/art-basil.png",
+    "artist": "jmill",
+    "year": "2026",
+    "genre": "IRL",
+    "project_tags": [
+      "project"
+    ],
+    "tagline": null,
+    "url": "https://artbasil.fyi"
+  },
+  {
+    "id": "cuelight",
+    "title": "Cuelight",
+    "cover": "/project-covers/cuelight.webp",
+    "fallbackCover": "/project-covers/cuelight.png",
+    "artist": "jmill",
+    "year": "2026",
+    "genre": "Software",
+    "project_tags": [
+      "project"
+    ],
+    "tagline": null,
+    "url": "https://cuelight.sh"
+  },
+  {
+    "id": "ciaudeai",
+    "title": "ciaude.ai",
+    "cover": "/project-covers/ciaudeai.webp",
+    "fallbackCover": "/project-covers/ciaudeai.png",
+    "artist": "jmill",
+    "year": "2026",
+    "genre": "Website / Agent",
+    "project_tags": [
+      "project"
+    ],
+    "tagline": null,
+    "url": "https://ciaude.ai"
   }
 ]

@@ -192,5 +192,83 @@
     "path": "/c/whoup",
     "artist": "BCAD (feat. Youyang)",
     "category": "project"
+  },
+  {
+    "slug": "vamp",
+    "title": "vamp",
+    "genre": "Protocol / Software",
+    "created": "2026-10-15T23:37:21.679Z",
+    "date": "2026-10-20T10:43:32.357Z",
+    "tags": [],
+    "url": "https://vamp.sh",
+    "year": "2026",
+    "path": "/c/vamp",
+    "artist": "jmill",
+    "category": "project"
+  },
+  {
+    "slug": "ai-2053",
+    "title": "AI 2053",
+    "genre": "Interactive fiction",
+    "created": "2026-10-19T02:02:57.335Z",
+    "date": "2026-10-20T10:43:32.351Z",
+    "tags": [],
+    "url": "https://ai-2053.com",
+    "year": "2026",
+    "path": "/c/ai-2053",
+    "artist": "jmill",
+    "category": "project"
+  },
+  {
+    "slug": "ambient-communal-intelligence",
+    "title": "Ambient Communal Intelligence",
+    "genre": "Essay",
+    "created": "2026-10-17T01:42:42.727Z",
+    "date": "2026-10-20T10:43:32.355Z",
+    "tags": [],
+    "url": "https://selfdrivingjazz.substack.com/p/ambient-communal-intelligence",
+    "year": "2026",
+    "path": "/c/ambient-communal-intelligence",
+    "artist": "jmill",
+    "category": "project"
+  },
+  {
+    "slug": "art-basil",
+    "title": "Art Basil",
+    "genre": "IRL",
+    "created": "2026-10-08T23:53:47.748Z",
+    "date": "2026-10-20T10:43:32.358Z",
+    "tags": [],
+    "url": "https://artbasil.fyi",
+    "year": "2026",
+    "path": "/c/art-basil",
+    "artist": "jmill",
+    "category": "project"
+  },
+  {
+    "slug": "cuelight",
+    "title": "Cuelight",
+    "genre": "Software",
+    "created": "2026-10-09T00:19:09.837Z",
+    "date": "2026-10-20T10:43:32.352Z",
+    "tags": [],
+    "url": "https://cuelight.sh",
+    "year": "2026",
+    "path": "/c/cuelight",
+    "artist": "jmill",
+    "category": "project"
+  },
+  {
+    "slug": "ciaudeai",
+    "title": "ciaude.ai",
+    "genre": "Website / Agent",
+    "created": "2026-10-17T02:03:00.323Z",
+    "date": "2026-10-20T10:43:32.354Z",
+    "tags": [],
+    "url": "https://ciaude.ai",
+    "year": "2026",
+    "path": "/c/ciaudeai",
+    "artist": "jmill",
+    "category": "project"
   }
 ]
