@@ -53,6 +53,46 @@ immutable release or a Vercel deployment. Do not stage those unrelated edits
 into the analytics commit. See the
 [`infra/ops` lifecycle SOP](../../../infra/ops/README.md#jmilldev-on-demand-development-server).
 
+### Isolated production deployment
+
+The analytics-only source is isolated from the dirty canonical checkout in
+`/home/jmill/sdj/tmp/jmill-dev-openpanel-release` (a detached Git worktree).
+It contains the committed analytics closure, not the unrelated mobile-window
+edits or untracked health route. Do not regenerate vault content during this
+deployment; that would introduce changes outside the approved source closure.
+
+Use the existing Vercel project that owns `www.jmill.dev`, not a newly created
+project. The authenticated `jmilldotdev` CLI account currently cannot find that
+project in either accessible scope (`jmilldotdevs-projects` or
+`timkosters-projects`), so its actual project ID/scope must be recovered through
+an existing credential with access. Do not guess the project or use
+`--create-if-missing`. Once the owning project is accessible and this site's
+real OpenPanel client is provisioned, the production invocation is:
+
+```sh
+# Required inputs: existing owning Vercel project/scope and public site client.
+: "${JMILL_VERCEL_PROJECT_ID:?Set the existing www.jmill.dev Vercel project ID}"
+: "${JMILL_VERCEL_SCOPE:?Set that project's owning Vercel scope}"
+: "${NEXT_PUBLIC_OPENPANEL_CLIENT_ID:?Set the real jmill.dev public client ID}"
+
+/home/jmill/.npm/_npx/69f9afb961c37556/node_modules/.bin/vercel deploy \
+  /home/jmill/sdj/tmp/jmill-dev-openpanel-release \
+  --prod --yes \
+  --project "$JMILL_VERCEL_PROJECT_ID" \
+  --scope "$JMILL_VERCEL_SCOPE" \
+  --build-env NEXT_PUBLIC_DEPLOYMENT_ENVIRONMENT=production \
+  --build-env "NEXT_PUBLIC_OPENPANEL_CLIENT_ID=$NEXT_PUBLIC_OPENPANEL_CLIENT_ID"
+```
+
+This uses the installed Vercel CLI 65.2.0 and uploads only the isolated source;
+Vercel performs the production build. The optional OpenPanel API URL is omitted
+to use the Cloud default. Also retain the two public values in the project's
+Production environment for later builds. No additional production go is needed
+for this analytics-only command. It has **not** been executed: the site client
+and owning-project access are missing. After deployment, repeat the real
+canonical browser/network check and confirm arrival in OpenPanel where access
+permits; a successful Vercel build alone does not prove tracking.
+
 ## Analytics
 
 `src/components/Analytics.tsx` + `src/lib/analytics.ts` send production-only
