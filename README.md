@@ -31,11 +31,12 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 
 ## Release and private preview
 
-Production promotion requires explicit approval under the workspace
+Production promotion follows the workspace
 [`software-feedback-loop.md` rollout policy](../../../infra/docs/software-feedback-loop.md#rollout-and-acceptance).
-Do not push to a production-connected branch or run a Vercel production deploy
-as part of preview review. Keep the analytics closure on
-`rc/openpanel-jmilldev-20261024` until production promotion is approved.
+jmill's 2026-10-24 request authorizes this analytics-only production rollout;
+no additional production go is needed for that scope. It does not authorize
+unrelated working-tree changes. The analytics closure is committed separately
+on `rc/openpanel-jmilldev-20261024`; never deploy the dirty working tree.
 
 The documented preview is the managed, on-demand live-source service:
 
@@ -86,8 +87,9 @@ NEXT_PUBLIC_OPENPANEL_CLIENT_ID=<jmill.dev public client ID>
 The API URL can remain unset. Do not use a fixture ID or another site's client,
 and do not put any OpenPanel management credential or client secret in
 `NEXT_PUBLIC_*`. The parent rollout owns API access and client provisioning.
-An approved production build/deploy is still required; preview silence is not
-evidence of destination delivery.
+Production must deploy the analytics-only committed source closure, not the
+unrelated dirty working tree. Preview silence is not evidence of destination
+delivery.
 
 Auto-capture, outgoing-link and `data-track` attribute tracking, session
 replay, identify and profiles are all off; an SDK filter drops anything but
@@ -119,6 +121,6 @@ GPC false:
   integration. Historical Umami data/account configuration is untouched.
 - OpenPanel event arrival is not verified: this site's client is not yet
   provisioned and the source cutover is not promoted. Production completion
-  requires the public client ID, explicit promotion approval, and then a real
+  requires the public client ID and an analytics-only deployment, then a real
   browser `/track` request plus destination-event confirmation where read access
-  permits.
+  permits. The requested analytics-only rollout is already authorized.
