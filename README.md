@@ -53,53 +53,60 @@ immutable release or a Vercel deployment. Do not stage those unrelated edits
 into the analytics commit. See the
 [`infra/ops` lifecycle SOP](../../../infra/ops/README.md#jmilldev-on-demand-development-server).
 
-### Isolated production deployment
+### Isolated GitHub production deployment
+
+The Vercel GitHub integration for `jmilldotdev/jmilldotdev3` deploys
+**Production from `main`**. Before the analytics cutover, GitHub deployment
+records identified production source `e554737`, matching `origin/main`; the separate
+`rc/mobile-projects-20261020` commit is only a Preview and must not be included.
+Vercel CLI access is **not** required and is not a release blocker.
 
 The analytics-only source is isolated from the dirty canonical checkout in
 `/home/jmill/sdj/tmp/jmill-dev-openpanel-release` (a detached Git worktree).
-It contains the committed analytics closure, not the unrelated mobile-window
-edits or untracked health route. Do not regenerate vault content during this
-deployment; that would introduce changes outside the approved source closure.
+It excludes unrelated mobile-window edits and the untracked health route.
+Do not regenerate vault content or merge unrelated RC work into this release.
 
-Use the existing Vercel project that owns `www.jmill.dev`, not a newly created
-project. The authenticated `jmilldotdev` CLI account currently cannot find that
-project in either accessible scope (`jmilldotdevs-projects` or
-`timkosters-projects`), so its actual project ID/scope must be recovered through
-an existing credential with access. Do not guess the project or use
-`--create-if-missing`. Once the owning project is accessible and this site's
-real OpenPanel client is provisioned, the production invocation is:
+The public jmill.dev OpenPanel client ID is committed in
+`src/config/openpanel.json`: `6d507382-51ad-4290-b039-8defbe1b3702`, with allowed
+domain `https://www.jmill.dev`. `next.config.ts` uses this public value as the
+fallback and enables the existing production-environment gate only when Vercel
+sets `VERCEL_ENV=production`. Existing explicit `NEXT_PUBLIC_*` overrides still
+take precedence. Preview deployments and development remain disabled by default;
+the canonical hostname and browser privacy gates are unchanged. No management
+key or client secret belongs in this file.
+
+Update the detached release worktree to the exact analytics-only commit, then:
 
 ```sh
-# Required inputs: existing owning Vercel project/scope and public site client.
-: "${JMILL_VERCEL_PROJECT_ID:?Set the existing www.jmill.dev Vercel project ID}"
-: "${JMILL_VERCEL_SCOPE:?Set that project's owning Vercel scope}"
-: "${NEXT_PUBLIC_OPENPANEL_CLIENT_ID:?Set the real jmill.dev public client ID}"
+# Run from /home/jmill/sdj/tmp/jmill-dev-openpanel-release
+git fetch origin main
+git merge-base --is-ancestor origin/main HEAD
+git log --oneline origin/main..HEAD  # must contain only analytics/config/docs
+release_sha=$(git rev-parse HEAD)
+git push origin HEAD:main           # ordinary fast-forward; never force
 
-/home/jmill/.npm/_npx/69f9afb961c37556/node_modules/.bin/vercel deploy \
-  /home/jmill/sdj/tmp/jmill-dev-openpanel-release \
-  --prod --yes \
-  --project "$JMILL_VERCEL_PROJECT_ID" \
-  --scope "$JMILL_VERCEL_SCOPE" \
-  --build-env NEXT_PUBLIC_DEPLOYMENT_ENVIRONMENT=production \
-  --build-env "NEXT_PUBLIC_OPENPANEL_CLIENT_ID=$NEXT_PUBLIC_OPENPANEL_CLIENT_ID"
+gh api "repos/jmilldotdev/jmilldotdev3/deployments?environment=Production&sha=$release_sha" \
+  --jq '.[] | {id, sha, environment, statuses_url}'
+# Use the returned deployment ID; repeat for up to about five minutes.
+gh api "repos/jmilldotdev/jmilldotdev3/deployments/<deployment-id>/statuses" \
+  --jq '.[] | {state, environment_url, log_url}'
 ```
 
-This uses the installed Vercel CLI 65.2.0 and uploads only the isolated source;
-Vercel performs the production build. The optional OpenPanel API URL is omitted
-to use the Cloud default. Also retain the two public values in the project's
-Production environment for later builds. No additional production go is needed
-for this analytics-only command. It has **not** been executed: the site client
-and owning-project access are missing. After deployment, repeat the real
-canonical browser/network check and confirm arrival in OpenPanel where access
-permits; a successful Vercel build alone does not prove tracking.
+Stop if the ancestry check fails or the commit list contains unrelated changes.
+Wait for a **Production success for the exact pushed SHA**, then use a real
+browser at <https://www.jmill.dev/> to confirm the old Umami request is gone and
+OpenPanel `/track` is present. Confirm event arrival where destination read
+access permits. Neither a Git push nor a successful build proves collection.
+No additional production go or Vercel dashboard environment setup is needed.
 
 ## Analytics
 
 `src/components/Analytics.tsx` + `src/lib/analytics.ts` send production-only
 [OpenPanel](https://openpanel.dev/docs/sdks/web) analytics via `@openpanel/web`
 (this replaced the old hard-coded Umami script). Nothing loads unless **all**
-hold: `NEXT_PUBLIC_DEPLOYMENT_ENVIRONMENT=production`, a valid
-`NEXT_PUBLIC_OPENPANEL_CLIENT_ID`, the page is served from
+hold: `NEXT_PUBLIC_DEPLOYMENT_ENVIRONMENT=production` (inlined from the Vercel
+production environment or an explicit override), a valid public client ID from
+`src/config/openpanel.json` or `NEXT_PUBLIC_OPENPANEL_CLIENT_ID`, and the page is served from
 `https://www.jmill.dev` (the apex redirects there), and the browser sends
 neither Do Not Track nor Global Privacy Control. Otherwise the SDK chunk is
 never fetched and no request is made, so `pnpm dev`, the MTS tailnet dev server
@@ -107,22 +114,17 @@ and Vercel preview URLs stay silent even if they inherit production variables.
 
 | variable | value |
 | --- | --- |
-| `NEXT_PUBLIC_DEPLOYMENT_ENVIRONMENT` | `production` (anything else disables) |
-| `NEXT_PUBLIC_OPENPANEL_CLIENT_ID` | public OpenPanel client ID for this site (no client secret, ever) |
+| `NEXT_PUBLIC_DEPLOYMENT_ENVIRONMENT` | optional override; otherwise `production` only when `VERCEL_ENV=production` |
+| `NEXT_PUBLIC_OPENPANEL_CLIENT_ID` | optional override for `src/config/openpanel.json`'s public `clientId` (no client secret, ever) |
 | `NEXT_PUBLIC_OPENPANEL_API_URL` | optional; defaults to `https://api.openpanel.dev`, must be HTTPS without credentials or query |
 
-These are public build-time values inlined into the client bundle: set them
-only in the Vercel project's **Production** environment and redeploy after
-changing them.
+These are public build-time values inlined into the client bundle. The committed
+public configuration supports the GitHub production build without Vercel
+dashboard access. Changing the ID requires a new production build/deployment.
 
-The only missing analytics configuration input is this site's real public
-OpenPanel client ID. Once provisioned, the exact Vercel **Production** values
-are:
-
-```dotenv
-NEXT_PUBLIC_DEPLOYMENT_ENVIRONMENT=production
-NEXT_PUBLIC_OPENPANEL_CLIENT_ID=<jmill.dev public client ID>
-```
+The real public client ID is committed in `src/config/openpanel.json`; no
+fixture or another site's client is used. Future ID changes must be committed
+before the fast-forward production push above.
 
 The API URL can remain unset. Do not use a fixture ID or another site's client,
 and do not put any OpenPanel management credential or client secret in
@@ -149,7 +151,7 @@ preview URL, or with DNT/GPC enabled, the same filter stays empty.
 
 ### Cutover status
 
-Browser observation on 2026-10-25 UTC (2026-10-24 local), with DNT unset and
+Pre-cutover browser baseline on 2026-10-25 UTC (2026-10-24 local), with DNT unset and
 GPC false:
 
 - Managed preview `/` returned 200 and made no OpenPanel or Umami requests;
@@ -159,8 +161,6 @@ GPC false:
   `/api/send` (POST 200), with no OpenPanel requests.
 - Source removes the old Umami script and has no other analytics provider
   integration. Historical Umami data/account configuration is untouched.
-- OpenPanel event arrival is not verified: this site's client is not yet
-  provisioned and the source cutover is not promoted. Production completion
-  requires the public client ID and an analytics-only deployment, then a real
-  browser `/track` request plus destination-event confirmation where read access
-  permits. The requested analytics-only rollout is already authorized.
+- Destination event arrival must be confirmed separately from browser HTTP
+  success; the parent rollout owns the dashboard evidence. The requested
+  analytics-only production rollout is already authorized.
