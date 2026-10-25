@@ -1,5 +1,7 @@
 "use client";
 
+import { trackEvent } from "@/lib/analytics";
+
 interface AboutContentProps {
   onOpenProjects?: () => void;
   onOpenWiki?: () => void;
@@ -100,6 +102,7 @@ export default function AboutContent({
             <span className="text-accent mr-2">•</span>
             <a
               href="https://x.com/jmilldotdev"
+              onClick={() => trackEvent({ name: "contact_open", channel: "x" })}
               target="_blank"
               rel="noopener noreferrer"
               className="text-warm underline hover:text-foreground transition-colors"
@@ -111,6 +114,9 @@ export default function AboutContent({
             <span className="text-accent mr-2">•</span>
             <a
               href="https://github.com/jmilldotdev"
+              onClick={() =>
+                trackEvent({ name: "contact_open", channel: "github" })
+              }
               target="_blank"
               rel="noopener noreferrer"
               className="text-warm underline hover:text-foreground transition-colors"
@@ -122,6 +128,9 @@ export default function AboutContent({
             <span className="text-accent mr-2">•</span>
             <a
               href="mailto:jon@jmill.dev"
+              onClick={() =>
+                trackEvent({ name: "contact_open", channel: "email" })
+              }
               className="text-warm underline hover:text-foreground transition-colors"
             >
               Email

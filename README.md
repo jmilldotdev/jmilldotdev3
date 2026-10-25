@@ -29,8 +29,96 @@ To learn more about Next.js, take a look at the following resources:
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-## Deploy on Vercel
+## Release and private preview
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Production promotion requires explicit approval under the workspace
+[`software-feedback-loop.md` rollout policy](../../../infra/docs/software-feedback-loop.md#rollout-and-acceptance).
+Do not push to a production-connected branch or run a Vercel production deploy
+as part of preview review. Keep the analytics closure on
+`rc/openpanel-jmilldev-20261024` until production promotion is approved.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The documented preview is the managed, on-demand live-source service:
+
+```sh
+# From /home/jmill/sdj/infra/ops
+bin/sdj jmilldev apply  # reconcile after dependency/lockfile changes
+bin/sdj jmilldev start
+bin/sdj jmilldev status --json
+```
+
+Review at <https://jmill-desktop.tail587341.ts.net:8453>. This serves the
+canonical working tree, including unrelated uncommitted edits; it is not an
+immutable release or a Vercel deployment. Do not stage those unrelated edits
+into the analytics commit. See the
+[`infra/ops` lifecycle SOP](../../../infra/ops/README.md#jmilldev-on-demand-development-server).
+
+## Analytics
+
+`src/components/Analytics.tsx` + `src/lib/analytics.ts` send production-only
+[OpenPanel](https://openpanel.dev/docs/sdks/web) analytics via `@openpanel/web`
+(this replaced the old hard-coded Umami script). Nothing loads unless **all**
+hold: `NEXT_PUBLIC_DEPLOYMENT_ENVIRONMENT=production`, a valid
+`NEXT_PUBLIC_OPENPANEL_CLIENT_ID`, the page is served from
+`https://www.jmill.dev` (the apex redirects there), and the browser sends
+neither Do Not Track nor Global Privacy Control. Otherwise the SDK chunk is
+never fetched and no request is made, so `pnpm dev`, the MTS tailnet dev server
+and Vercel preview URLs stay silent even if they inherit production variables.
+
+| variable | value |
+| --- | --- |
+| `NEXT_PUBLIC_DEPLOYMENT_ENVIRONMENT` | `production` (anything else disables) |
+| `NEXT_PUBLIC_OPENPANEL_CLIENT_ID` | public OpenPanel client ID for this site (no client secret, ever) |
+| `NEXT_PUBLIC_OPENPANEL_API_URL` | optional; defaults to `https://api.openpanel.dev`, must be HTTPS without credentials or query |
+
+These are public build-time values inlined into the client bundle: set them
+only in the Vercel project's **Production** environment and redeploy after
+changing them.
+
+The only missing analytics configuration input is this site's real public
+OpenPanel client ID. Once provisioned, the exact Vercel **Production** values
+are:
+
+```dotenv
+NEXT_PUBLIC_DEPLOYMENT_ENVIRONMENT=production
+NEXT_PUBLIC_OPENPANEL_CLIENT_ID=<jmill.dev public client ID>
+```
+
+The API URL can remain unset. Do not use a fixture ID or another site's client,
+and do not put any OpenPanel management credential or client secret in
+`NEXT_PUBLIC_*`. The parent rollout owns API access and client provisioning.
+An approved production build/deploy is still required; preview silence is not
+evidence of destination delivery.
+
+Auto-capture, outgoing-link and `data-track` attribute tracking, session
+replay, identify and profiles are all off; an SDK filter drops anything but
+the events below. Page views send origin + path (no query string or hash)
+and the public page title; the referrer is reduced to an external origin. Named events:
+
+| event | properties | fired by |
+| --- | --- | --- |
+| `project_open` | `project` (id) | opening a project in the Projects window, incl. previous/next |
+| `project_link_open` | `project` (id) | the project detail "Open project" button |
+| `contact_open` | `channel` (`x`\|`github`\|`email`) | About presence links |
+
+Tracking is fire-and-forget and never blocks navigation. Smoke check on
+production: devtools Network filtered to `openpanel` shows a `/track`
+`screen_view` POST on load and `project_open` after opening a project; on a
+preview URL, or with DNT/GPC enabled, the same filter stays empty.
+
+### Cutover status
+
+Browser observation on 2026-10-25 UTC (2026-10-24 local), with DNT unset and
+GPC false:
+
+- Managed preview `/` returned 200 and made no OpenPanel or Umami requests;
+  the canonical-host/environment gates intentionally keep it tracker-free.
+- <https://jmill.dev> redirected to <https://www.jmill.dev/> (200). That
+  still-unpromoted deployment loaded the old Umami `script.js` (200) and sent
+  `/api/send` (POST 200), with no OpenPanel requests.
+- Source removes the old Umami script and has no other analytics provider
+  integration. Historical Umami data/account configuration is untouched.
+- OpenPanel event arrival is not verified: this site's client is not yet
+  provisioned and the source cutover is not promoted. Production completion
+  requires the public client ID, explicit promotion approval, and then a real
+  browser `/track` request plus destination-event confirmation where read access
+  permits.

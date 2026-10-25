@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import "./globals.css";
 import Header from "@/components/Header";
-import Script from "next/script";
+import Analytics from "@/components/Analytics";
 import QuickSwitcher from "@/components/QuickSwitcher";
 import { getQuickSwitcherData } from "@/lib/quick-switcher-data";
 import { DesktopProvider } from "@/contexts/DesktopContext";
@@ -148,18 +148,14 @@ const Layout = async ({ children }: LayoutProps) => {
           dangerouslySetInnerHTML={{ __html: paletteBootScript }}
         />
       </head>
-      <Script
-        defer
-        src="https://umami-tawny-theta.vercel.app/script.js"
-        data-website-id="016992b7-62de-4ef5-84aa-b0274ddaabb0"
-      />
       <body className="min-h-screen bg-[color:var(--palette-background)] text-foreground">
+        <Analytics />
         <DesktopProvider>
           <PaletteProvider>
             <QuickSwitcher pageMetadata={pageMetadata} tagData={tagData}>
               <div
                 id="app"
-                className="grid grid-rows-[80px_1fr] h-screen p-2.5 gap-2.5"
+                className="grid grid-rows-[1fr] sm:grid-rows-[80px_1fr] h-screen p-2.5 gap-2.5"
               >
                 <Header />
                 <main className="relative border border-[color:var(--palette-border-soft)] bg-[color:var(--palette-surface-muted)] flex flex-col justify-start overflow-auto">

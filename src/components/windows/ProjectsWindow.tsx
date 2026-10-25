@@ -5,6 +5,7 @@ import { BaseWindow } from "./BaseWindow";
 import Image from "next/image";
 import { MDXRemote, MDXRemoteSerializeResult } from "next-mdx-remote";
 import { unlockAchievement } from "@/lib/achievements";
+import { trackEvent } from "@/lib/analytics";
 
 interface ProjectWindowProps {
   id: string;
@@ -195,6 +196,7 @@ export const ProjectsWindow: React.FC<ProjectWindowProps> = ({
   };
 
   const handleProjectClick = (project: Project) => {
+    trackEvent({ name: "project_open", project: project.id });
     setSelectedProject(project);
     setIsPlaying(true);
     setViewMode("detail");
@@ -424,10 +426,14 @@ export const ProjectsWindow: React.FC<ProjectWindowProps> = ({
                 </button>
                 {selectedProject?.url && (
                   <button
-                    onClick={() =>
-                      selectedProject.url &&
-                      window.open(selectedProject.url, "_blank")
-                    }
+                    onClick={() => {
+                      if (!selectedProject.url) return;
+                      trackEvent({
+                        name: "project_link_open",
+                        project: selectedProject.id,
+                      });
+                      window.open(selectedProject.url, "_blank");
+                    }}
                     className="text-zinc-500 hover:text-warm transition-colors"
                     title="Open project"
                   >
