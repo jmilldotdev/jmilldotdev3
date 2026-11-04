@@ -10,12 +10,14 @@ interface PostClientProps {
     date?: string;
     created?: string;
     URL?: string;
+    url?: string;
     tags?: string[];
     [key: string]: string | string[] | number | boolean | undefined;
   };
 }
 
 export default function PostClient({ source, frontmatter }: PostClientProps) {
+  const projectUrl = frontmatter.url || frontmatter.URL;
   const formatDate = (dateStr?: string) => {
     if (!dateStr) return "";
     const date = new Date(dateStr);
@@ -61,15 +63,15 @@ export default function PostClient({ source, frontmatter }: PostClientProps) {
             <div className="text-accent">{formatDate(frontmatter.date)}</div>
           )}
 
-          {frontmatter.URL && (
+          {projectUrl && (
             <div>
               <a
-                href={frontmatter.URL as string}
+                href={projectUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-accent hover:underline"
               >
-                {getRootUrl(frontmatter.URL as string)}
+                {getRootUrl(projectUrl)}
               </a>
             </div>
           )}
