@@ -31,12 +31,9 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 
 ## Release and private preview
 
-Production promotion follows the workspace
-[`software-feedback-loop.md` rollout policy](../../../infra/docs/software-feedback-loop.md#rollout-and-acceptance).
-jmill's 2026-10-24 request authorizes this analytics-only production rollout;
-no additional production go is needed for that scope. It does not authorize
-unrelated working-tree changes. The analytics closure is committed separately
-on `rc/openpanel-jmilldev-20261024`; never deploy the dirty working tree.
+Production promotion requires explicit approval under the workspace
+[`rollout policy`](../../../infra/docs/software-feedback-loop.md#rollout-and-acceptance).
+Never deploy the dirty working tree or include unrelated changes.
 
 The documented preview is the managed, on-demand live-source service:
 
@@ -56,29 +53,16 @@ into the analytics commit. See the
 ### Isolated GitHub production deployment
 
 The Vercel GitHub integration for `jmilldotdev/jmilldotdev3` deploys
-**Production from `main`**. Before the analytics cutover, GitHub deployment
-records identified production source `e554737`, matching `origin/main`; the separate
-`rc/mobile-projects-20261020` commit is only a Preview and must not be included.
-Vercel CLI access is **not** required and is not a release blocker.
+**Production from `main`**. Set `NEXT_PUBLIC_CLOUDFLARE_WEB_ANALYTICS_TOKEN`
+to the public token for this site in the Vercel project's **Production**
+environment before building. Do not merge the full local release branch or
+`rc/mobile-projects-20261020` into production.
 
-The analytics-only source is isolated from the dirty canonical checkout in
-`/home/jmill/sdj/tmp/jmill-dev-openpanel-release` (a detached Git worktree).
-It excludes unrelated mobile-window edits and the untracked health route.
-Do not regenerate vault content or merge unrelated RC work into this release.
-
-The public jmill.dev OpenPanel client ID is committed in
-`src/config/openpanel.json`: `6d507382-51ad-4290-b039-8defbe1b3702`, with allowed
-domain `https://www.jmill.dev`. `next.config.ts` uses this public value as the
-fallback and enables the existing production-environment gate only when Vercel
-sets `VERCEL_ENV=production`. Existing explicit `NEXT_PUBLIC_*` overrides still
-take precedence. Preview deployments and development remain disabled by default;
-the canonical hostname and browser privacy gates are unchanged. No management
-key or client secret belongs in this file.
-
-Update the detached release worktree to the exact analytics-only commit, then:
+Prepare the scoped analytics commit in an isolated worktree based on
+`origin/main`. It must exclude unrelated mobile/window edits and the
+untracked health route. Do not regenerate vault content for this release.
 
 ```sh
-# Run from /home/jmill/sdj/tmp/jmill-dev-openpanel-release
 git fetch origin main
 git merge-base --is-ancestor origin/main HEAD
 git log --oneline origin/main..HEAD  # must contain only analytics/config/docs
@@ -93,50 +77,24 @@ gh api "repos/jmilldotdev/jmilldotdev3/deployments/<deployment-id>/statuses" \
 ```
 
 Stop if the ancestry check fails or the commit list contains unrelated changes.
-Wait for a **Production success for the exact pushed SHA**, then use a real
-browser at <https://www.jmill.dev/> to confirm the old Umami request is gone and
-OpenPanel `/track` is present. Confirm event arrival where destination read
-access permits. Neither a Git push nor a successful build proves collection.
-No additional production go or Vercel dashboard environment setup is needed.
+Wait for **Production success for the exact pushed SHA**, then follow the
+browser check below. Neither a Git push nor a successful build proves collection.
 
 ## Analytics
 
-`src/components/Analytics.tsx` + `src/lib/analytics.ts` send production-only
-[OpenPanel](https://openpanel.dev/docs/sdks/web) analytics via `@openpanel/web`
-(this replaced the old hard-coded Umami script). Nothing loads unless **all**
-hold: `NEXT_PUBLIC_DEPLOYMENT_ENVIRONMENT=production` (inlined from the Vercel
-production environment or an explicit override), a valid public client ID from
-`src/config/openpanel.json` or `NEXT_PUBLIC_OPENPANEL_CLIENT_ID`, and the page is served from
-`https://www.jmill.dev` (the apex redirects there), and the browser sends
-neither Do Not Track nor Global Privacy Control. Otherwise the SDK chunk is
-never fetched and no request is made, so `pnpm dev`, the MTS tailnet dev server
-and Vercel preview URLs stay silent even if they inherit production variables.
+Cloudflare Web Analytics measures pageviews. Existing named custom events
+go to `https://events.cuelight.fyi/e`. Both are enabled only on
+`https://www.jmill.dev` in a production build, and neither runs when the
+browser signals Do Not Track or Global Privacy Control.
 
-| variable | value |
+| Build variable | Value |
 | --- | --- |
-| `NEXT_PUBLIC_DEPLOYMENT_ENVIRONMENT` | optional override; otherwise `production` only when `VERCEL_ENV=production` |
-| `NEXT_PUBLIC_OPENPANEL_CLIENT_ID` | optional override for `src/config/openpanel.json`'s public `clientId` (no client secret, ever) |
-| `NEXT_PUBLIC_OPENPANEL_API_URL` | optional; defaults to `https://api.openpanel.dev`, must be HTTPS without credentials or query |
+| `NEXT_PUBLIC_DEPLOYMENT_ENVIRONMENT` | Optional override; defaults to `production` only when `VERCEL_ENV=production`. |
+| `NEXT_PUBLIC_CLOUDFLARE_WEB_ANALYTICS_TOKEN` | This site's public Cloudflare token. If unset, only custom events are enabled. |
 
-These are public build-time values inlined into the client bundle. The committed
-public configuration supports the GitHub production build without Vercel
-dashboard access. Changing the ID requires a new production build/deployment.
-
-The real public client ID is committed in `src/config/openpanel.json`; no
-fixture or another site's client is used. Future ID changes must be committed
-before the fast-forward production push above.
-
-The API URL can remain unset. Do not use a fixture ID or another site's client,
-and do not put any OpenPanel management credential or client secret in
-`NEXT_PUBLIC_*`. The parent rollout owns API access and client provisioning.
-Production must deploy the analytics-only committed source closure, not the
-unrelated dirty working tree. Preview silence is not evidence of destination
-delivery.
-
-Auto-capture, outgoing-link and `data-track` attribute tracking, session
-replay, identify and profiles are all off; an SDK filter drops anything but
-the events below. Page views send origin + path (no query string or hash)
-and the public page title; the referrer is reduced to an external origin. Named events:
+Changing a variable requires a new build. Do not put credentials in
+`NEXT_PUBLIC_*`. Custom events send the apex site, event name, pathname
+only (no query or fragment), and the following properties:
 
 | event | properties | fired by |
 | --- | --- | --- |
@@ -144,12 +102,13 @@ and the public page title; the referrer is reduced to an external origin. Named 
 | `project_link_open` | `project` (id) | the project detail "Open project" button |
 | `contact_open` | `channel` (`x`\|`github`\|`email`) | About presence links |
 
-Tracking is fire-and-forget and never blocks navigation. Smoke check on
-production: devtools Network filtered to `openpanel` shows a `/track`
-`screen_view` POST on load and `project_open` after opening a project; on a
-preview URL, or with DNT/GPC enabled, the same filter stays empty.
+On production, check the Network panel for `beacon.min.js` and a Cloudflare
+`/cdn-cgi/rum` POST (switch tabs or navigate if needed). Open a project and
+check for `POST https://events.cuelight.fyi/e` carrying `project_open`. Verify
+the custom event in Site events and the pageview in Cloudflare. Repeat with
+DNT/GPC enabled and on a preview URL; neither request should occur.
 
-### Cutover status
+### Historical baseline before the OpenPanel cutover
 
 Pre-cutover browser baseline on 2026-10-25 UTC (2026-10-24 local), with DNT unset and
 GPC false:
@@ -159,8 +118,5 @@ GPC false:
 - <https://jmill.dev> redirected to <https://www.jmill.dev/> (200). That
   still-unpromoted deployment loaded the old Umami `script.js` (200) and sent
   `/api/send` (POST 200), with no OpenPanel requests.
-- Source removes the old Umami script and has no other analytics provider
-  integration. Historical Umami data/account configuration is untouched.
-- Destination event arrival must be confirmed separately from browser HTTP
-  success; the parent rollout owns the dashboard evidence. The requested
-  analytics-only production rollout is already authorized.
+- The OpenPanel change removed the old Umami integration without changing
+  historical Umami data or account configuration.
