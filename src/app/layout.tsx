@@ -155,7 +155,7 @@ const Layout = async ({ children }: LayoutProps) => {
             <QuickSwitcher pageMetadata={pageMetadata} tagData={tagData}>
               <div
                 id="app"
-                className="grid grid-rows-[1fr] sm:grid-rows-[80px_1fr] h-screen p-2.5 gap-2.5"
+                className="grid grid-rows-[80px_1fr] h-screen p-2.5 gap-2.5"
               >
                 <Header />
                 <main className="relative border border-[color:var(--palette-border-soft)] bg-[color:var(--palette-surface-muted)] flex flex-col justify-start overflow-auto">
