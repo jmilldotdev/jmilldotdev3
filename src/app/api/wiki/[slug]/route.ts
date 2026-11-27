@@ -1,8 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
+import { contentSlugs, readContent } from "@/lib/content";
 import matter from 'gray-matter';
 import { serialize } from 'next-mdx-remote/serialize';
+
+export const dynamic = "force-static";
+
+export function generateStaticParams() {
+  return contentSlugs().map((slug) => ({ slug }));
+}
 
 export async function GET(
   request: NextRequest,
@@ -10,14 +15,13 @@ export async function GET(
 ) {
   try {
     const { slug } = await params;
-    const contentPath = path.join(process.cwd(), 'content', `${slug}.mdx`);
+    const fileContent = readContent(slug);
     
-    if (!fs.existsSync(contentPath)) {
+    if (fileContent === undefined) {
       console.log(`Content not found: ${slug}.mdx`);
       return NextResponse.json({ error: 'Content not found' }, { status: 404 });
     }
     
-    const fileContent = fs.readFileSync(contentPath, 'utf8');
     const { data, content } = matter(fileContent);
     
     // Serialize the MDX content on the server

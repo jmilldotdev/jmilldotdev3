@@ -5,6 +5,9 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "build:worker": "opennextjs-cloudflare build",
+    "deploy:worker": "opennextjs-cloudflare deploy",
+    "preview:worker": "opennextjs-cloudflare preview",
     "start": "next start",
     "lint": "next lint",
     "generate:index": "tsx ./src/scripts/generate-index",
@@ -16,11 +19,12 @@
     "prepare": "husky"
   },
   "dependencies": {
+    "@opennextjs/cloudflare": "1.20.19",
     "@mdx-js/react": "^3.1.0",
     "@tailwindcss/typography": "^0.5.16",
     "gray-matter": "^4.0.3",
     "kbar": "0.1.0-beta.45",
-    "next": "15.5.20",
+    "next": "15.5.29",
     "next-mdx-remote": "^6.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
@@ -29,6 +33,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@mdx-js/loader": "3.1.1",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
@@ -37,11 +42,12 @@
     "chalk": "^5.4.1",
     "dotenv": "^16.5.0",
     "eslint": "^9",
-    "eslint-config-next": "15.5.20",
+    "eslint-config-next": "15.5.29",
     "husky": "^9.0.0",
     "sharp": "^0.33.0",
     "tailwindcss": "^4",
     "tsx": "^4.19.4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "wrangler": "4.169.0"
   }
 }

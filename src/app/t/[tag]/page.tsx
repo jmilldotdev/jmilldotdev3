@@ -1,5 +1,4 @@
-import fs from "fs";
-import path from "path";
+import tags from "@/config/tags.json";
 import Link from "next/link";
 import { Metadata } from "next";
 
@@ -49,17 +48,7 @@ export default async function TagPage({
   const { tag } = await params;
   const decodedTag = decodeURIComponent(tag);
 
-  let tagData: TagData = {};
-  let posts: PageMetadata[] = [];
-
-  try {
-    const tagDataPath = path.join(process.cwd(), "src", "config", "tags.json");
-    const tagDataContent = fs.readFileSync(tagDataPath, "utf8");
-    tagData = JSON.parse(tagDataContent);
-    posts = tagData[decodedTag] || [];
-  } catch (error) {
-    console.error("Error loading tag data:", error);
-  }
+  const posts = (tags as TagData)[decodedTag] || [];
 
   return (
     <div className="w-full px-4 md:px-8 lg:px-16 py-8">
@@ -141,19 +130,3 @@ export default async function TagPage({
   );
 }
 
-export async function generateStaticParams() {
-  let tagData: TagData = {};
-
-  try {
-    const tagDataPath = path.join(process.cwd(), "src", "config", "tags.json");
-    const tagDataContent = fs.readFileSync(tagDataPath, "utf8");
-    tagData = JSON.parse(tagDataContent);
-  } catch (error) {
-    console.error("Error loading tag data for static params:", error);
-    return [];
-  }
-
-  return Object.keys(tagData).map((tag) => ({
-    tag: encodeURIComponent(tag),
-  }));
-}

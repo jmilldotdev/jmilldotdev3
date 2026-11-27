@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
+import tags from "@/config/tags.json";
 import { serialize } from 'next-mdx-remote/serialize';
 
 interface PageMetadata {
@@ -23,16 +22,7 @@ export async function GET(
     const { tag } = await params;
     const decodedTag = decodeURIComponent(tag);
     
-    // Load tags.json
-    const tagDataPath = path.join(process.cwd(), 'src', 'config', 'tags.json');
-    
-    if (!fs.existsSync(tagDataPath)) {
-      return NextResponse.json({ error: 'Tags data not found' }, { status: 404 });
-    }
-    
-    const tagDataContent = fs.readFileSync(tagDataPath, 'utf8');
-    const tagData: TagData = JSON.parse(tagDataContent);
-    const posts = tagData[decodedTag] || [];
+    const posts = (tags as TagData)[decodedTag] || [];
     
     // Generate MDX content for the tag page
     const escapedTag = decodedTag.replace(/[`${}\\]/g, '\\$&');

@@ -1,8 +1,11 @@
-import fs from "fs";
-import path from "path";
+import { contentSlugs, readContent } from "@/lib/content";
 import matter from "gray-matter";
+import Link from "next/link";
 import PostClient from "@/components/PostClient";
 import { Metadata } from "next";
+import { notFound } from "next/navigation";
+
+const mdxComponents = { Link };
 
 export async function generateMetadata({
   params,
@@ -12,8 +15,8 @@ export async function generateMetadata({
   const { slug } = await params;
 
   try {
-    const filePath = path.join(process.cwd(), "content", `${slug}.mdx`);
-    const source = fs.readFileSync(filePath, "utf8");
+    const source = readContent(slug);
+    if (source === undefined) throw new Error("Content not found");
     const { data } = matter(source);
 
     return {
@@ -60,19 +63,24 @@ export default async function Post({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const filePath = path.join(process.cwd(), "content", `${slug}.mdx`);
-  const source = fs.readFileSync(filePath, "utf8");
+  const source = readContent(slug);
+  if (source === undefined) notFound();
 
   const { content, data } = matter(source);
 
-  return <PostClient source={content} frontmatter={data} />;
+  const hasContent = content.replace(/import\s+.*?from\s+["'].*?["'];?\s*/g, "").trim();
+  // Resolve the build-compiled MDX module for this slug; Workers cannot evaluate MDX at runtime.
+  const Content = hasContent
+    ? (await import(`../../../../content/${slug}.mdx?component`)).default
+    : null;
+
+  return (
+    <PostClient frontmatter={data}>
+      {Content && <Content components={mdxComponents} />}
+    </PostClient>
+  );
 }
 
 export async function generateStaticParams() {
-  const files = fs.readdirSync(path.join(process.cwd(), "content"));
-  return files
-    .filter((file) => file.endsWith(".mdx"))
-    .map((file) => ({
-      slug: file.replace(/\.mdx?$/, ""),
-    }));
+  return contentSlugs().map((slug) => ({ slug }));
 }

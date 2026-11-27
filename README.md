@@ -80,6 +80,31 @@ Stop if the ancestry check fails or the commit list contains unrelated changes.
 Wait for **Production success for the exact pushed SHA**, then follow the
 browser check below. Neither a Git push nor a successful build proves collection.
 
+### Cloudflare Workers deployment
+
+Build from the isolated Cloudflare migration branch, not the dirty
+working tree. Use Node.js 22.12+ and pnpm. The deployment targets the
+`jmill-dev` Worker on `workers.dev`; this command does not change DNS.
+
+```sh
+pnpm install --frozen-lockfile
+NEXT_PUBLIC_DEPLOYMENT_ENVIRONMENT=production \
+  NEXT_PUBLIC_CLOUDFLARE_WEB_ANALYTICS_TOKEN="${JMill_RUM_SITE_TOKEN:?Set the public site token}" \
+  /home/jmill/sdj/infra/ops/bin/heavy-job 6G pnpm build:worker
+pnpm preview:worker --ip 127.0.0.1   # optional local Workers runtime check
+
+CLOUDFLARE_API_TOKEN="$(op read --no-newline 'op://sdj/Cloudflare jmill.dev/workers_deploy_token')" \
+  pnpm deploy:worker
+```
+
+`JMill_RUM_SITE_TOKEN` is the public `site_token` from
+`GET /accounts/{account_id}/rum/site_info/list` for `host=www.jmill.dev`
+and `auto_install=false`. Authenticate that lookup with the existing
+broker-provisioned `rum_api_token` in `sdj/Cloudflare SDJ events`; never pass
+the management token to the build. The deploy token comes from `admin-access`
+with `Workers Scripts Edit` for the configured account. Both preview URLs
+remain tracker-free because analytics only runs on `www.jmill.dev`.
+
 ## Analytics
 
 Cloudflare Web Analytics measures pageviews. Existing named custom events
