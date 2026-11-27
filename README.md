@@ -57,14 +57,15 @@ that preserves the path and query. Proxied DNS and Worker routes are managed
 separately; deploys update the `jmill-dev` Worker without touching them.
 
 ```sh
-pnpm install --frozen-lockfile
-NEXT_PUBLIC_DEPLOYMENT_ENVIRONMENT=production \
-  NEXT_PUBLIC_CLOUDFLARE_WEB_ANALYTICS_TOKEN="${JMILL_RUM_SITE_TOKEN:?Set the public site token}" \
-  /home/jmill/sdj/infra/ops/bin/heavy-job 6G pnpm build:worker
-pnpm preview:worker --ip 127.0.0.1   # optional local Workers runtime check
-
-CLOUDFLARE_API_TOKEN="$(op read --no-newline 'op://sdj/Cloudflare jmill.dev/workers_deploy_token')" \
-  pnpm deploy:worker
+(
+  set -eu
+  pnpm install --frozen-lockfile
+  NEXT_PUBLIC_DEPLOYMENT_ENVIRONMENT=production \
+    NEXT_PUBLIC_CLOUDFLARE_WEB_ANALYTICS_TOKEN="${JMILL_RUM_SITE_TOKEN:?Set the public site token}" \
+    /home/jmill/sdj/infra/ops/bin/heavy-job 6G pnpm build:worker
+  worker_token=$(op read --no-newline 'op://sdj/Cloudflare jmill.dev/workers_deploy_token')
+  CLOUDFLARE_API_TOKEN="${worker_token:?Missing Workers deploy token}" pnpm deploy:worker
+)
 ```
 
 `JMILL_RUM_SITE_TOKEN` is the public `site_token` from
