@@ -45,51 +45,21 @@ bin/sdj jmilldev status --json
 ```
 
 Review at <https://jmill-desktop.tail587341.ts.net:8453>. This serves the
-canonical working tree, including unrelated uncommitted edits; it is not an
-immutable release or a Vercel deployment. Do not stage those unrelated edits
-into the analytics commit. See the
+canonical working tree, including unrelated uncommitted edits; it is not a
+production deployment. See the
 [`infra/ops` lifecycle SOP](../../../infra/ops/README.md#jmilldev-on-demand-development-server).
 
-### Isolated GitHub production deployment
+### Cloudflare Workers production deployment
 
-The Vercel GitHub integration for `jmilldotdev/jmilldotdev3` deploys
-**Production from `main`**. Set `NEXT_PUBLIC_CLOUDFLARE_WEB_ANALYTICS_TOKEN`
-to the public token for this site in the Vercel project's **Production**
-environment before building. Do not merge the full local release branch or
-`rc/mobile-projects-20261020` into production.
-
-Prepare the scoped analytics commit in an isolated worktree based on
-`origin/main`. It must exclude unrelated mobile/window edits and the
-untracked health route. Do not regenerate vault content for this release.
-
-```sh
-git fetch origin main
-git merge-base --is-ancestor origin/main HEAD
-git log --oneline origin/main..HEAD  # must contain only analytics/config/docs
-release_sha=$(git rev-parse HEAD)
-git push origin HEAD:main           # ordinary fast-forward; never force
-
-gh api "repos/jmilldotdev/jmilldotdev3/deployments?environment=Production&sha=$release_sha" \
-  --jq '.[] | {id, sha, environment, statuses_url}'
-# Use the returned deployment ID; repeat for up to about five minutes.
-gh api "repos/jmilldotdev/jmilldotdev3/deployments/<deployment-id>/statuses" \
-  --jq '.[] | {state, environment_url, log_url}'
-```
-
-Stop if the ancestry check fails or the commit list contains unrelated changes.
-Wait for **Production success for the exact pushed SHA**, then follow the
-browser check below. Neither a Git push nor a successful build proves collection.
-
-### Cloudflare Workers deployment
-
-Build from the isolated Cloudflare migration branch, not the dirty
-working tree. Use Node.js 22.12+ and pnpm. The deployment targets the
-`jmill-dev` Worker on `workers.dev`; this command does not change DNS.
+Build from a clean release checkout with Node.js 22.12+ and pnpm.
+Production is <https://www.jmill.dev>, with a 307 from <https://jmill.dev>
+that preserves the path and query. Proxied DNS and Worker routes are managed
+separately; deploys update the `jmill-dev` Worker without touching them.
 
 ```sh
 pnpm install --frozen-lockfile
 NEXT_PUBLIC_DEPLOYMENT_ENVIRONMENT=production \
-  NEXT_PUBLIC_CLOUDFLARE_WEB_ANALYTICS_TOKEN="${JMill_RUM_SITE_TOKEN:?Set the public site token}" \
+  NEXT_PUBLIC_CLOUDFLARE_WEB_ANALYTICS_TOKEN="${JMILL_RUM_SITE_TOKEN:?Set the public site token}" \
   /home/jmill/sdj/infra/ops/bin/heavy-job 6G pnpm build:worker
 pnpm preview:worker --ip 127.0.0.1   # optional local Workers runtime check
 
@@ -97,13 +67,18 @@ CLOUDFLARE_API_TOKEN="$(op read --no-newline 'op://sdj/Cloudflare jmill.dev/work
   pnpm deploy:worker
 ```
 
-`JMill_RUM_SITE_TOKEN` is the public `site_token` from
+`JMILL_RUM_SITE_TOKEN` is the public `site_token` from
 `GET /accounts/{account_id}/rum/site_info/list` for `host=www.jmill.dev`
 and `auto_install=false`. Authenticate that lookup with the existing
 broker-provisioned `rum_api_token` in `sdj/Cloudflare SDJ events`; never pass
 the management token to the build. The deploy token comes from `admin-access`
 with `Workers Scripts Edit` for the configured account. Both preview URLs
 remain tracker-free because analytics only runs on `www.jmill.dev`.
+
+Record the release revision and Worker version, then verify the apex 307 and
+`https://www.jmill.dev/healthz` (`200`, `x-opennext: 1`, `jmill-dev-ready`).
+Smoke-test the canonical site and check analytics below. Leave the Vercel
+project, `vault.jmill.dev`, and mail records alone.
 
 ## Analytics
 
